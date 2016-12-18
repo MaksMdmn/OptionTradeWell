@@ -30,6 +30,7 @@ namespace OptionsTradeWell.model.entities
 
         public void BreakConnection()
         {
+            Console.WriteLine("sup");
             // DUNNO YET
         }
 
