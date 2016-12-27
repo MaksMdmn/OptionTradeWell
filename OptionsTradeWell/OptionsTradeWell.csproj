@@ -61,11 +61,12 @@
     <Compile Include="model\entities\GreeksCalculator.cs" />
     <Compile Include="model\entities\Option.cs" />
     <Compile Include="model\entities\OptionType.cs" />
-    <Compile Include="model\interfaces\IDataHandler.cs" />
+    <Compile Include="model\entities\QuikRowDde.cs" />
+    <Compile Include="model\entities\QuikTableDde.cs" />
     <Compile Include="model\interfaces\ITradable.cs" />
     <Compile Include="model\entities\TradeBlotter.cs" />
     <Compile Include="model\assistants\NativeMethods.cs" />
-    <Compile Include="model\entities\QuikDdeServer.cs" />
+    <Compile Include="model\entities\QuikServerDde.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
