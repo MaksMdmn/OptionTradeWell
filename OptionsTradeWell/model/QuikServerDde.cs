@@ -1,50 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Timers;
 using NDde.Server;
-using OptionsTradeWell.model.interfaces;
+using OptionsTradeWell.assistants;
 
-namespace OptionsTradeWell.model.entities
+namespace OptionsTradeWell.model
 {
     public class QuikServerDde : DdeServer
     {
-
-        private Dictionary<string, QuikTableDde> tablesMap = new Dictionary<string, QuikTableDde>();
         private readonly string serverName;
-        private readonly string splitToken;
         private System.Timers.Timer timer = new System.Timers.Timer();
+        private readonly Dictionary<string, int> topicRowLengthMap;
 
-        public QuikServerDde(string serverName, string splitToken) : base(serverName)
+        public delegate void DataHandlerMethod(string topic, string[] data);
+        public event DataHandlerMethod OnDataUpdate;
+
+        public QuikServerDde(string serverName, Dictionary<string, int> topicRowLengthMap) : base(serverName)
         {
             this.serverName = serverName;
-            this.splitToken = splitToken;
+            this.topicRowLengthMap = topicRowLengthMap;
             timer.Elapsed += this.OnTimerElapsed;
             timer.Interval = 1000;
             timer.SynchronizingObject = this.Context;
         }
-
-        public bool IsConnected()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void EstablishConnection(Dictionary<string, QuikTableDde> topicsTableMap)
-        {
-            if (topicsTableMap == null)
-            {
-                throw new NotImplementedException();
-            }
-            this.tablesMap = topicsTableMap;
-            Register();
-        }
-
-        public void BreakConnection()
-        {
-            throw new NotImplementedException();
-        }
-
-        #region NDDE overriding
 
         public override void Register()
         {
@@ -65,20 +43,30 @@ namespace OptionsTradeWell.model.entities
 
         protected override PokeResult OnPoke(DdeConversation conversation, string item, byte[] data, int format)
         {
-            string key = conversation.Topic;
-            StringBuilder sb = new StringBuilder();
+            int rowLength = topicRowLengthMap[conversation.Topic];
+            string[] dataArr = new string[rowLength];
+            int dataCounter = -2; //because of 2 metadata symbols like: some number (D:) and type
 
-            if (tablesMap.ContainsKey(key))
             {
                 foreach (Object o in XlTableFormat.Read(data))
                 {
-                    sb.Append(o);
-                    sb.Append(splitToken);
+                    dataCounter++;
+                    if (dataCounter < 0)
+                    {
+                        continue;
+                    }
+
+                    dataArr[dataCounter % rowLength] = o.ToString();
+                    if (dataCounter % rowLength == 0)
+                    {
+                        if (OnDataUpdate != null)
+                        {
+                            OnDataUpdate(conversation.Topic, dataArr);
+                        }
+                        dataArr = new string[rowLength];
+                    }
                 }
-
-                tablesMap[key].AddNewDdeData(sb.ToString());
             }
-
 
             return PokeResult.Processed;
         }
@@ -106,6 +94,7 @@ namespace OptionsTradeWell.model.entities
         {
             return null;
         }
+
         protected override bool OnBeforeConnect(string topic)
         {
             return true;
@@ -116,15 +105,10 @@ namespace OptionsTradeWell.model.entities
 
         }
 
-        #endregion
-
         private void OnTimerElapsed(object sender, ElapsedEventArgs args)
         {
             // DUNNO WHAT TO DO, BUD
         }
-
-
-
     }
 }
 

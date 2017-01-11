@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace OptionsTradeWell.model.assistants
+namespace OptionsTradeWell.assistants
 {
     internal static class NativeMethods
     {

@@ -1,13 +1,11 @@
-﻿using OptionsTradeWell.model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using NDde.Server;
-using OptionsTradeWell.model.assistants;
-using OptionsTradeWell.model.entities;
+using OptionsTradeWell.assistants;
 
 namespace OptionsTradeWell
 {
@@ -86,13 +84,6 @@ namespace OptionsTradeWell
             Application.Run(new MainForm());
             NativeMethods.FreeConsole();
         }
-
-        static void printTable(QuikTableDde table)
-        {
-            foreach (QuikRowDde quikRowDde in table.GetAllRows())
-            {
-                Console.WriteLine(quikRowDde.ToString());
-            }
-        }
+        
     }
 }

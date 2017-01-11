@@ -1,7 +1,7 @@
 ﻿using System;
 using OptionsTradeWell.model.interfaces;
 
-namespace OptionsTradeWell.model.entities
+namespace OptionsTradeWell.model
 {
     public class Futures : ITradable
     {

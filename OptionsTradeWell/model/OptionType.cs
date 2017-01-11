@@ -1,4 +1,4 @@
-﻿namespace OptionsTradeWell.model.entities
+﻿namespace OptionsTradeWell.model
 {
     public enum OptionType
     {

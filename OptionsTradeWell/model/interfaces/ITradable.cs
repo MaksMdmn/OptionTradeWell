@@ -1,6 +1,4 @@
-﻿using OptionsTradeWell.model.entities;
-
-namespace OptionsTradeWell.model.interfaces
+﻿namespace OptionsTradeWell.model.interfaces
 {
     public interface ITradable
     {

@@ -1,7 +1,6 @@
 ﻿using System;
-using OptionsTradeWell.model.entities;
 
-namespace OptionsTradeWell.model.entities
+namespace OptionsTradeWell.model
 {
     public static class GreeksCalculator
     {
