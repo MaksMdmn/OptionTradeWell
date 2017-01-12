@@ -8,7 +8,7 @@ namespace OptionsTradeWell.model
         private TradeBlotter blotter = null;
         private static double DAYS_IN_YEAR = 365;
 
-        public Option(Futures futures, OptionType optionType, int remainingDays, double strike, double marginRequirementCover, double marginRequirementNotCover, double marginRequirementBuyer, double priceStep, double priceStepValue, DateTime expirationDate, string ticker)
+        public Option(Futures futures, OptionType optionType,  double strike, double marginRequirementCover, double marginRequirementNotCover, double marginRequirementBuyer, string ticker, double priceStep, double priceStepValue, DateTime expirationDate, int remainingDays)
         {
             this.Futures = futures;
             this.MarginRequirementCover = marginRequirementCover;
@@ -34,11 +34,11 @@ namespace OptionsTradeWell.model
         public double PriceStep { get; }
         public double PriceStepValue { get; }
 
-        public double MarginRequirementCover { get; }
+        public double MarginRequirementCover { get; set; }
 
-        public double MarginRequirementNotCover { get; }
+        public double MarginRequirementNotCover { get; set; }
 
-        public double MarginRequirementBuyer { get; }
+        public double MarginRequirementBuyer { get; set; }
 
         public OptionType OptionType { get; }
 
