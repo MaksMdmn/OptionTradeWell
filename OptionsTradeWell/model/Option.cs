@@ -8,12 +8,16 @@ namespace OptionsTradeWell.model
         private TradeBlotter blotter = null;
         private static double DAYS_IN_YEAR = 365;
 
-        public Option(Futures futures, OptionType optionType, int remainingDays, double strike, double marginRequirementCover, double marginRequirementNoCover, double marginRequirementBuyer)
+        public Option(Futures futures, OptionType optionType, int remainingDays, double strike, double marginRequirementCover, double marginRequirementNotCover, double marginRequirementBuyer, double priceStep, double priceStepValue, DateTime expirationDate, string ticker)
         {
             this.Futures = futures;
             this.MarginRequirementCover = marginRequirementCover;
-            this.MarginRequirementNoCover = marginRequirementNoCover;
+            this.MarginRequirementNotCover = marginRequirementNotCover;
             this.MarginRequirementBuyer = marginRequirementBuyer;
+            this.PriceStep = priceStep;
+            this.PriceStepValue = priceStepValue;
+            this.ExpirationDate = expirationDate;
+            this.Ticker = ticker;
             this.OptionType = optionType;
             this.RemainingDays = remainingDays;
             this.Strike = strike;
@@ -23,14 +27,34 @@ namespace OptionsTradeWell.model
 
         public double RemainingDays { get; }
 
+        public DateTime ExpirationDate { get; }
         public double Strike { get; }
+
+        public string Ticker { get; }
+        public double PriceStep { get; }
+        public double PriceStepValue { get; }
+
         public double MarginRequirementCover { get; }
 
-        public double MarginRequirementNoCover { get; }
+        public double MarginRequirementNotCover { get; }
 
         public double MarginRequirementBuyer { get; }
 
         public OptionType OptionType { get; }
+
+        public double Delta { get; private set; }
+
+        public double Gamma { get; private set; }
+
+        public double Vega { get; private set; }
+
+        public double Theta { get; private set; }
+
+        public double ImplVol { get; private set; }
+
+        public double BuyVol { get; private set; }
+
+        public double SellVol { get; private set; }
 
         public void AssignTradeBlotter(TradeBlotter blotter)
         {
@@ -54,19 +78,6 @@ namespace OptionsTradeWell.model
             return this.blotter;
         }
 
-        public double Delta { get; private set; }
-
-        public double Gamma { get; private set; }
-
-        public double Vega { get; private set; }
-
-        public double Theta { get; private set; }
-
-        public double ImplVol { get; private set; }
-
-        public double BuyVol { get; private set; }
-
-        public double SellVol { get; private set; }
         public void UpdateAllGreeksTogether()
         {
             double optionTime = this.RemainingDays / DAYS_IN_YEAR;

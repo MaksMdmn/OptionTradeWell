@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using OptionsTradeWell.model;
 using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.view.interfaces;

@@ -15,7 +15,7 @@ namespace OptionsTradeWell.model
         public delegate void DataHandlerMethod(string topic, string[] data);
         public event DataHandlerMethod OnDataUpdate;
 
-        public QuikServerDde(string serverName, Dictionary<string, int> topicRowLengthMap) : base(serverName)
+        internal QuikServerDde(string serverName, Dictionary<string, int> topicRowLengthMap) : base(serverName)
         {
             this.serverName = serverName;
             this.topicRowLengthMap = topicRowLengthMap;

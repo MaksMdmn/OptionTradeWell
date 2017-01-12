@@ -4,12 +4,12 @@ using System.Threading;
 
 namespace OptionsTradeWell.view
 {
-    public class DataCollector
+    public class FileDataSaver
     {
-        private string filePath;
-        private Encoding encoding;
+        private readonly string filePath;
+        private readonly Encoding encoding;
 
-        public DataCollector(string filePath, Encoding encoding)
+        public FileDataSaver(string filePath, Encoding encoding)
         {
             this.filePath = filePath;
             this.encoding = encoding;
@@ -17,7 +17,7 @@ namespace OptionsTradeWell.view
 
         public void SaveData(string data)
         {
-            File.AppendAllText(filePath, data, encoding);
+            File.AppendAllText(filePath, data + "\r", encoding);
         }
 
         public string[] GetAllData()
