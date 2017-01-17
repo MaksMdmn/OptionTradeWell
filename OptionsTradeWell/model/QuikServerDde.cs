@@ -57,7 +57,7 @@ namespace OptionsTradeWell.model
                     }
 
                     dataArr[dataCounter % rowLength] = o.ToString();
-                    if (dataCounter % rowLength == 0)
+                    if ((dataCounter + 1) % rowLength == 0 && dataCounter != 0)
                     {
                         if (OnDataUpdate != null)
                         {

@@ -18,5 +18,10 @@
         {
             return BidPrice != null && AskPrice != null && BidSize != null && AskSize != null;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(BidPrice)}: {BidPrice}, {nameof(BidSize)}: {BidSize}, {nameof(AskPrice)}: {AskPrice}, {nameof(AskSize)}: {AskSize}";
+        }
     }
 }

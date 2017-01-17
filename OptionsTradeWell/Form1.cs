@@ -22,6 +22,7 @@ namespace OptionsTradeWell
         private Dictionary<double, OptionsDataRow> rowMap;
         private DataTable optionsDataTable;
         private List<string> columnsNames;
+        private string spotPrice;
 
         public MainForm()
         {
@@ -30,8 +31,12 @@ namespace OptionsTradeWell
             InitializeComponent();
 
             InitializeOptionDeskTable();
-            FulfilByTestData();
-            //SetupLayouts();
+
+            SetupOptionDeskTableLayout();
+
+            SetupChartsLayouts();
+
+            //FulfilByTestData();
 
         }
 
@@ -66,8 +71,6 @@ namespace OptionsTradeWell
             }
 
             dgvOptionDesk.DataSource = optionsDataTable;
-
-            SetupOptionDeskTableLayout();
         }
 
         private void SetupOptionDeskTableLayout()
@@ -122,56 +125,14 @@ namespace OptionsTradeWell
         }
 
 
-        private void SetupLayouts()
+        private void SetupChartsLayouts()
         {
-            SetupOptionDeskTableLayout();
-            SetupImplVolChartLayout();
-            SetupCallVolChartLayout();
-            SetupPutVolChartLayout();
-            //FulfilByTestData();
+
         }
 
-
-        private void SetupImplVolChartLayout()
-        {
-        }
-        private void SetupCallVolChartLayout()
-        {
-        }
-        private void SetupPutVolChartLayout()
-        {
-        }
 
         private void FulfilByTestData()
         {
-            List<double[]> myList = new List<double[]>();
-
-            double[] myTestData1 = new double[17];
-            Random r = new Random();
-
-
-
-
-            for (int i = 0; i < 40; i++)
-            {
-                for (int j = 0; j < 17; j++)
-                {
-                    if (j == 2)
-                    {
-                        myTestData1[2] = i;
-                    }
-                    else
-                    {
-                        myTestData1[j] = (j+1) * r.Next(5, 20);
-                    }
-                }
-                myList.Add(myTestData1);
-                myTestData1 = new double[17];
-
-            }
-
-            ItinializePrimaryViewData(myList, 2);
-
             //double[] chartData1 = { 32.12, 43.11, 3.42, 12, 54, 110, 85.2, 25.3 };
             //double[] chartData2 = { 2.12, 48.11, 13.42, 18, 24, 10, 5.2, 25.3 };
 
@@ -193,19 +154,26 @@ namespace OptionsTradeWell
             //    chrtPutVol.Series[1].Points.AddXY(i, chartData1[i] * rnd.Next(0, 5));
             //}
 
-            toolStripStLbAsset.Text = "BR-02.17";
-            toolStripStLbDaysToExp.Text = "9";
-
-            toolStripPrBrConnection.Value = 100;
+            
 
 
         }
 
-        public void ItinializePrimaryViewData(List<double[]> tableDataList, int uniqueValueIndex)
+        private void HistoryImplVolData()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void UpdatePrimaryViewData(List<double[]> tableDataList, int uniqueValueIndex)
         {
             if (tableDataList.Count == 0)
             {
                 throw new IllegalViewDataException("data for display is incorrect or empty: " + tableDataList);
+            }
+
+            if (optionsDataTable.Rows.Count != 0)
+            {
+                optionsDataTable.Clear();
             }
 
 
@@ -235,14 +203,19 @@ namespace OptionsTradeWell
             midPutVolSeries.ChartType = SeriesChartType.Line;
             midPutVolSeries.Color = Color.DarkRed;
 
+            chrtCallVol.ChartAreas[0].AxisY.Minimum = 0.1;
+            chrtCallVol.ChartAreas[0].AxisY.Maximum = 0.8;
+            chrtPutVol.ChartAreas[0].AxisY.Minimum = 0.1;
+            chrtPutVol.ChartAreas[0].AxisY.Maximum = 0.8;
+
             for (int i = 0; i < tableDataList.Count; i++)
             {
                 //Create and fulfill row in options table
                 OptionsDataRow tempRow = new OptionsDataRow(i, uniqueValueIndex, tableDataList[i]);
                 rowMap.Add(tempRow.GetUniqueValue(), tempRow);
                 optionsDataTable.Rows.Add();
-                FulfilOptionsDataTableRow(tempRow);
 
+                FulfilOptionsDataTableRow(tempRow);
 
                 //use the same data for chart view
 
@@ -266,11 +239,6 @@ namespace OptionsTradeWell
             chrtPutVol.Series.Add(buyPutVolSeries);
             chrtPutVol.Series.Add(sellPutVolSeries);
             chrtPutVol.Series.Add(midPutVolSeries);
-        }
-
-        private void HistoryImplVolData()
-        {
-            //throw new NotImplementedException();
         }
 
         public void UpdateRowInViewDataMap(double[] updatedData, int uniqueValueIndex)
@@ -304,6 +272,41 @@ namespace OptionsTradeWell
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            chrtImplVol.Series[0].Points.Clear();
+            double[] d = new[] { 66, 48.11, 13.42, 112, 24, 10, 52, 25.3 };
+            Random r = new Random();
+
+            for (int i = 0; i < d.Length; i++)
+            {
+                chrtImplVol.Series[0].Points.AddXY(i * r.Next(1, 3), d[i] * r.Next(5, 10));
+            }
+
+            //DataRow row = optionsDataTable.NewRow();
+            //row[0] = 13;
+            //row[1] = 13;
+            //row[2] = 13;
+            //row[3] = 13;
+
+            //optionsDataTable.Rows.InsertAt(row, 0);
+
+            //optionsDataTable.Rows.RemoveAt(optionsDataTable.Rows.Count-1);
+
+            optionsDataTable.Rows.Clear();
+        }
+
+        public void UpdateFuturesData(string[] data)
+        {
+            this.BeginInvoke((Action)(() =>
+               {
+                   this.lblSpotPrice.Text = "" + data[0];
+                   this.toolStripStLbAsset.Text = data[1];
+                   this.toolStripStLbDaysToExp.Text = data[2];
+                   this.toolStripStLbLastUpd.Text = DateTime.Now.ToString();
+                   this.toolStripPrBrConnection.Value = 100; //TODO
+               }));
+        }
 
         private class OptionsDataRow
         {
@@ -369,18 +372,6 @@ namespace OptionsTradeWell
             public double GetMidVolPut()
             {
                 return (GetBuyVolPut() + GetSellVolPut()) / 2;
-            }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            chrtImplVol.Series[0].Points.Clear();
-            double[] d = new[] { 66, 48.11, 13.42, 112, 24, 10, 52, 25.3 };
-            Random r = new Random();
-
-            for (int i = 0; i < d.Length; i++)
-            {
-                chrtImplVol.Series[0].Points.AddXY(i * r.Next(1, 3), d[i] * r.Next(5, 10));
             }
         }
     }

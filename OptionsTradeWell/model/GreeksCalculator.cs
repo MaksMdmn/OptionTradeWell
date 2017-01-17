@@ -4,6 +4,11 @@ namespace OptionsTradeWell.model
 {
     public static class GreeksCalculator
     {
+
+        public static double DAYS_IN_YEAR = 365;
+        public static double MAX_VOLA_VALUE = 3.0;
+        public static int NUMBER_OF_DECIMAL_PLACES = 4;
+
         public static double CalculateDelta(OptionType type, double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
             double result = 0d;
@@ -20,7 +25,7 @@ namespace OptionsTradeWell.model
                     break;
             }
 
-            return result;
+            return GetRoundValue(result);
         }
 
         public static double CalculateDelta(OptionType type, double ditsr_d1)
@@ -38,7 +43,7 @@ namespace OptionsTradeWell.model
                 default:
                     break;
             }
-            return result;
+            return GetRoundValue(result);
         }
 
         public static double CalculateGamma(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
@@ -46,12 +51,12 @@ namespace OptionsTradeWell.model
             double optionTime = daysLeft / daysInYear;
             double d1 = Calculate_d1(spotPrice, strike, daysLeft, daysInYear, vola);
 
-            return GreeksDistribution(d1) / (spotPrice * vola * Math.Sqrt(optionTime));
+            return GetRoundValue(GreeksDistribution(d1) / (spotPrice * vola * Math.Sqrt(optionTime)));
         }
 
         public static double CalculateGamma(double spotPrice, double ditsr_d1, double optionTime, double vola)
         {
-            return ditsr_d1 / (spotPrice * vola * Math.Sqrt(optionTime));
+            return GetRoundValue(ditsr_d1 / (spotPrice * vola * Math.Sqrt(optionTime)));
         }
 
         public static double CalculateVega(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
@@ -59,12 +64,12 @@ namespace OptionsTradeWell.model
             double optionTime = daysLeft / daysInYear;
             double d1 = Calculate_d1(spotPrice, strike, daysLeft, daysInYear, vola);
 
-            return (spotPrice * Math.Sqrt(optionTime) * GreeksDistribution(d1)) / 100;
+            return GetRoundValue((spotPrice * Math.Sqrt(optionTime) * GreeksDistribution(d1)) / 100);
         }
 
         public static double CalculateVega(double spotPrice, double ditsr_d1, double optionTime)
         {
-            return (spotPrice * Math.Sqrt(optionTime) * ditsr_d1) / 100;
+            return GetRoundValue((spotPrice * Math.Sqrt(optionTime) * ditsr_d1) / 100);
         }
 
         public static double CalculateTheta(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
@@ -72,12 +77,12 @@ namespace OptionsTradeWell.model
             double optionTime = daysLeft / daysInYear;
             double d1 = Calculate_d1(spotPrice, strike, daysLeft, daysInYear, vola);
 
-            return -(spotPrice * vola * GreeksDistribution(d1)) / (2 * Math.Sqrt(optionTime)) / daysInYear;
+            return GetRoundValue(-(spotPrice * vola * GreeksDistribution(d1)) / (2 * Math.Sqrt(optionTime)) / daysInYear);
         }
 
         public static double CalculateTheta(double spotPrice, double ditsr_d1, double daysInYear, double optionTime, double vola, bool overloadProblem_nvm)
         {
-            return -(spotPrice * vola * ditsr_d1) / (2 * Math.Sqrt(optionTime)) / daysInYear;
+            return GetRoundValue(-(spotPrice * vola * ditsr_d1) / (2 * Math.Sqrt(optionTime)) / daysInYear);
         }
 
         public static double CalculateOptionPrice_BS(OptionType type, double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
@@ -178,7 +183,11 @@ namespace OptionsTradeWell.model
                 i++;
             }
 
-            return vol1;
+            //double tempResult = GetRoundValue(vol1);
+
+            //return tempResult > MAX_VOLA_VALUE || tempResult < 0 ? 0.00 : tempResult;
+
+            return GetRoundValue(vol1);
         }
 
         public static double GreeksDistribution(double value)
@@ -186,5 +195,18 @@ namespace OptionsTradeWell.model
             double result = 1 / (Math.Sqrt(2 * Math.PI)) * Math.Exp(value * value * 0.5 * -1);
             return result;
         }
+
+        public static double GetFilteredVolatilityValue(double value)
+        {
+            return value > MAX_VOLA_VALUE || value < 0 ? 0.00 : value;
+        }
+
+
+        private static double GetRoundValue(double value)
+        {
+            return Math.Round(value, NUMBER_OF_DECIMAL_PLACES);
+        }
+
+
     }
 }

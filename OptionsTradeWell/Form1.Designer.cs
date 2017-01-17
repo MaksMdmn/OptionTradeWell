@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabSettings = new System.Windows.Forms.TabPage();
             this.chrtPutVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chrtCallVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -50,6 +50,8 @@
             this.toolStripPrBrConnection = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStLbAsset = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStLbDaysToExp = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblSpotPrice = new System.Windows.Forms.Label();
+            this.toolStripStLbLastUpd = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPutVol)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtCallVol)).BeginInit();
@@ -79,12 +81,12 @@
             this.chrtPutVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtPutVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtPutVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea1.Name = "ChartArea1";
-            this.chrtPutVol.ChartAreas.Add(chartArea1);
+            chartArea4.Name = "ChartArea1";
+            this.chrtPutVol.ChartAreas.Add(chartArea4);
             this.chrtPutVol.Location = new System.Drawing.Point(625, 6);
             this.chrtPutVol.Name = "chrtPutVol";
             this.chrtPutVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Chocolate;
-            this.chrtPutVol.Size = new System.Drawing.Size(600, 500);
+            this.chrtPutVol.Size = new System.Drawing.Size(600, 672);
             this.chrtPutVol.TabIndex = 6;
             this.chrtPutVol.Text = "chart3";
             // 
@@ -94,12 +96,12 @@
             this.chrtCallVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtCallVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtCallVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea2.Name = "ChartArea1";
-            this.chrtCallVol.ChartAreas.Add(chartArea2);
+            chartArea5.Name = "ChartArea1";
+            this.chrtCallVol.ChartAreas.Add(chartArea5);
             this.chrtCallVol.Location = new System.Drawing.Point(7, 6);
             this.chrtCallVol.Name = "chrtCallVol";
             this.chrtCallVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Berry;
-            this.chrtCallVol.Size = new System.Drawing.Size(600, 500);
+            this.chrtCallVol.Size = new System.Drawing.Size(600, 672);
             this.chrtCallVol.TabIndex = 4;
             this.chrtCallVol.Text = "chart2";
             // 
@@ -107,6 +109,7 @@
             // 
             this.tabMain.AutoScroll = true;
             this.tabMain.BackColor = System.Drawing.Color.Gainsboro;
+            this.tabMain.Controls.Add(this.lblSpotPrice);
             this.tabMain.Controls.Add(this.chrtImplVol);
             this.tabMain.Controls.Add(this.statusStrip2);
             this.tabMain.Controls.Add(this.button4);
@@ -127,16 +130,16 @@
             this.chrtImplVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtImplVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtImplVol.BorderlineWidth = 5;
-            chartArea3.Name = "ChartArea1";
-            this.chrtImplVol.ChartAreas.Add(chartArea3);
-            this.chrtImplVol.Location = new System.Drawing.Point(34, 450);
+            chartArea6.Name = "ChartArea1";
+            this.chrtImplVol.ChartAreas.Add(chartArea6);
+            this.chrtImplVol.Location = new System.Drawing.Point(34, 367);
             this.chrtImplVol.Name = "chrtImplVol";
             this.chrtImplVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series1.Name = "Series1";
-            this.chrtImplVol.Series.Add(series1);
-            this.chrtImplVol.Size = new System.Drawing.Size(910, 223);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series2.Name = "Series1";
+            this.chrtImplVol.Series.Add(series2);
+            this.chrtImplVol.Size = new System.Drawing.Size(910, 306);
             this.chrtImplVol.TabIndex = 10;
             this.chrtImplVol.Text = "chart1";
             // 
@@ -194,7 +197,7 @@
             this.dgvOptionDesk.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvOptionDesk.Location = new System.Drawing.Point(34, 6);
             this.dgvOptionDesk.Name = "dgvOptionDesk";
-            this.dgvOptionDesk.Size = new System.Drawing.Size(910, 415);
+            this.dgvOptionDesk.Size = new System.Drawing.Size(910, 343);
             this.dgvOptionDesk.TabIndex = 1;
             // 
             // tabs
@@ -235,7 +238,8 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripPrBrConnection,
             this.toolStripStLbAsset,
-            this.toolStripStLbDaysToExp});
+            this.toolStripStLbDaysToExp,
+            this.toolStripStLbLastUpd});
             this.statusStrip1.Location = new System.Drawing.Point(0, 729);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1263, 22);
@@ -244,7 +248,7 @@
             // 
             // toolStripPrBrConnection
             // 
-            this.toolStripPrBrConnection.Margin = new System.Windows.Forms.Padding(50, 3, 150, 3);
+            this.toolStripPrBrConnection.Margin = new System.Windows.Forms.Padding(50, 3, 40, 3);
             this.toolStripPrBrConnection.Name = "toolStripPrBrConnection";
             this.toolStripPrBrConnection.Size = new System.Drawing.Size(100, 16);
             // 
@@ -257,10 +261,28 @@
             // 
             // toolStripStLbDaysToExp
             // 
-            this.toolStripStLbDaysToExp.Margin = new System.Windows.Forms.Padding(0, 3, 1, 2);
+            this.toolStripStLbDaysToExp.Margin = new System.Windows.Forms.Padding(0, 3, 40, 2);
             this.toolStripStLbDaysToExp.Name = "toolStripStLbDaysToExp";
             this.toolStripStLbDaysToExp.Size = new System.Drawing.Size(118, 17);
             this.toolStripStLbDaysToExp.Text = "toolStripStatusLabel2";
+            // 
+            // lblSpotPrice
+            // 
+            this.lblSpotPrice.BackColor = System.Drawing.Color.Gray;
+            this.lblSpotPrice.Font = new System.Drawing.Font("Times New Roman", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblSpotPrice.ForeColor = System.Drawing.Color.Blue;
+            this.lblSpotPrice.Location = new System.Drawing.Point(1128, 6);
+            this.lblSpotPrice.Name = "lblSpotPrice";
+            this.lblSpotPrice.Size = new System.Drawing.Size(100, 42);
+            this.lblSpotPrice.TabIndex = 11;
+            this.lblSpotPrice.Text = "spotPrice";
+            this.lblSpotPrice.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // toolStripStLbLastUpd
+            // 
+            this.toolStripStLbLastUpd.Name = "toolStripStLbLastUpd";
+            this.toolStripStLbLastUpd.Size = new System.Drawing.Size(118, 17);
+            this.toolStripStLbLastUpd.Text = "toolStripStatusLabel1";
             // 
             // MainForm
             // 
@@ -308,6 +330,8 @@
         private System.Windows.Forms.ToolStripProgressBar toolStripPrBrConnection;
         private System.Windows.Forms.StatusStrip statusStrip2;
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtImplVol;
+        private System.Windows.Forms.Label lblSpotPrice;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStLbLastUpd;
     }
 }
 
