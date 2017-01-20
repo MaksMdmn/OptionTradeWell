@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using OptionsTradeWell.model.exceptions;
@@ -19,28 +21,110 @@ namespace OptionsTradeWell
     {
         private static int VIEW_NUMBER_OF_IMPL_VOL_VALUES = 300;
 
-        private Dictionary<double, OptionsDataRow> rowMap;
-        private DataTable optionsDataTable;
+        private double minValueY = 5;
+        private double maxValueY = 80;
+        private double stepY = 5;
+
+        private SortedDictionary<double, OptTableDataRow> rowMap;
         private List<string> columnsNames;
-        private string spotPrice;
+        private System.Timers.Timer statusBarReducingTimer;
+
+        private DataTable optionsDataTable;
+
+        private Series buyCallVolSeries;
+        private Series sellCallVolSeries;
+        private Series midCallVolSeries;
+        private Series buyPutVolSeries;
+        private Series sellPutVolSeries;
+        private Series midPutVolSeries;
 
         public MainForm()
         {
-            rowMap = new Dictionary<double, OptionsDataRow>();
+            statusBarReducingTimer = new System.Timers.Timer();
+            rowMap = new SortedDictionary<double, OptTableDataRow>();
 
             InitializeComponent();
 
-            InitializeOptionDeskTable();
+            InitializeOptionsDataTable();
 
             SetupOptionDeskTableLayout();
 
             SetupChartsLayouts();
 
-            //FulfilByTestData();
+            StartUpdateTimer();
+
+            toolStripPrBrConnection.Value = 100;
+        }
+
+        public void UpdatePrimaryViewData(List<double[]> tableDataList, int uniqueValueIndex)
+        {
+            if (tableDataList.Count == 0)
+            {
+                throw new IllegalViewDataException("data for display is incorrect or empty: " + tableDataList);
+            }
+
+            if (optionsDataTable.Rows.Count != 0)
+            {
+                optionsDataTable.Clear();
+                rowMap.Clear();
+            }
+
+            for (int i = 0; i < tableDataList.Count; i++)
+            {
+                //Create and fulfill row in options table
+                OptTableDataRow tempRow = new OptTableDataRow(i, uniqueValueIndex, tableDataList[i]);
+                rowMap.Add(tempRow.UniqueValue, tempRow);
+                optionsDataTable.Rows.Add();
+
+                FulfilOptionsDataTableRow(tempRow);
+
+                //use the same data for chart view
+
+                //implied volatility chart
+                HistoryImplVolData();
+            }
+        }
+
+
+        public void UpdateRowInViewDataMap(double[] updatedData, int uniqueValueIndex)
+        {
+
+            double tempKey = updatedData[uniqueValueIndex];
+            if (this.rowMap.Count == 0)
+            {
+                throw new IllegalViewDataException("data for display is incorrect or empty: " + this.rowMap);
+            }
+
+            if (this.rowMap.ContainsKey(tempKey))
+            {
+                OptTableDataRow tempRow = this.rowMap[tempKey];
+                tempRow.DataArr = updatedData;
+                FulfilOptionsDataTableRow(tempRow);
+            }
+            else
+            {
+                throw new IllegalViewDataException("row with such a unique value does not exist in table: " + tempKey);
+            }
+        }
+
+        public void UpdateFuturesData(string[] data)
+        {
+            while (this.IsHandleCreated == false)
+            {
+            }
+
+            this.BeginInvoke((Action)(() =>
+            {
+                this.lblSpotPrice.Text = data[0];
+                this.toolStripStLbAsset.Text = string.Format("{0} {1}", "underlying asset:", data[1]);
+                this.toolStripStLbDaysToExp.Text = string.Format("{0} {1}", "opt. days left:", data[2]);
+                this.toolStripStLbLastUpd.Text = string.Format("{0} {1:dd-MM-yyyy HH:mm:ss}", "last update:", DateTime.Now);
+                this.toolStripPrBrConnection.Value = 100; //TODO
+            }));
 
         }
 
-        private void InitializeOptionDeskTable()
+        private void InitializeOptionsDataTable()
         {
             optionsDataTable = new DataTable();
 
@@ -71,6 +155,7 @@ namespace OptionsTradeWell
             }
 
             dgvOptionDesk.DataSource = optionsDataTable;
+
         }
 
         private void SetupOptionDeskTableLayout()
@@ -120,43 +205,107 @@ namespace OptionsTradeWell
             dgvOptionDesk.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.BottomCenter;
 
             dgvOptionDesk.ScrollBars = ScrollBars.Vertical;
-            dgvOptionDesk.Height = 415;
+            dgvOptionDesk.Height = 315;
             dgvOptionDesk.Width = dgvOptionDesk.ColumnCount * 50 + 50 + 10;
+
+            dgvOptionDesk.ScrollBars = ScrollBars.Vertical;
+
         }
 
 
         private void SetupChartsLayouts()
         {
+            Chart[] allCharts = new Chart[] { chrtImplVol, chrtCallVol, chrtPutVol };
+            foreach (Chart chart in allCharts)
+            {
+                chart.BackColor = Color.SlateGray;
+                chart.ChartAreas[0].BackColor = Color.SlateGray;
 
-        }
+                chart.ChartAreas[0].AxisX.LabelStyle.ForeColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisX.MajorTickMark.LineColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisX.MajorGrid.LineColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisX.LineColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisX.ScaleBreakStyle.LineColor = Color.WhiteSmoke;
 
-
-        private void FulfilByTestData()
-        {
-            //double[] chartData1 = { 32.12, 43.11, 3.42, 12, 54, 110, 85.2, 25.3 };
-            //double[] chartData2 = { 2.12, 48.11, 13.42, 18, 24, 10, 5.2, 25.3 };
-
-            //chrtCallVol.Series.Add(new Series());
-            //chrtCallVol.Series.Add(new Series());
-            //chrtPutVol.Series.Add(new Series());
-            //chrtPutVol.Series.Add(new Series());
-
-            //Random rnd = new Random();
-            //for (int i = 0; i < chartData1.Length; i++)
-            //{
-            //    chrtImplVol.Series[0].Points.AddXY(i, chartData1[i]);
-            //    chrtImplVol.Series[0].Points.AddXY(i, chartData1[i]);
-
-            //    chrtCallVol.Series[0].Points.AddXY(i, chartData1[i]);
-            //    chrtCallVol.Series[1].Points.AddXY(i, chartData1[i] * rnd.Next(0, 5));
-
-            //    chrtPutVol.Series[0].Points.AddXY(i, chartData1[i]);
-            //    chrtPutVol.Series[1].Points.AddXY(i, chartData1[i] * rnd.Next(0, 5));
-            //}
-
-            
+                chart.ChartAreas[0].AxisY.LabelStyle.ForeColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisY.MajorTickMark.LineColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisY.MajorGrid.LineColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisY.LineColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisY.ScaleBreakStyle.LineColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
+            }
 
 
+            buyCallVolSeries = new Series();
+            sellCallVolSeries = new Series();
+            midCallVolSeries = new Series();
+            buyPutVolSeries = new Series();
+            sellPutVolSeries = new Series();
+            midPutVolSeries = new Series();
+
+            buyCallVolSeries.ChartType = SeriesChartType.Point;
+            buyCallVolSeries.MarkerStyle = MarkerStyle.Circle;
+            buyCallVolSeries.Color = Color.GreenYellow;
+            buyCallVolSeries.MarkerSize = 10;
+
+            sellCallVolSeries.ChartType = SeriesChartType.Point;
+            sellCallVolSeries.MarkerStyle = MarkerStyle.Circle;
+            sellCallVolSeries.Color = Color.OrangeRed;
+            sellCallVolSeries.MarkerSize = 10;
+
+            midCallVolSeries.ChartType = SeriesChartType.Spline;
+            midCallVolSeries.Color = Color.Aquamarine;
+            midCallVolSeries.MarkerSize = 5;
+
+            buyPutVolSeries.ChartType = SeriesChartType.Point;
+            buyPutVolSeries.MarkerStyle = MarkerStyle.Circle;
+            buyPutVolSeries.Color = Color.GreenYellow;
+            buyPutVolSeries.MarkerSize = 10;
+
+            sellPutVolSeries.ChartType = SeriesChartType.Point;
+            sellPutVolSeries.MarkerStyle = MarkerStyle.Circle;
+            sellPutVolSeries.Color = Color.OrangeRed;
+            sellPutVolSeries.MarkerSize = 10;
+
+            midPutVolSeries.ChartType = SeriesChartType.Spline;
+            midPutVolSeries.Color = Color.DarkRed;
+            midPutVolSeries.MarkerSize = 5;
+
+            chrtCallVol.Series.Add(buyCallVolSeries);
+            chrtCallVol.Series.Add(sellCallVolSeries);
+            chrtCallVol.Series.Add(midCallVolSeries);
+
+            chrtPutVol.Series.Add(buyPutVolSeries);
+            chrtPutVol.Series.Add(sellPutVolSeries);
+            chrtPutVol.Series.Add(midPutVolSeries);
+
+            buyCallVolSeries.XValueMember = "Strike";
+            buyCallVolSeries.YValueMembers = "BuyCallVol";
+            sellCallVolSeries.XValueMember = "Strike";
+            sellCallVolSeries.YValueMembers = "SellCallVol";
+            midCallVolSeries.XValueMember = "Strike";
+            midCallVolSeries.YValueMembers = "MidCallVol";
+
+            buyPutVolSeries.XValueMember = "Strike";
+            buyPutVolSeries.YValueMembers = "BuyPutVol";
+            sellPutVolSeries.XValueMember = "Strike";
+            sellPutVolSeries.YValueMembers = "SellPutVol";
+            midPutVolSeries.XValueMember = "Strike";
+            midPutVolSeries.YValueMembers = "MidPutVol";
+
+            chrtCallVol.DataBindings.DefaultDataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
+            chrtPutVol.DataBindings.DefaultDataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
+
+            chrtCallVol.DataSource = rowMap.Values;
+            chrtPutVol.DataSource = rowMap.Values;
+
+            chrtCallVol.ChartAreas[0].AxisY.Minimum = minValueY;
+            chrtCallVol.ChartAreas[0].AxisY.Maximum = maxValueY;
+            chrtCallVol.ChartAreas[0].AxisY.Interval = stepY;
+
+            chrtPutVol.ChartAreas[0].AxisY.Minimum = minValueY;
+            chrtPutVol.ChartAreas[0].AxisY.Maximum = maxValueY;
+            chrtPutVol.ChartAreas[0].AxisY.Interval = stepY;
         }
 
         private void HistoryImplVolData()
@@ -164,163 +313,96 @@ namespace OptionsTradeWell
             //throw new NotImplementedException();
         }
 
-        public void UpdatePrimaryViewData(List<double[]> tableDataList, int uniqueValueIndex)
+        private void StartUpdateTimer()
         {
-            if (tableDataList.Count == 0)
-            {
-                throw new IllegalViewDataException("data for display is incorrect or empty: " + tableDataList);
-            }
-
-            if (optionsDataTable.Rows.Count != 0)
-            {
-                optionsDataTable.Clear();
-            }
-
-
-            Series buyCallVolSeries = new Series();
-            Series sellCallVolSeries = new Series();
-            Series midCallVolSeries = new Series();
-
-            Series buyPutVolSeries = new Series();
-            Series sellPutVolSeries = new Series();
-            Series midPutVolSeries = new Series();
-
-            buyCallVolSeries.ChartType = SeriesChartType.Point;
-            buyCallVolSeries.Color = Color.OrangeRed;
-
-            sellCallVolSeries.ChartType = SeriesChartType.Point;
-            sellCallVolSeries.Color = Color.Green;
-
-            midCallVolSeries.ChartType = SeriesChartType.Line;
-            midCallVolSeries.Color = Color.DarkSlateGray;
-
-            buyPutVolSeries.ChartType = SeriesChartType.Point;
-            buyPutVolSeries.Color = Color.OrangeRed;
-
-            sellPutVolSeries.ChartType = SeriesChartType.Point;
-            sellPutVolSeries.Color = Color.Green;
-
-            midPutVolSeries.ChartType = SeriesChartType.Line;
-            midPutVolSeries.Color = Color.DarkRed;
-
-            chrtCallVol.ChartAreas[0].AxisY.Minimum = 0.1;
-            chrtCallVol.ChartAreas[0].AxisY.Maximum = 0.8;
-            chrtPutVol.ChartAreas[0].AxisY.Minimum = 0.1;
-            chrtPutVol.ChartAreas[0].AxisY.Maximum = 0.8;
-
-            for (int i = 0; i < tableDataList.Count; i++)
-            {
-                //Create and fulfill row in options table
-                OptionsDataRow tempRow = new OptionsDataRow(i, uniqueValueIndex, tableDataList[i]);
-                rowMap.Add(tempRow.GetUniqueValue(), tempRow);
-                optionsDataTable.Rows.Add();
-
-                FulfilOptionsDataTableRow(tempRow);
-
-                //use the same data for chart view
-
-                //implied volatility chart
-                HistoryImplVolData();
-
-                //call volatility chart
-                buyCallVolSeries.Points.AddXY(tempRow.GetUniqueValue(), tempRow.GetBuyVolCall());
-                sellCallVolSeries.Points.AddXY(tempRow.GetUniqueValue(), tempRow.GetSellVolCall());
-                midCallVolSeries.Points.AddXY(tempRow.GetUniqueValue(), tempRow.GetMidVolCall());
-
-                //put volatility chart
-                buyPutVolSeries.Points.AddXY(tempRow.GetUniqueValue(), tempRow.GetBuyVolPut());
-                sellPutVolSeries.Points.AddXY(tempRow.GetUniqueValue(), tempRow.GetSellVolPut());
-                midPutVolSeries.Points.AddXY(tempRow.GetUniqueValue(), tempRow.GetMidVolPut());
-            }
-
-            chrtCallVol.Series.Add(buyCallVolSeries);
-            chrtCallVol.Series.Add(sellCallVolSeries);
-            chrtCallVol.Series.Add(midCallVolSeries);
-            chrtPutVol.Series.Add(buyPutVolSeries);
-            chrtPutVol.Series.Add(sellPutVolSeries);
-            chrtPutVol.Series.Add(midPutVolSeries);
+            statusBarReducingTimer.Elapsed += StatusBarReducingTimer_Elapsed;
+            statusBarReducingTimer.Interval = 500;
+            statusBarReducingTimer.Enabled = true;
         }
 
-        public void UpdateRowInViewDataMap(double[] updatedData, int uniqueValueIndex)
+        private void StatusBarReducingTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            double tempKey = updatedData[uniqueValueIndex];
-            if (this.rowMap.Count == 0)
+            while (this.IsHandleCreated == false)
             {
-                throw new IllegalViewDataException("data for display is incorrect or empty: " + this.rowMap);
             }
 
-            if (this.rowMap.ContainsKey(tempKey))
+            this.BeginInvoke((Action)(() =>
             {
-                OptionsDataRow tempRow = this.rowMap[tempKey];
-                tempRow.DataArr = updatedData;
-                FulfilOptionsDataTableRow(tempRow);
+                int tempVal = toolStripPrBrConnection.Value;
+                if (tempVal > 0)
+                {
+                    toolStripPrBrConnection.Value = tempVal - 2;
+
+                    chrtCallVol.DataBind();
+                    chrtPutVol.DataBind();
+                }
+            }));
+        }
 
 
-                //charts add too!!!
-            }
-            else
+        private void FulfilOptionsDataTableRow(OptTableDataRow row)
+        {
+            for (int i = 0; i < row.DataArr.Length; i++)
             {
-                throw new IllegalViewDataException("row with such a unique value does not exist in table: " + tempKey);
+                if (i == row.buyVollCallIndex 
+                    || i == row.sellVollCallIndex
+                    || i == row.buyVollPutIndex
+                    || i == row.sellVollPutIndex)
+                {
+                    optionsDataTable.Rows[row.RowNumber][i] = row.DataArr[i] * 100 + "%";
+                }
+                else
+                {
+                    optionsDataTable.Rows[row.RowNumber][i] = row.DataArr[i];
+                }
             }
         }
 
-        private void FulfilOptionsDataTableRow(OptionsDataRow row)
+        private void SafetyMethodExecution(Action method)
         {
-            for (int i = 0; i < row.GetDataArrLength(); i++)
+            while (this.IsHandleCreated == false)
             {
-                optionsDataTable.Rows[row.RowNumber][i] = row.DataArr[i];
             }
+
+            this.BeginInvoke((Action)(() =>
+            {
+                method();
+            }));
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            chrtImplVol.Series[0].Points.Clear();
-            double[] d = new[] { 66, 48.11, 13.42, 112, 24, 10, 52, 25.3 };
-            Random r = new Random();
 
-            for (int i = 0; i < d.Length; i++)
-            {
-                chrtImplVol.Series[0].Points.AddXY(i * r.Next(1, 3), d[i] * r.Next(5, 10));
-            }
+            //chrtImplVol.Series[0].Points.Clear();
+            //double[] d = new[] { 66, 48.11, 13.42, 112, 24, 10, 52, 25.3 };
+            //Random r = new Random();
 
-            //DataRow row = optionsDataTable.NewRow();
-            //row[0] = 13;
-            //row[1] = 13;
-            //row[2] = 13;
-            //row[3] = 13;
+            //for (int i = 0; i < d.Length; i++)
+            //{
+            //    chrtImplVol.Series[0].Points.AddXY(i * r.Next(1, 3), d[i] * r.Next(5, 10));
+            //}
 
-            //optionsDataTable.Rows.InsertAt(row, 0);
+            //buyCallVolSeries.Points.DataBind();
 
-            //optionsDataTable.Rows.RemoveAt(optionsDataTable.Rows.Count-1);
-
-            optionsDataTable.Rows.Clear();
         }
 
-        public void UpdateFuturesData(string[] data)
+        private class OptTableDataRow
         {
-            this.BeginInvoke((Action)(() =>
-               {
-                   this.lblSpotPrice.Text = "" + data[0];
-                   this.toolStripStLbAsset.Text = data[1];
-                   this.toolStripStLbDaysToExp.Text = data[2];
-                   this.toolStripStLbLastUpd.Text = DateTime.Now.ToString();
-                   this.toolStripPrBrConnection.Value = 100; //TODO
-               }));
-        }
+            internal readonly int buyVollCallIndex = 5;
+            internal readonly int sellVollCallIndex = 6;
+            internal readonly int buyVollPutIndex = 7;
+            internal readonly int sellVollPutIndex = 8;
 
-        private class OptionsDataRow
-        {
-            private static int BUY_VOLL_CALL_INDEX = 6;
-            private static int SELL_VOLL_CALL_INDEX = 7;
-            private static int BUY_VOLL_PUT_INDEX = 8;
-            private static int SELL_VOLL_PUT_INDEX = 9;
+            private double[] dataArr;
 
-            public OptionsDataRow(int rowNumber, int uniqueValueInDataArrIndex, double[] dataArr)
+            public OptTableDataRow(int rowNumber, int uniqueValueInDataArrIndex, double[] dataArr)
             {
                 RowNumber = rowNumber;
                 UniqueValueInDataArrIndex = uniqueValueInDataArrIndex;
                 DataArr = dataArr;
+                SetValuesFromDataArr();
             }
+
             public int RowNumber
             {
                 get; private set;
@@ -331,50 +413,49 @@ namespace OptionsTradeWell
             }
             public double[] DataArr
             {
-                get; set;
+                get { return dataArr; }
+                set
+                {
+                    this.dataArr = value;
+                    SetValuesFromDataArr();
+                }
             }
 
-            public double GetUniqueValue()
+            public double UniqueValue
             {
-                return DataArr[UniqueValueInDataArrIndex];
+                get
+                {
+                    return DataArr[UniqueValueInDataArrIndex];
+                }
             }
 
-            public int GetDataArrLength()
-            {
-                return DataArr.Length;
-            }
+            public double Strike { get; set; }
 
-            public double GetBuyVolCall()
-            {
-                return DataArr[BUY_VOLL_CALL_INDEX];
-            }
+            public double BuyCallVol { get; set; }
 
-            public double GetSellVolCall()
-            {
-                return DataArr[SELL_VOLL_CALL_INDEX];
-            }
+            public double SellCallVol { get; set; }
 
-            public double GetBuyVolPut()
-            {
-                return DataArr[BUY_VOLL_PUT_INDEX];
-            }
+            public double MidCallVol { get; set; }
 
-            public double GetSellVolPut()
-            {
-                return DataArr[SELL_VOLL_PUT_INDEX];
-            }
+            public double BuyPutVol { get; set; }
 
-            public double GetMidVolCall()
-            {
-                return (GetBuyVolCall() + GetSellVolCall()) / 2;
-            }
+            public double SellPutVol { get; set; }
 
-            public double GetMidVolPut()
+            public double MidPutVol { get; set; }
+
+            private void SetValuesFromDataArr()
             {
-                return (GetBuyVolPut() + GetSellVolPut()) / 2;
+                Strike = DataArr[UniqueValueInDataArrIndex];
+                BuyCallVol = DataArr[buyVollCallIndex] * 100.0;
+                SellCallVol = DataArr[sellVollCallIndex] * 100.0;
+                MidCallVol = ((DataArr[buyVollCallIndex] + DataArr[sellVollCallIndex]) / 2.0) * 100.0;
+                BuyPutVol = DataArr[buyVollPutIndex] * 100.0;
+                SellPutVol = DataArr[sellVollPutIndex] * 100.0;
+                MidPutVol = ((DataArr[buyVollPutIndex] + DataArr[sellVollPutIndex]) / 2.0) * 100.0;
             }
         }
+
+
     }
-
-
 }
+

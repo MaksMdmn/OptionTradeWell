@@ -26,13 +26,9 @@ namespace OptionsTradeWell
 
             //NativeMethods.AllocConsole();
 
-            ITerminalOptionDataCollector dataCollector = new OptionsQuikDdeDataCollector(14);
+            ITerminalOptionDataCollector dataCollector = new OptionsQuikDdeDataCollector(18);
             IDerivativesDataRender dataRender = new DerivativesDataRender();
             MainForm mainForm = new MainForm();
-
-            dataCollector.EstablishConnection();
-
-            Thread.Sleep(5000);
 
             MainPresenter presenter = new MainPresenter(dataCollector, mainForm, dataRender);
 

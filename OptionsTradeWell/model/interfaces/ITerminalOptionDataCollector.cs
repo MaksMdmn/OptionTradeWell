@@ -5,7 +5,7 @@ namespace OptionsTradeWell.model.interfaces
     public interface ITerminalOptionDataCollector : ITerminalDataCollector
     {
         event EventHandler<OptionEventArgs> OnOptionsDeskChanged;
-        event EventHandler<FuturesEventArgs> OnSpotPriceChanged;
+        event EventHandler<OptionEventArgs> OnSpotPriceChanged;
         event EventHandler OnBasedParametersChanged;
 
         int NumberOfTrackingOptions { get; set; }
@@ -20,18 +20,6 @@ namespace OptionsTradeWell.model.interfaces
         Option GetOption(double strike, OptionType type);
         double CalculateMinImportantStrike();
         double CalculateMaxImportantStrike();
-    }
-
-    public class FuturesEventArgs : EventArgs
-    {
-        public Futures fut;
-        public int optionDaysToExp;
-
-        public FuturesEventArgs(Futures fut, int optionDaysToExp)
-        {
-            this.fut = fut;
-            this.optionDaysToExp = optionDaysToExp;
-        }
     }
 
     public class OptionEventArgs : EventArgs

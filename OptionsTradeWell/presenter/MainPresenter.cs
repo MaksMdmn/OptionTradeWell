@@ -27,6 +27,13 @@ namespace OptionsTradeWell.presenter
             this.dataRender = dataRender;
             fileDataSaver = new FileDataSaver(FILE_PATH, Encoding.GetEncoding("windows-1251")); //hardcore D:
 
+            dataCollector.EstablishConnection();
+
+            while (!dataCollector.IsConnected())
+            {
+
+            }
+
             dataCollector.OnOptionsDeskChanged += DataCollector_OnOptionsDeskChanged;
             dataCollector.OnSpotPriceChanged += DataCollector_OnSpotPriceChanged;
             dataCollector.OnBasedParametersChanged += DataCollector_OnBasedParametersChanged;
@@ -61,13 +68,13 @@ namespace OptionsTradeWell.presenter
             mainForm.UpdateRowInViewDataMap(tempData, UNIQUE_STRIKE_INDEX_IN_ARRAY);
         }
 
-        private void DataCollector_OnSpotPriceChanged(object sender, FuturesEventArgs e)
+        private void DataCollector_OnSpotPriceChanged(object sender, OptionEventArgs e)
         {
             string[] data = new[]
             {
-                Convert.ToString(e.fut.GetTradeBlotter().AskPrice),
-                e.fut.Ticker,
-                Convert.ToString(e.optionDaysToExp)
+                Convert.ToString(e.opt.Futures.GetTradeBlotter().AskPrice),
+                e.opt.Futures.Ticker,
+                Convert.ToString(e.opt.RemainingDays)
 
             };
             mainForm.UpdateFuturesData(data);

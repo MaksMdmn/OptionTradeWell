@@ -10,20 +10,26 @@ namespace OptionsTradeWell.model
         private static string SERVER_NAME = "OTWserver";
         private static string OPTIONS_DESK = "OPTIONS_DESK";
         private static string FUTURES_DESK = "FUTURES_DESK";
+        private static double MINIMUM_UPDATE_TIME_SEC = 10.0;
 
         private static Dictionary<string, int> TOPICS_AND_ROWS_LENGTH_MAP = CreateCustomDdeTableMap();
 
         public event EventHandler<OptionEventArgs> OnOptionsDeskChanged;
-        public event EventHandler<FuturesEventArgs> OnSpotPriceChanged;
+        public event EventHandler<OptionEventArgs> OnSpotPriceChanged;
         public event EventHandler OnBasedParametersChanged;
 
         private QuikServerDde server;
         private Dictionary<double, Option> callMap;
         private Dictionary<double, Option> putMap;
-        //default values
+
         private Futures basicFutures;
+        private Option infoOption;
         private int numberOfTrackingOptions;
         private double lastTrackingStrike;
+        private DateTime lastTrackingUpdate;
+
+        private bool futRecievedDataFlag;
+        private bool optRecievedDataFlag;
 
         public OptionsQuikDdeDataCollector(int numberOfTrackingOptions)
         {
@@ -42,6 +48,10 @@ namespace OptionsTradeWell.model
             this.callMap = new Dictionary<double, Option>();
             this.putMap = new Dictionary<double, Option>();
             this.lastTrackingStrike = 0.0;
+            this.lastTrackingUpdate = DateTime.Now;
+
+            this.futRecievedDataFlag = false;
+            this.optRecievedDataFlag = false;
         }
 
         private static Dictionary<string, int> CreateCustomDdeTableMap()
@@ -71,7 +81,7 @@ namespace OptionsTradeWell.model
 
         public bool IsConnected()
         {
-            return server.IsRegistered;
+            return server.IsRegistered && futRecievedDataFlag && optRecievedDataFlag;
         }
 
         public void EstablishConnection()
@@ -151,6 +161,11 @@ namespace OptionsTradeWell.model
 
         private void CollectAndSortServerDataByMaps(string topic, string[] data)
         {
+            if (futRecievedDataFlag == false || optRecievedDataFlag == false)
+            {
+                CheckConnectionFlags();
+            }
+
             //DDE ORDER IS: futures -> options
             if (topic.Equals(FUTURES_DESK))
             {
@@ -185,20 +200,17 @@ namespace OptionsTradeWell.model
                     futuresBlotter.AskSize = Convert.ToDouble(data[9]);
                 }
 
-                if (OnSpotPriceChanged != null)
+                if (OnSpotPriceChanged != null && infoOption != null)
                 {
-                    int tempOptExpDays = 0;
-                    if (callMap.Count != 0)
-                    {
-                        tempOptExpDays = Convert.ToInt32(callMap[CalculateTrackingStrike()].RemainingDays);
-                    }
-
-                    OnSpotPriceChanged(this, new FuturesEventArgs(basicFutures, tempOptExpDays));
+                    OnSpotPriceChanged(this, new OptionEventArgs(infoOption));
                 }
 
 
-                if (OnBasedParametersChanged != null && Math.Abs(lastTrackingStrike - CalculateTrackingStrike()) > 0.01)
+                if (OnBasedParametersChanged != null 
+                    && Math.Abs(lastTrackingStrike - CalculateTrackingStrike()) > 0.01
+                    && DateTime.Now > lastTrackingUpdate)
                 {
+                    lastTrackingUpdate = DateTime.Now.AddSeconds(MINIMUM_UPDATE_TIME_SEC);
                     OnBasedParametersChanged(this, EventArgs.Empty);
                 }
             }
@@ -251,6 +263,14 @@ namespace OptionsTradeWell.model
                     tempOption.AssignTradeBlotter(optionsBlotter);
 
                     suitOptionsMap.Add(strike, tempOption);
+
+                }
+
+
+                if (infoOption == null)
+                {
+                    //just for access to general options field
+                    infoOption = suitOptionsMap[strike];
                 }
 
                 if (OnOptionsDeskChanged != null)
@@ -263,6 +283,23 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("table with a such name wasn't mapped: " + TOPICS_AND_ROWS_LENGTH_MAP.Keys);
             }
 
+        }
+
+        private void CheckConnectionFlags()
+        {
+            if (basicFutures != null)
+            {
+                futRecievedDataFlag = true;
+            }
+
+            if (futRecievedDataFlag == true
+                && callMap.ContainsKey(CalculateMinImportantStrike())
+                && callMap.ContainsKey(CalculateMaxImportantStrike())
+                && putMap.ContainsKey(CalculateMinImportantStrike())
+                && putMap.ContainsKey(CalculateMaxImportantStrike()))
+            {
+                optRecievedDataFlag = true;
+            }
         }
 
         private Dictionary<double, Option> GetSuitableOptionsMap(OptionType type)
