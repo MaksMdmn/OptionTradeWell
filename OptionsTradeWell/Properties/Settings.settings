@@ -1,7 +1,51 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OptionsTradeWell.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ServerName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OTWserver</Value>
+    </Setting>
+    <Setting Name="FuturesTableName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">FUTURES_DESK</Value>
+    </Setting>
+    <Setting Name="OptionsTableName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OPTIONS_DESK</Value>
+    </Setting>
+    <Setting Name="UniqueIndexInDdeDataArray" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="AutoWrittingToFileMs" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
+    <Setting Name="PathToVolatilityFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\\programming\\c# here\\Project\\OptionsTradeWell\\OptionsTradeWell\\assistants\\data.txt</Value>
+    </Setting>
+    <Setting Name="NumberOfTrackingOptions" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">18</Value>
+    </Setting>
+    <Setting Name="DaysInYear" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">365</Value>
+    </Setting>
+    <Setting Name="RoundTo" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="MaxValueOfImplVol" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="MinActualStrikeUpdateTimeSec" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="DisplayedPeriodOfImplVol" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="ChartsMinYValue" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="ChartsMaxYValue" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="ChartsStepYValue" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

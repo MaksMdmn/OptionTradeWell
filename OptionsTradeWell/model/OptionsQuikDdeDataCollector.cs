@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.model.interfaces;
+using OptionsTradeWell.Properties;
 
 namespace OptionsTradeWell.model
 {
     public class OptionsQuikDdeDataCollector : ITerminalOptionDataCollector
     {
-        private static string SERVER_NAME = "OTWserver";
-        private static string OPTIONS_DESK = "OPTIONS_DESK";
-        private static string FUTURES_DESK = "FUTURES_DESK";
-        private static double MINIMUM_UPDATE_TIME_SEC = 10.0;
+        private static string SERVER_NAME = Settings.Default.ServerName;
+        private static string OPTIONS_DESK = Settings.Default.OptionsTableName;
+        private static string FUTURES_DESK = Settings.Default.FuturesTableName;
+        private static double MINIMUM_UPDATE_TIME_SEC = Settings.Default.MinActualStrikeUpdateTimeSec;
 
         private static Dictionary<string, int> TOPICS_AND_ROWS_LENGTH_MAP = CreateCustomDdeTableMap();
 
@@ -141,7 +142,7 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("Basic futures still null : " + basicFutures);
             }
 
-            return CalculateTrackingStrike() - NumberOfTrackingOptions / 2;
+            return CalculateActualStrike() - NumberOfTrackingOptions / 2;
         }
 
         public double CalculateMaxImportantStrike()
@@ -151,7 +152,12 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("Basic futures still null : " + basicFutures);
             }
 
-            return CalculateTrackingStrike() + NumberOfTrackingOptions / 2;
+            return CalculateActualStrike() + NumberOfTrackingOptions / 2;
+        }
+
+        public double CalculateActualStrike()
+        {
+            return Math.Round(basicFutures.GetTradeBlotter().AskPrice, 0);
         }
 
         public Option GetOption(double strike, OptionType type)
@@ -189,7 +195,7 @@ namespace OptionsTradeWell.model
                         priceStepValue);
                     basicFutures.AssignTradeBlotter(futuresBlotter);
 
-                    lastTrackingStrike = CalculateTrackingStrike();
+                    lastTrackingStrike = CalculateActualStrike();
                 }
                 else
                 {
@@ -207,7 +213,7 @@ namespace OptionsTradeWell.model
 
 
                 if (OnBasedParametersChanged != null 
-                    && Math.Abs(lastTrackingStrike - CalculateTrackingStrike()) > 0.01
+                    && Math.Abs(lastTrackingStrike - CalculateActualStrike()) > 0.01
                     && DateTime.Now > lastTrackingUpdate)
                 {
                     lastTrackingUpdate = DateTime.Now.AddSeconds(MINIMUM_UPDATE_TIME_SEC);
@@ -311,11 +317,6 @@ namespace OptionsTradeWell.model
         {
             basicFutures = new Futures("", DateTime.Now, 0.0, 0.0, 0.0, 0.0); //HERE'S A LOT OF SHIT CAN BE
             DateTime expirationDate = DateTime.Now;
-        }
-
-        private double CalculateTrackingStrike()
-        {
-            return Math.Round(basicFutures.GetTradeBlotter().AskPrice, 0);
         }
     }
 }

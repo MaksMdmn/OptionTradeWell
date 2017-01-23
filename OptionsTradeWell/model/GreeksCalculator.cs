@@ -1,13 +1,14 @@
 ﻿using System;
+using OptionsTradeWell.Properties;
 
 namespace OptionsTradeWell.model
 {
     public static class GreeksCalculator
     {
 
-        public static double DAYS_IN_YEAR = 365;
-        public static double MAX_VOLA_VALUE = 3.0;
-        public static int NUMBER_OF_DECIMAL_PLACES = 4;
+        public static double DAYS_IN_YEAR = Settings.Default.DaysInYear;
+        public static double MAX_VOLA_VALUE = Settings.Default.MaxValueOfImplVol;
+        public static int NUMBER_OF_DECIMAL_PLACES = Settings.Default.RoundTo;
 
         public static double CalculateDelta(OptionType type, double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
@@ -114,6 +115,8 @@ namespace OptionsTradeWell.model
             double interestRate = 0.0;
             double optionTime = daysLeft / daysInYear;
 
+            double tempRes = (Math.Log(spotPrice / strike) + (interestRate + (vola * vola) / 2.0) * optionTime) / (vola * Math.Sqrt(optionTime));
+
             return (Math.Log(spotPrice / strike) + (interestRate + (vola * vola) / 2.0) * optionTime) / (vola * Math.Sqrt(optionTime));
         }
         public static double Calculate_d2(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
@@ -151,6 +154,11 @@ namespace OptionsTradeWell.model
             return result;
         }
 
+        public static double GreeksDistribution(double value)
+        {
+            double result = Math.Exp(value * value * 0.5 * -1) / (Math.Sqrt(2 * Math.PI));
+            return result;
+        }
 
         public static double CalculateImpliedVolatility(OptionType type, double spotPrice, double strike, double daysLeft, double daysInYear, double optionPrice, double volaGuess)
         {
@@ -188,12 +196,6 @@ namespace OptionsTradeWell.model
             //return tempResult > MAX_VOLA_VALUE || tempResult < 0 ? 0.00 : tempResult;
 
             return GetRoundValue(vol1);
-        }
-
-        public static double GreeksDistribution(double value)
-        {
-            double result = 1 / (Math.Sqrt(2 * Math.PI)) * Math.Exp(value * value * 0.5 * -1);
-            return result;
         }
 
         public static double GetFilteredVolatilityValue(double value)

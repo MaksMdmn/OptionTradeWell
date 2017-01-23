@@ -94,32 +94,34 @@ namespace OptionsTradeWell.model
             }
             else
             {
+                double deltaDistr_d1 = GreeksCalculator.CalculateDistributionOfStNrmDstr(GreeksCalculator.Calculate_d1(spotPrice, this.Strike, this.RemainingDays, GreeksCalculator.DAYS_IN_YEAR, vola));
                 double distr_d1 = GreeksCalculator.GreeksDistribution(GreeksCalculator.Calculate_d1(spotPrice, this.Strike, this.RemainingDays, GreeksCalculator.DAYS_IN_YEAR, vola));
 
-                Delta = GreeksCalculator.CalculateDelta(this.OptionType, distr_d1);
+                Delta = GreeksCalculator.CalculateDelta(this.OptionType, deltaDistr_d1);
                 Gamma = GreeksCalculator.CalculateGamma(spotPrice, distr_d1, optionTime, vola);
                 Vega = GreeksCalculator.CalculateVega(spotPrice, distr_d1, optionTime);
-                Theta = GreeksCalculator.CalculateTheta(spotPrice, this.Strike, this.RemainingDays, GreeksCalculator.DAYS_IN_YEAR, vola, true);
+                Theta = GreeksCalculator.CalculateTheta(spotPrice, distr_d1, GreeksCalculator.DAYS_IN_YEAR, optionTime, vola, true);
             }
+
 
             ImplVol = vola;
             BuyVol = GreeksCalculator.GetFilteredVolatilityValue(
                 GreeksCalculator.CalculateImpliedVolatility(
-                    this.OptionType, 
-                    spotPrice, 
-                    this.Strike, 
-                    this.RemainingDays, 
+                    this.OptionType,
+                    spotPrice,
+                    this.Strike,
+                    this.RemainingDays,
                     GreeksCalculator.DAYS_IN_YEAR,
                     this.GetTradeBlotter().AskPrice,
                     0.5));
             SellVol = GreeksCalculator.GetFilteredVolatilityValue(
                 GreeksCalculator.CalculateImpliedVolatility(
-                    this.OptionType, 
-                    spotPrice, 
-                    this.Strike, 
-                    this.RemainingDays, 
+                    this.OptionType,
+                    spotPrice,
+                    this.Strike,
+                    this.RemainingDays,
                     GreeksCalculator.DAYS_IN_YEAR,
-                    this.GetTradeBlotter().BidPrice, 
+                    this.GetTradeBlotter().BidPrice,
                     0.5));
 
         }
@@ -127,6 +129,16 @@ namespace OptionsTradeWell.model
         public override string ToString()
         {
             return $"{nameof(RemainingDays)}: {RemainingDays}, {nameof(ExpirationDate)}: {ExpirationDate}, {nameof(Strike)}: {Strike}, {nameof(Ticker)}: {Ticker}, {nameof(PriceStep)}: {PriceStep}, {nameof(PriceStepValue)}: {PriceStepValue}, {nameof(MarginRequirementCover)}: {MarginRequirementCover}, {nameof(MarginRequirementNotCover)}: {MarginRequirementNotCover}, {nameof(MarginRequirementBuyer)}: {MarginRequirementBuyer}, {nameof(OptionType)}: {OptionType}, {nameof(Delta)}: {Delta}, {nameof(Gamma)}: {Gamma}, {nameof(Vega)}: {Vega}, {nameof(Theta)}: {Theta}, {nameof(ImplVol)}: {ImplVol}, {nameof(BuyVol)}: {BuyVol}, {nameof(SellVol)}: {SellVol}";
+        }
+
+        public string ShowGreeks()
+        {
+            return "Type: " + OptionType + "\n"
+                   + "Delta: " + Delta + "\n"
+                   + "Gamma: " + Gamma + "\n"
+                   + "Vega: " + Vega + "\n"
+                   + "Theta: " + Theta + "\n"
+                   + "ImplVol, BuyVol, SellVol:  " + ImplVol + " | " + BuyVol + " | " + SellVol;
         }
 
     }

@@ -20,6 +20,7 @@ namespace OptionsTradeWell.model.interfaces
         Option GetOption(double strike, OptionType type);
         double CalculateMinImportantStrike();
         double CalculateMaxImportantStrike();
+        double CalculateActualStrike();
     }
 
     public class OptionEventArgs : EventArgs

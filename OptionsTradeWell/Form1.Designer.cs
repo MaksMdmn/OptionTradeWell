@@ -28,10 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             this.tabSettings = new System.Windows.Forms.TabPage();
             this.chrtPutVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chrtCallVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -39,14 +38,45 @@
             this.lblSpotPrice = new System.Windows.Forms.Label();
             this.chrtImplVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.statusStrip2 = new System.Windows.Forms.StatusStrip();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnStart = new System.Windows.Forms.Button();
             this.dgvOptionDesk = new System.Windows.Forms.DataGridView();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.btnSetDefaultSettings = new System.Windows.Forms.Button();
+            this.btnSaveSettings = new System.Windows.Forms.Button();
+            this.txBxStepYValue = new System.Windows.Forms.TextBox();
+            this.txBxMaxYValue = new System.Windows.Forms.TextBox();
+            this.txBxMinYValue = new System.Windows.Forms.TextBox();
+            this.txBxImplVolPeriodsDisplayedNumbers = new System.Windows.Forms.TextBox();
+            this.txBxCentralStrChangeTimeSec = new System.Windows.Forms.TextBox();
+            this.txBxMaxVolValue = new System.Windows.Forms.TextBox();
+            this.txBxRounding = new System.Windows.Forms.TextBox();
+            this.txBxDaysInYear = new System.Windows.Forms.TextBox();
+            this.txBxNumberOfTrackOpt = new System.Windows.Forms.TextBox();
+            this.txBxPathToVolFile = new System.Windows.Forms.TextBox();
+            this.txBxAutoWrtTimeMs = new System.Windows.Forms.TextBox();
+            this.txBxUniqueIndx = new System.Windows.Forms.TextBox();
+            this.txBxOptTableName = new System.Windows.Forms.TextBox();
+            this.txBxServName = new System.Windows.Forms.TextBox();
+            this.txBxFutTableName = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripPrBrConnection = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStLbAsset = new System.Windows.Forms.ToolStripStatusLabel();
@@ -60,7 +90,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvOptionDesk)).BeginInit();
             this.tabs.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -82,8 +111,8 @@
             this.chrtPutVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtPutVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtPutVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea1.Name = "ChartArea1";
-            this.chrtPutVol.ChartAreas.Add(chartArea1);
+            chartArea4.Name = "ChartArea1";
+            this.chrtPutVol.ChartAreas.Add(chartArea4);
             this.chrtPutVol.Location = new System.Drawing.Point(665, 6);
             this.chrtPutVol.Name = "chrtPutVol";
             this.chrtPutVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Chocolate;
@@ -97,8 +126,8 @@
             this.chrtCallVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtCallVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtCallVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea2.Name = "ChartArea1";
-            this.chrtCallVol.ChartAreas.Add(chartArea2);
+            chartArea5.Name = "ChartArea1";
+            this.chrtCallVol.ChartAreas.Add(chartArea5);
             this.chrtCallVol.Location = new System.Drawing.Point(12, 6);
             this.chrtCallVol.Name = "chrtCallVol";
             this.chrtCallVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Berry;
@@ -113,10 +142,7 @@
             this.tabMain.Controls.Add(this.lblSpotPrice);
             this.tabMain.Controls.Add(this.chrtImplVol);
             this.tabMain.Controls.Add(this.statusStrip2);
-            this.tabMain.Controls.Add(this.button4);
-            this.tabMain.Controls.Add(this.button3);
-            this.tabMain.Controls.Add(this.button2);
-            this.tabMain.Controls.Add(this.button1);
+            this.tabMain.Controls.Add(this.btnStart);
             this.tabMain.Controls.Add(this.dgvOptionDesk);
             this.tabMain.Location = new System.Drawing.Point(4, 22);
             this.tabMain.Name = "tabMain";
@@ -130,7 +156,7 @@
             this.lblSpotPrice.BackColor = System.Drawing.Color.Gray;
             this.lblSpotPrice.Font = new System.Drawing.Font("Times New Roman", 15.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.lblSpotPrice.ForeColor = System.Drawing.Color.Blue;
-            this.lblSpotPrice.Location = new System.Drawing.Point(950, 138);
+            this.lblSpotPrice.Location = new System.Drawing.Point(950, 6);
             this.lblSpotPrice.Name = "lblSpotPrice";
             this.lblSpotPrice.Size = new System.Drawing.Size(100, 42);
             this.lblSpotPrice.TabIndex = 11;
@@ -143,15 +169,11 @@
             this.chrtImplVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtImplVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtImplVol.BorderlineWidth = 5;
-            chartArea3.Name = "ChartArea1";
-            this.chrtImplVol.ChartAreas.Add(chartArea3);
+            chartArea6.Name = "ChartArea1";
+            this.chrtImplVol.ChartAreas.Add(chartArea6);
             this.chrtImplVol.Location = new System.Drawing.Point(34, 327);
             this.chrtImplVol.Name = "chrtImplVol";
             this.chrtImplVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series1.Name = "Series1";
-            this.chrtImplVol.Series.Add(series1);
             this.chrtImplVol.Size = new System.Drawing.Size(910, 324);
             this.chrtImplVol.TabIndex = 10;
             this.chrtImplVol.Text = "chart1";
@@ -164,46 +186,20 @@
             this.statusStrip2.TabIndex = 9;
             this.statusStrip2.Text = "statusStrip2";
             // 
-            // button4
+            // btnStart
             // 
-            this.button4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.button4.Location = new System.Drawing.Point(950, 93);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(75, 23);
-            this.button4.TabIndex = 8;
-            this.button4.Text = "button4";
-            this.button4.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            this.button3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.button3.Location = new System.Drawing.Point(950, 64);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 7;
-            this.button3.Text = "button3";
-            this.button3.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.button2.Location = new System.Drawing.Point(950, 35);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 6;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            this.button1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.button1.Location = new System.Drawing.Point(950, 6);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnStart.BackColor = System.Drawing.Color.Transparent;
+            this.btnStart.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.btnStart.FlatAppearance.BorderSize = 5;
+            this.btnStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnStart.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnStart.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.btnStart.Location = new System.Drawing.Point(1186, 3);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(126, 66);
+            this.btnStart.TabIndex = 5;
+            this.btnStart.Text = "Let\'s do it, buddy.";
+            this.btnStart.UseVisualStyleBackColor = false;
             // 
             // dgvOptionDesk
             // 
@@ -229,7 +225,41 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.dataGridView1);
+            this.tabPage1.Controls.Add(this.btnSetDefaultSettings);
+            this.tabPage1.Controls.Add(this.btnSaveSettings);
+            this.tabPage1.Controls.Add(this.txBxStepYValue);
+            this.tabPage1.Controls.Add(this.txBxMaxYValue);
+            this.tabPage1.Controls.Add(this.txBxMinYValue);
+            this.tabPage1.Controls.Add(this.txBxImplVolPeriodsDisplayedNumbers);
+            this.tabPage1.Controls.Add(this.txBxCentralStrChangeTimeSec);
+            this.tabPage1.Controls.Add(this.txBxMaxVolValue);
+            this.tabPage1.Controls.Add(this.txBxRounding);
+            this.tabPage1.Controls.Add(this.txBxDaysInYear);
+            this.tabPage1.Controls.Add(this.txBxNumberOfTrackOpt);
+            this.tabPage1.Controls.Add(this.txBxPathToVolFile);
+            this.tabPage1.Controls.Add(this.txBxAutoWrtTimeMs);
+            this.tabPage1.Controls.Add(this.txBxUniqueIndx);
+            this.tabPage1.Controls.Add(this.txBxOptTableName);
+            this.tabPage1.Controls.Add(this.txBxServName);
+            this.tabPage1.Controls.Add(this.txBxFutTableName);
+            this.tabPage1.Controls.Add(this.label18);
+            this.tabPage1.Controls.Add(this.label17);
+            this.tabPage1.Controls.Add(this.label16);
+            this.tabPage1.Controls.Add(this.label15);
+            this.tabPage1.Controls.Add(this.label14);
+            this.tabPage1.Controls.Add(this.label13);
+            this.tabPage1.Controls.Add(this.label12);
+            this.tabPage1.Controls.Add(this.label11);
+            this.tabPage1.Controls.Add(this.label10);
+            this.tabPage1.Controls.Add(this.label9);
+            this.tabPage1.Controls.Add(this.label8);
+            this.tabPage1.Controls.Add(this.label7);
+            this.tabPage1.Controls.Add(this.label6);
+            this.tabPage1.Controls.Add(this.label5);
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.label2);
+            this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -238,13 +268,276 @@
             this.tabPage1.Text = "Settings";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // dataGridView1
+            // btnSetDefaultSettings
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(93, 51);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(240, 150);
-            this.dataGridView1.TabIndex = 0;
+            this.btnSetDefaultSettings.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.btnSetDefaultSettings.Location = new System.Drawing.Point(775, 191);
+            this.btnSetDefaultSettings.Name = "btnSetDefaultSettings";
+            this.btnSetDefaultSettings.Size = new System.Drawing.Size(75, 23);
+            this.btnSetDefaultSettings.TabIndex = 34;
+            this.btnSetDefaultSettings.Text = "Set Default";
+            this.btnSetDefaultSettings.UseVisualStyleBackColor = true;
+            this.btnSetDefaultSettings.Click += new System.EventHandler(this.btnSetDefaultSettings_Click);
+            // 
+            // btnSaveSettings
+            // 
+            this.btnSaveSettings.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.btnSaveSettings.Location = new System.Drawing.Point(856, 191);
+            this.btnSaveSettings.Name = "btnSaveSettings";
+            this.btnSaveSettings.Size = new System.Drawing.Size(75, 23);
+            this.btnSaveSettings.TabIndex = 33;
+            this.btnSaveSettings.Text = "Save";
+            this.btnSaveSettings.UseVisualStyleBackColor = true;
+            this.btnSaveSettings.Click += new System.EventHandler(this.btnSaveSettings_Click);
+            // 
+            // txBxStepYValue
+            // 
+            this.txBxStepYValue.Location = new System.Drawing.Point(831, 154);
+            this.txBxStepYValue.Name = "txBxStepYValue";
+            this.txBxStepYValue.Size = new System.Drawing.Size(100, 20);
+            this.txBxStepYValue.TabIndex = 32;
+            // 
+            // txBxMaxYValue
+            // 
+            this.txBxMaxYValue.Location = new System.Drawing.Point(831, 129);
+            this.txBxMaxYValue.Name = "txBxMaxYValue";
+            this.txBxMaxYValue.Size = new System.Drawing.Size(100, 20);
+            this.txBxMaxYValue.TabIndex = 31;
+            // 
+            // txBxMinYValue
+            // 
+            this.txBxMinYValue.Location = new System.Drawing.Point(831, 98);
+            this.txBxMinYValue.Name = "txBxMinYValue";
+            this.txBxMinYValue.Size = new System.Drawing.Size(100, 20);
+            this.txBxMinYValue.TabIndex = 30;
+            // 
+            // txBxImplVolPeriodsDisplayedNumbers
+            // 
+            this.txBxImplVolPeriodsDisplayedNumbers.Location = new System.Drawing.Point(831, 68);
+            this.txBxImplVolPeriodsDisplayedNumbers.Name = "txBxImplVolPeriodsDisplayedNumbers";
+            this.txBxImplVolPeriodsDisplayedNumbers.Size = new System.Drawing.Size(100, 20);
+            this.txBxImplVolPeriodsDisplayedNumbers.TabIndex = 29;
+            // 
+            // txBxCentralStrChangeTimeSec
+            // 
+            this.txBxCentralStrChangeTimeSec.Location = new System.Drawing.Point(831, 39);
+            this.txBxCentralStrChangeTimeSec.Name = "txBxCentralStrChangeTimeSec";
+            this.txBxCentralStrChangeTimeSec.Size = new System.Drawing.Size(100, 20);
+            this.txBxCentralStrChangeTimeSec.TabIndex = 28;
+            // 
+            // txBxMaxVolValue
+            // 
+            this.txBxMaxVolValue.Location = new System.Drawing.Point(493, 129);
+            this.txBxMaxVolValue.Name = "txBxMaxVolValue";
+            this.txBxMaxVolValue.Size = new System.Drawing.Size(100, 20);
+            this.txBxMaxVolValue.TabIndex = 27;
+            // 
+            // txBxRounding
+            // 
+            this.txBxRounding.Location = new System.Drawing.Point(493, 98);
+            this.txBxRounding.Name = "txBxRounding";
+            this.txBxRounding.Size = new System.Drawing.Size(100, 20);
+            this.txBxRounding.TabIndex = 26;
+            // 
+            // txBxDaysInYear
+            // 
+            this.txBxDaysInYear.Location = new System.Drawing.Point(493, 68);
+            this.txBxDaysInYear.Name = "txBxDaysInYear";
+            this.txBxDaysInYear.Size = new System.Drawing.Size(100, 20);
+            this.txBxDaysInYear.TabIndex = 25;
+            // 
+            // txBxNumberOfTrackOpt
+            // 
+            this.txBxNumberOfTrackOpt.Location = new System.Drawing.Point(493, 41);
+            this.txBxNumberOfTrackOpt.Name = "txBxNumberOfTrackOpt";
+            this.txBxNumberOfTrackOpt.Size = new System.Drawing.Size(100, 20);
+            this.txBxNumberOfTrackOpt.TabIndex = 24;
+            // 
+            // txBxPathToVolFile
+            // 
+            this.txBxPathToVolFile.Location = new System.Drawing.Point(162, 188);
+            this.txBxPathToVolFile.Name = "txBxPathToVolFile";
+            this.txBxPathToVolFile.Size = new System.Drawing.Size(431, 20);
+            this.txBxPathToVolFile.TabIndex = 23;
+            // 
+            // txBxAutoWrtTimeMs
+            // 
+            this.txBxAutoWrtTimeMs.Location = new System.Drawing.Point(162, 156);
+            this.txBxAutoWrtTimeMs.Name = "txBxAutoWrtTimeMs";
+            this.txBxAutoWrtTimeMs.Size = new System.Drawing.Size(100, 20);
+            this.txBxAutoWrtTimeMs.TabIndex = 22;
+            // 
+            // txBxUniqueIndx
+            // 
+            this.txBxUniqueIndx.Location = new System.Drawing.Point(162, 129);
+            this.txBxUniqueIndx.Name = "txBxUniqueIndx";
+            this.txBxUniqueIndx.Size = new System.Drawing.Size(100, 20);
+            this.txBxUniqueIndx.TabIndex = 21;
+            // 
+            // txBxOptTableName
+            // 
+            this.txBxOptTableName.Location = new System.Drawing.Point(162, 98);
+            this.txBxOptTableName.Name = "txBxOptTableName";
+            this.txBxOptTableName.Size = new System.Drawing.Size(100, 20);
+            this.txBxOptTableName.TabIndex = 20;
+            // 
+            // txBxServName
+            // 
+            this.txBxServName.Location = new System.Drawing.Point(162, 44);
+            this.txBxServName.Name = "txBxServName";
+            this.txBxServName.Size = new System.Drawing.Size(100, 20);
+            this.txBxServName.TabIndex = 19;
+            // 
+            // txBxFutTableName
+            // 
+            this.txBxFutTableName.Location = new System.Drawing.Point(162, 71);
+            this.txBxFutTableName.Name = "txBxFutTableName";
+            this.txBxFutTableName.Size = new System.Drawing.Size(100, 20);
+            this.txBxFutTableName.TabIndex = 18;
+            // 
+            // label18
+            // 
+            this.label18.Location = new System.Drawing.Point(675, 98);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(150, 15);
+            this.label18.TabIndex = 17;
+            this.label18.Text = "GeneralChartMinYValue";
+            // 
+            // label17
+            // 
+            this.label17.Location = new System.Drawing.Point(675, 129);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(150, 15);
+            this.label17.TabIndex = 16;
+            this.label17.Text = "GeneralChartMaxYValue";
+            // 
+            // label16
+            // 
+            this.label16.Location = new System.Drawing.Point(675, 159);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(150, 15);
+            this.label16.TabIndex = 15;
+            this.label16.Text = "GeneralChartStepYValue";
+            // 
+            // label15
+            // 
+            this.label15.Location = new System.Drawing.Point(42, 20);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(150, 15);
+            this.label15.TabIndex = 14;
+            this.label15.Text = "QUIK CONNECTION";
+            // 
+            // label14
+            // 
+            this.label14.Location = new System.Drawing.Point(6, 191);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(150, 15);
+            this.label14.TabIndex = 13;
+            this.label14.Text = "PathToVolatilityFile";
+            // 
+            // label13
+            // 
+            this.label13.Location = new System.Drawing.Point(337, 98);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(150, 15);
+            this.label13.TabIndex = 12;
+            this.label13.Text = "RoundingInOptionsCalcs";
+            // 
+            // label12
+            // 
+            this.label12.Location = new System.Drawing.Point(337, 129);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(150, 15);
+            this.label12.TabIndex = 11;
+            this.label12.Text = "MaxValueOfVolatility";
+            // 
+            // label11
+            // 
+            this.label11.Location = new System.Drawing.Point(337, 71);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(150, 15);
+            this.label11.TabIndex = 10;
+            this.label11.Text = "DaysInYear";
+            // 
+            // label10
+            // 
+            this.label10.Location = new System.Drawing.Point(368, 20);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(150, 15);
+            this.label10.TabIndex = 9;
+            this.label10.Text = "OPTIONS FEATURES";
+            // 
+            // label9
+            // 
+            this.label9.Location = new System.Drawing.Point(675, 44);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(150, 15);
+            this.label9.TabIndex = 8;
+            this.label9.Text = "CentralStrikeChange(min sec.)";
+            // 
+            // label8
+            // 
+            this.label8.Location = new System.Drawing.Point(675, 71);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(150, 15);
+            this.label8.TabIndex = 7;
+            this.label8.Text = "DisplayedPeriodImplVol (n.)";
+            // 
+            // label7
+            // 
+            this.label7.Location = new System.Drawing.Point(6, 159);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(150, 15);
+            this.label7.TabIndex = 6;
+            this.label7.Text = "AutoWrittingToFileTime ms.";
+            // 
+            // label6
+            // 
+            this.label6.Location = new System.Drawing.Point(706, 20);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(150, 15);
+            this.label6.TabIndex = 5;
+            this.label6.Text = "CHARTS FEATURES";
+            // 
+            // label5
+            // 
+            this.label5.Location = new System.Drawing.Point(6, 129);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(150, 15);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "UniqueIndexInDdeDataArray";
+            // 
+            // label4
+            // 
+            this.label4.Location = new System.Drawing.Point(337, 44);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(150, 15);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "NumberOfTrackingOptions";
+            // 
+            // label3
+            // 
+            this.label3.Location = new System.Drawing.Point(6, 98);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(150, 15);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "OptionsTableName";
+            // 
+            // label2
+            // 
+            this.label2.Location = new System.Drawing.Point(6, 71);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(150, 15);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "FuturesTableName";
+            // 
+            // label1
+            // 
+            this.label1.Location = new System.Drawing.Point(6, 44);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(150, 15);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "ServerName";
             // 
             // statusStrip1
             // 
@@ -304,7 +597,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvOptionDesk)).EndInit();
             this.tabs.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.tabPage1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -316,16 +609,12 @@
 
         private System.Windows.Forms.TabPage tabSettings;
         private System.Windows.Forms.TabPage tabMain;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.DataGridView dgvOptionDesk;
         private System.Windows.Forms.TabControl tabs;
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtPutVol;
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtCallVol;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStLbAsset;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStLbDaysToExp;
@@ -334,6 +623,41 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtImplVol;
         private System.Windows.Forms.Label lblSpotPrice;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStLbLastUpd;
+        private System.Windows.Forms.TextBox txBxStepYValue;
+        private System.Windows.Forms.TextBox txBxMaxYValue;
+        private System.Windows.Forms.TextBox txBxMinYValue;
+        private System.Windows.Forms.TextBox txBxImplVolPeriodsDisplayedNumbers;
+        private System.Windows.Forms.TextBox txBxCentralStrChangeTimeSec;
+        private System.Windows.Forms.TextBox txBxMaxVolValue;
+        private System.Windows.Forms.TextBox txBxRounding;
+        private System.Windows.Forms.TextBox txBxDaysInYear;
+        private System.Windows.Forms.TextBox txBxNumberOfTrackOpt;
+        private System.Windows.Forms.TextBox txBxPathToVolFile;
+        private System.Windows.Forms.TextBox txBxAutoWrtTimeMs;
+        private System.Windows.Forms.TextBox txBxUniqueIndx;
+        private System.Windows.Forms.TextBox txBxOptTableName;
+        private System.Windows.Forms.TextBox txBxServName;
+        private System.Windows.Forms.TextBox txBxFutTableName;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnSetDefaultSettings;
+        private System.Windows.Forms.Button btnSaveSettings;
     }
 }
 

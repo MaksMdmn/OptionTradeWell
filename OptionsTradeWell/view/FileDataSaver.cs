@@ -1,11 +1,14 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading;
+using System.Timers;
 
 namespace OptionsTradeWell.view
 {
     public class FileDataSaver
     {
+        public EventHandler onDataSavedAtFile;
         private readonly string filePath;
         private readonly Encoding encoding;
 
@@ -31,5 +34,9 @@ namespace OptionsTradeWell.view
             return tempDataArr[tempDataArr.Length - 1];
         }
 
+        public bool IsFileDataExists()
+        {
+            return GetAllData().Length > 0;
+        }
     }
 }

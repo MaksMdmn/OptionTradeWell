@@ -9,8 +9,10 @@ namespace OptionsTradeWell.view.interfaces
         //event EventHandler Button2Click;
         //event EventHandler Button3Click;
 
-        void UpdatePrimaryViewData(List<double[]>tableDataList, int uniqueValueIndex);
+        void UpdatePrimaryViewData(List<double[]> tableDataList, int uniqueValueIndex);
         void UpdateRowInViewDataMap(double[] updatedData, int uniqueValueIndex);
         void UpdateFuturesData(string[] data);
+        void UpdateImplVolChartData(string[] data);
+        void InitPrimarySettingsView();
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OptionsTradeWell.model;
 using OptionsTradeWell.model.interfaces;
+using OptionsTradeWell.Properties;
 using OptionsTradeWell.view;
 using OptionsTradeWell.view.interfaces;
 
@@ -10,15 +11,15 @@ namespace OptionsTradeWell.presenter
 {
     public class MainPresenter
     {
-        private static int UNIQUE_STRIKE_INDEX_IN_ARRAY = 2;
-
-        private static string FILE_PATH =
-            "D:\\programming\\c# here\\Project\\OptionsTradeWell\\OptionsTradeWell\\assistants\\data.txt";
+        private static int UNIQUE_STRIKE_INDEX_IN_ARRAY = Settings.Default.UniqueIndexInDdeDataArray;
+        private static string FILE_PATH = Settings.Default.PathToVolatilityFile;
+        private static double FILE_WRITTING_PERIODICITY = Settings.Default.AutoWrittingToFileMs;
 
         private readonly ITerminalOptionDataCollector dataCollector;
         private readonly IMainForm mainForm;
         private readonly IDerivativesDataRender dataRender;
         private readonly FileDataSaver fileDataSaver;
+        private System.Timers.Timer writtingTimer = new System.Timers.Timer();
 
         public MainPresenter(ITerminalOptionDataCollector dataCollector, IMainForm mainForm, IDerivativesDataRender dataRender)
         {
@@ -44,6 +45,8 @@ namespace OptionsTradeWell.presenter
             mainForm.UpdatePrimaryViewData(
                 MakeDataList(minStrike, maxStrike),
                 UNIQUE_STRIKE_INDEX_IN_ARRAY);
+
+            StartWrittingToFile();
         }
 
         private void DataCollector_OnBasedParametersChanged(object sender, EventArgs e)
@@ -97,6 +100,26 @@ namespace OptionsTradeWell.presenter
             }
 
             return resultList;
+        }
+
+        private void StartWrittingToFile()
+        {
+            writtingTimer.Elapsed += WrittingTimer_Elapsed;
+            writtingTimer.Interval = FILE_WRITTING_PERIODICITY;
+            writtingTimer.Enabled = true;
+        }
+
+        private void WrittingTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(DateTime.Now.ToString("dd-MM-yyyy-HH-mm-ss"));
+            sb.Append(" ");
+            sb.Append(dataCollector.GetOption(dataCollector.CalculateActualStrike(), OptionType.Call).BuyVol * 100);
+            sb.Append(" ");
+            sb.Append(dataCollector.GetOption(dataCollector.CalculateActualStrike(), OptionType.Put).BuyVol * 100);
+            fileDataSaver.SaveData(sb.ToString());
+
+            mainForm.UpdateImplVolChartData(sb.ToString().Split(new char[] { ' ' }));
         }
     }
 }

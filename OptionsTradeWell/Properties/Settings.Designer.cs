@@ -8,22 +8,199 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OptionsTradeWell.Properties
-{
-
-
+namespace OptionsTradeWell.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("OTWserver")]
+        public string ServerName {
+            get {
+                return ((string)(this["ServerName"]));
+            }
+            set {
+                this["ServerName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("FUTURES_DESK")]
+        public string FuturesTableName {
+            get {
+                return ((string)(this["FuturesTableName"]));
+            }
+            set {
+                this["FuturesTableName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("OPTIONS_DESK")]
+        public string OptionsTableName {
+            get {
+                return ((string)(this["OptionsTableName"]));
+            }
+            set {
+                this["OptionsTableName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int UniqueIndexInDdeDataArray {
+            get {
+                return ((int)(this["UniqueIndexInDdeDataArray"]));
+            }
+            set {
+                this["UniqueIndexInDdeDataArray"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int AutoWrittingToFileMs {
+            get {
+                return ((int)(this["AutoWrittingToFileMs"]));
+            }
+            set {
+                this["AutoWrittingToFileMs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\\\programming\\\\c# here\\\\Project\\\\OptionsTradeWell\\\\OptionsTradeWell\\\\assistants" +
+            "\\\\data.txt")]
+        public string PathToVolatilityFile {
+            get {
+                return ((string)(this["PathToVolatilityFile"]));
+            }
+            set {
+                this["PathToVolatilityFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("18")]
+        public int NumberOfTrackingOptions {
+            get {
+                return ((int)(this["NumberOfTrackingOptions"]));
+            }
+            set {
+                this["NumberOfTrackingOptions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("365")]
+        public double DaysInYear {
+            get {
+                return ((double)(this["DaysInYear"]));
+            }
+            set {
+                this["DaysInYear"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int RoundTo {
+            get {
+                return ((int)(this["RoundTo"]));
+            }
+            set {
+                this["RoundTo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public double MaxValueOfImplVol {
+            get {
+                return ((double)(this["MaxValueOfImplVol"]));
+            }
+            set {
+                this["MaxValueOfImplVol"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int MinActualStrikeUpdateTimeSec {
+            get {
+                return ((int)(this["MinActualStrikeUpdateTimeSec"]));
+            }
+            set {
+                this["MinActualStrikeUpdateTimeSec"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int DisplayedPeriodOfImplVol {
+            get {
+                return ((int)(this["DisplayedPeriodOfImplVol"]));
+            }
+            set {
+                this["DisplayedPeriodOfImplVol"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public double ChartsMinYValue {
+            get {
+                return ((double)(this["ChartsMinYValue"]));
+            }
+            set {
+                this["ChartsMinYValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        public double ChartsMaxYValue {
+            get {
+                return ((double)(this["ChartsMaxYValue"]));
+            }
+            set {
+                this["ChartsMaxYValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public double ChartsStepYValue {
+            get {
+                return ((double)(this["ChartsStepYValue"]));
+            }
+            set {
+                this["ChartsStepYValue"] = value;
             }
         }
     }
