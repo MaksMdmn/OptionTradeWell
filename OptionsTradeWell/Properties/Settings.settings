@@ -14,8 +14,8 @@
     <Setting Name="UniqueIndexInDdeDataArray" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
-    <Setting Name="AutoWrittingToFileMs" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">500</Value>
+    <Setting Name="AutoImplVolaUpdateMs" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">60000</Value>
     </Setting>
     <Setting Name="PathToVolatilityFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">D:\\programming\\c# here\\Project\\OptionsTradeWell\\OptionsTradeWell\\assistants\\data.txt</Value>

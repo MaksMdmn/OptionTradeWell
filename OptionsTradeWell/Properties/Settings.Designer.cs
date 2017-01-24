@@ -73,13 +73,13 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
-        public int AutoWrittingToFileMs {
+        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
+        public int AutoImplVolaUpdateMs {
             get {
-                return ((int)(this["AutoWrittingToFileMs"]));
+                return ((int)(this["AutoImplVolaUpdateMs"]));
             }
             set {
-                this["AutoWrittingToFileMs"] = value;
+                this["AutoImplVolaUpdateMs"] = value;
             }
         }
         

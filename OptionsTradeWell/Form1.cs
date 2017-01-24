@@ -20,11 +20,15 @@ namespace OptionsTradeWell
 {
     public partial class MainForm : Form, IMainForm
     {
-        private static int VIEW_NUMBER_OF_IMPL_VOL_VALUES = Settings.Default.DisplayedPeriodOfImplVol;
-        private double minValueY = Settings.Default.ChartsMinYValue;
-        private double maxValueY = Settings.Default.ChartsMaxYValue;
-        private double stepY = Settings.Default.ChartsStepYValue;
+        public static int VIEW_NUMBER_OF_IMPL_VOL_VALUES = Settings.Default.DisplayedPeriodOfImplVol;
+        public static double minValueY = Settings.Default.ChartsMinYValue;
+        public static double maxValueY = Settings.Default.ChartsMaxYValue;
+        public static double stepY = Settings.Default.ChartsStepYValue;
 
+        public event EventHandler OnStartUp;
+        public event EventHandler OnSettingsInFormChanged;
+
+        private bool onTimeStartUpClick;
         private SortedDictionary<double, OptTableDataRow> rowMap;
         private List<string> columnsNames;
         private System.Timers.Timer statusBarReducingTimer;
@@ -58,6 +62,8 @@ namespace OptionsTradeWell
             StartUpdateTimer();
 
             toolStripPrBrConnection.Value = 100;
+
+            onTimeStartUpClick = true;
         }
 
         public void UpdatePrimaryViewData(List<double[]> tableDataList, int uniqueValueIndex)
@@ -123,7 +129,6 @@ namespace OptionsTradeWell
 
         }
 
-
         public void UpdateImplVolChartData(string[] data)
         {
             while (this.IsHandleCreated == false)
@@ -143,9 +148,24 @@ namespace OptionsTradeWell
             }));
         }
 
+        public void ReloadImplVolChartData(string[] data)
+        {
+            while (this.IsHandleCreated == false)
+            {
+            }
+
+            this.BeginInvoke((Action)(() =>
+            {
+                implVolCallSeries.Points.Clear();
+                implVolPutSeries.Points.Clear();
+            }));
+
+            UpdateImplVolChartData(data);
+        }
+
         public void InitPrimarySettingsView()
         {
-            txBxAutoWrtTimeMs.Text = Settings.Default.AutoWrittingToFileMs.ToString();
+            txBxAutoWrtTimeMs.Text = Settings.Default.AutoImplVolaUpdateMs.ToString();
             txBxCentralStrChangeTimeSec.Text = Settings.Default.MinActualStrikeUpdateTimeSec.ToString();
             txBxDaysInYear.Text = Settings.Default.DaysInYear.ToString();
             txBxFutTableName.Text = Settings.Default.FuturesTableName;
@@ -355,17 +375,21 @@ namespace OptionsTradeWell
             chrtCallVol.DataSource = rowMap.Values;
             chrtPutVol.DataSource = rowMap.Values;
 
-            chrtImplVol.ChartAreas[0].AxisY.Minimum = minValueY;
-            chrtImplVol.ChartAreas[0].AxisY.Maximum = maxValueY;
-            chrtImplVol.ChartAreas[0].AxisY.Interval = stepY;
-
             chrtCallVol.ChartAreas[0].AxisY.Minimum = minValueY;
             chrtCallVol.ChartAreas[0].AxisY.Maximum = maxValueY;
             chrtCallVol.ChartAreas[0].AxisY.Interval = stepY;
+            chrtCallVol.Titles.Add("CALLs");
+            chrtCallVol.Titles[0].Alignment = ContentAlignment.TopCenter;
+            chrtCallVol.Titles[0].ForeColor = Color.WhiteSmoke;
+            chrtCallVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
 
             chrtPutVol.ChartAreas[0].AxisY.Minimum = minValueY;
             chrtPutVol.ChartAreas[0].AxisY.Maximum = maxValueY;
             chrtPutVol.ChartAreas[0].AxisY.Interval = stepY;
+            chrtPutVol.Titles.Add("PUTs");
+            chrtPutVol.Titles[0].Alignment = ContentAlignment.TopCenter;
+            chrtPutVol.Titles[0].ForeColor = Color.WhiteSmoke;
+            chrtPutVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
 
         }
 
@@ -485,12 +509,53 @@ namespace OptionsTradeWell
 
         private void btnSetDefaultSettings_Click(object sender, EventArgs e)
         {
-
+            InitPrimarySettingsView();
         }
 
         private void btnSaveSettings_Click(object sender, EventArgs e)
         {
+            Settings.Default.AutoImplVolaUpdateMs = Convert.ToInt32(txBxAutoWrtTimeMs.Text);
+            Settings.Default.MinActualStrikeUpdateTimeSec = Convert.ToInt32(txBxCentralStrChangeTimeSec.Text);
+            Settings.Default.DaysInYear = Convert.ToDouble(txBxDaysInYear.Text);
+            Settings.Default.FuturesTableName = txBxFutTableName.Text;
+            Settings.Default.DisplayedPeriodOfImplVol = Convert.ToInt32(txBxImplVolPeriodsDisplayedNumbers.Text);
+            Settings.Default.MaxValueOfImplVol = Convert.ToDouble(txBxMaxVolValue.Text);
+            Settings.Default.ChartsMaxYValue = Convert.ToDouble(txBxMaxYValue.Text);
+            Settings.Default.ChartsMinYValue = Convert.ToDouble(txBxMinYValue.Text);
+            Settings.Default.NumberOfTrackingOptions = Convert.ToInt32(txBxNumberOfTrackOpt.Text);
+            Settings.Default.OptionsTableName = txBxOptTableName.Text;
+            Settings.Default.ChartsStepYValue = Convert.ToDouble(txBxStepYValue.Text);
+            Settings.Default.ServerName = txBxServName.Text;
+            Settings.Default.PathToVolatilityFile = txBxPathToVolFile.Text;
+            Settings.Default.UniqueIndexInDdeDataArray = Convert.ToInt32(txBxUniqueIndx.Text);
+            Settings.Default.RoundTo = Convert.ToInt32(txBxRounding.Text);
+            Settings.Default.Save();
 
+            if (OnSettingsInFormChanged != null)
+            {
+                OnSettingsInFormChanged(sender, e);
+            }
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            if (onTimeStartUpClick)
+            {
+                btnStart.BackColor = Color.Gray;
+
+                if (OnStartUp != null)
+                {
+                    OnStartUp(sender, e);
+                }
+                btnStart.ForeColor = Color.SkyBlue;
+                btnStart.Text = "Started";
+
+                onTimeStartUpClick = false;
+            }
+            else
+            {
+                MessageBox.Show("Program is working now, buddy.");
+            }
         }
     }
 }

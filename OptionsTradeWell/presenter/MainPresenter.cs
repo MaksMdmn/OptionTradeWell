@@ -13,7 +13,7 @@ namespace OptionsTradeWell.presenter
     {
         private static int UNIQUE_STRIKE_INDEX_IN_ARRAY = Settings.Default.UniqueIndexInDdeDataArray;
         private static string FILE_PATH = Settings.Default.PathToVolatilityFile;
-        private static double FILE_WRITTING_PERIODICITY = Settings.Default.AutoWrittingToFileMs;
+        private static double FILE_WRITTING_PERIODICITY = Settings.Default.AutoImplVolaUpdateMs;
 
         private readonly ITerminalOptionDataCollector dataCollector;
         private readonly IMainForm mainForm;
@@ -28,6 +28,12 @@ namespace OptionsTradeWell.presenter
             this.dataRender = dataRender;
             fileDataSaver = new FileDataSaver(FILE_PATH, Encoding.GetEncoding("windows-1251")); //hardcore D:
 
+            mainForm.OnStartUp += MainForm_OnStartUp;
+
+        }
+
+        private void MainForm_OnStartUp(object sender, EventArgs e)
+        {
             dataCollector.EstablishConnection();
 
             while (!dataCollector.IsConnected())
@@ -46,8 +52,30 @@ namespace OptionsTradeWell.presenter
                 MakeDataList(minStrike, maxStrike),
                 UNIQUE_STRIKE_INDEX_IN_ARRAY);
 
+
+            UpdateImplVolData(mainForm.UpdateImplVolChartData);
+
             StartWrittingToFile();
         }
+
+        //private void MainFormOnSettingsInFormChanged(object sender, EventArgs e)
+        //{
+        //    //changes in view
+        //    writtingTimer.Interval = Settings.Default.MinActualStrikeUpdateTimeSec;
+        //    MainForm.VIEW_NUMBER_OF_IMPL_VOL_VALUES = Settings.Default.DisplayedPeriodOfImplVol;
+        //    MainForm.maxValueY = Settings.Default.ChartsMaxYValue;
+        //    MainForm.minValueY = Settings.Default.ChartsMinYValue;
+        //    MainForm.stepY = Settings.Default.ChartsStepYValue;
+        //    UpdateImplVolData(mainForm.ReloadImplVolChartData);
+
+        //    //changes in calculations
+        //    GreeksCalculator.DAYS_IN_YEAR = Settings.Default.DaysInYear;
+        //    GreeksCalculator.NUMBER_OF_DECIMAL_PLACES = Settings.Default.RoundTo;
+        //    GreeksCalculator.MAX_VOLA_VALUE = Settings.Default.MaxValueOfImplVol;
+        //        /*have event that would appear and make full recalc*/
+        //    dataCollector.NumberOfTrackingOptions = Settings.Default.NumberOfTrackingOptions;
+
+        //}
 
         private void DataCollector_OnBasedParametersChanged(object sender, EventArgs e)
         {
@@ -120,6 +148,21 @@ namespace OptionsTradeWell.presenter
             fileDataSaver.SaveData(sb.ToString());
 
             mainForm.UpdateImplVolChartData(sb.ToString().Split(new char[] { ' ' }));
+        }
+
+        private void UpdateImplVolData(Action<string[]> method)
+        {
+            if (fileDataSaver.IsFileDataExists())
+            {
+                string[] tempStartImplVolData = fileDataSaver.GetAllData();
+                for (int i = 0; i < tempStartImplVolData.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(tempStartImplVolData[i]))
+                    {
+                        method(tempStartImplVolData[i].Split(new char[] { ' ' }));
+                    }
+                }
+            }
         }
     }
 }

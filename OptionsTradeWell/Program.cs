@@ -20,21 +20,16 @@ namespace OptionsTradeWell
         [STAThread]
         static void Main()
         {
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //NativeMethods.AllocConsole();
-
-            ITerminalOptionDataCollector dataCollector = new OptionsQuikDdeDataCollector(18);
+            ITerminalOptionDataCollector dataCollector = new OptionsQuikDdeDataCollector();
             IDerivativesDataRender dataRender = new DerivativesDataRender();
             MainForm mainForm = new MainForm();
 
             MainPresenter presenter = new MainPresenter(dataCollector, mainForm, dataRender);
 
-
             Application.Run(mainForm);
-            //NativeMethods.FreeConsole();
         }
 
     }

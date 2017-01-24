@@ -5,14 +5,13 @@ namespace OptionsTradeWell.view.interfaces
 {
     public interface IMainForm
     {
-        //event EventHandler Button1Click;
-        //event EventHandler Button2Click;
-        //event EventHandler Button3Click;
+        event EventHandler OnStartUp;
+        event EventHandler OnSettingsInFormChanged;
 
         void UpdatePrimaryViewData(List<double[]> tableDataList, int uniqueValueIndex);
         void UpdateRowInViewDataMap(double[] updatedData, int uniqueValueIndex);
         void UpdateFuturesData(string[] data);
         void UpdateImplVolChartData(string[] data);
-        void InitPrimarySettingsView();
+        void ReloadImplVolChartData(string[] data);
     }
 }

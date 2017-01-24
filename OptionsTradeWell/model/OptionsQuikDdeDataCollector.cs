@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.model.interfaces;
 using OptionsTradeWell.Properties;
@@ -20,8 +21,8 @@ namespace OptionsTradeWell.model
         public event EventHandler OnBasedParametersChanged;
 
         private QuikServerDde server;
-        private Dictionary<double, Option> callMap;
-        private Dictionary<double, Option> putMap;
+        private SortedDictionary<double, Option> callMap;
+        private SortedDictionary<double, Option> putMap;
 
         private Futures basicFutures;
         private Option infoOption;
@@ -32,22 +33,22 @@ namespace OptionsTradeWell.model
         private bool futRecievedDataFlag;
         private bool optRecievedDataFlag;
 
-        public OptionsQuikDdeDataCollector(int numberOfTrackingOptions)
+        public OptionsQuikDdeDataCollector()
         {
             this.server = new QuikServerDde(SERVER_NAME, TOPICS_AND_ROWS_LENGTH_MAP);
             server.OnDataUpdate += CollectAndSortServerDataByMaps;
 
-            if (numberOfTrackingOptions % 2 == 0)
+            if (Settings.Default.NumberOfTrackingOptions % 2 == 0)
             {
-                this.NumberOfTrackingOptions = numberOfTrackingOptions;
+                this.NumberOfTrackingOptions = Settings.Default.NumberOfTrackingOptions;
             }
             else
             {
-                this.NumberOfTrackingOptions = numberOfTrackingOptions - 1;
+                this.NumberOfTrackingOptions = Settings.Default.NumberOfTrackingOptions - 1;
             }
 
-            this.callMap = new Dictionary<double, Option>();
-            this.putMap = new Dictionary<double, Option>();
+            this.callMap = new SortedDictionary<double, Option>();
+            this.putMap = new SortedDictionary<double, Option>();
             this.lastTrackingStrike = 0.0;
             this.lastTrackingUpdate = DateTime.Now;
 
@@ -142,7 +143,10 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("Basic futures still null : " + basicFutures);
             }
 
-            return CalculateActualStrike() - NumberOfTrackingOptions / 2;
+            double minMapStrike = callMap.First().Key;
+            double calculatedStrike = CalculateActualStrike() - NumberOfTrackingOptions / 2;
+
+            return calculatedStrike < minMapStrike ? minMapStrike : calculatedStrike;
         }
 
         public double CalculateMaxImportantStrike()
@@ -152,7 +156,10 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("Basic futures still null : " + basicFutures);
             }
 
-            return CalculateActualStrike() + NumberOfTrackingOptions / 2;
+            double maxMapStrike = callMap.Last().Key;
+            double calculatedStrike = CalculateActualStrike() + NumberOfTrackingOptions / 2;
+
+            return calculatedStrike > maxMapStrike ? maxMapStrike : calculatedStrike;
         }
 
         public double CalculateActualStrike()
@@ -212,7 +219,7 @@ namespace OptionsTradeWell.model
                 }
 
 
-                if (OnBasedParametersChanged != null 
+                if (OnBasedParametersChanged != null
                     && Math.Abs(lastTrackingStrike - CalculateActualStrike()) > 0.01
                     && DateTime.Now > lastTrackingUpdate)
                 {
@@ -224,10 +231,10 @@ namespace OptionsTradeWell.model
             {
                 OptionType optionType = (OptionType)Enum.Parse(typeof(OptionType), data[0]);
                 double strike = Convert.ToDouble(data[1]);
-                Dictionary<double, Option> suitOptionsMap = GetSuitableOptionsMap(optionType);
+                SortedDictionary<double, Option> suitOptionsMap = GetSuitableOptionsMap(optionType);
                 Option tempOption;
 
-                if (strike < CalculateMinImportantStrike() || strike > CalculateMaxImportantStrike())
+                if (strike < CalculateActualStrike() - (NumberOfTrackingOptions/2) || strike > CalculateActualStrike() + (NumberOfTrackingOptions / 2))
                 {
                     return;
                 }
@@ -299,24 +306,16 @@ namespace OptionsTradeWell.model
             }
 
             if (futRecievedDataFlag == true
-                && callMap.ContainsKey(CalculateMinImportantStrike())
-                && callMap.ContainsKey(CalculateMaxImportantStrike())
-                && putMap.ContainsKey(CalculateMinImportantStrike())
-                && putMap.ContainsKey(CalculateMaxImportantStrike()))
+                && callMap.Keys.Count >= NumberOfTrackingOptions
+                && putMap.Keys.Count >= NumberOfTrackingOptions)
             {
                 optRecievedDataFlag = true;
             }
         }
 
-        private Dictionary<double, Option> GetSuitableOptionsMap(OptionType type)
+        private SortedDictionary<double, Option> GetSuitableOptionsMap(OptionType type)
         {
             return type == OptionType.Call ? callMap : putMap;
-        }
-
-        private void InitDefaultDerivativesValues()
-        {
-            basicFutures = new Futures("", DateTime.Now, 0.0, 0.0, 0.0, 0.0); //HERE'S A LOT OF SHIT CAN BE
-            DateTime expirationDate = DateTime.Now;
         }
     }
 }

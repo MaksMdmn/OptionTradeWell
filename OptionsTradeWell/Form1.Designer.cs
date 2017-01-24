@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             this.tabSettings = new System.Windows.Forms.TabPage();
             this.chrtPutVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chrtCallVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -111,8 +111,8 @@
             this.chrtPutVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtPutVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtPutVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea4.Name = "ChartArea1";
-            this.chrtPutVol.ChartAreas.Add(chartArea4);
+            chartArea1.Name = "ChartArea1";
+            this.chrtPutVol.ChartAreas.Add(chartArea1);
             this.chrtPutVol.Location = new System.Drawing.Point(665, 6);
             this.chrtPutVol.Name = "chrtPutVol";
             this.chrtPutVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Chocolate;
@@ -126,8 +126,8 @@
             this.chrtCallVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtCallVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtCallVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea5.Name = "ChartArea1";
-            this.chrtCallVol.ChartAreas.Add(chartArea5);
+            chartArea2.Name = "ChartArea1";
+            this.chrtCallVol.ChartAreas.Add(chartArea2);
             this.chrtCallVol.Location = new System.Drawing.Point(12, 6);
             this.chrtCallVol.Name = "chrtCallVol";
             this.chrtCallVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Berry;
@@ -169,8 +169,8 @@
             this.chrtImplVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtImplVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtImplVol.BorderlineWidth = 5;
-            chartArea6.Name = "ChartArea1";
-            this.chrtImplVol.ChartAreas.Add(chartArea6);
+            chartArea3.Name = "ChartArea1";
+            this.chrtImplVol.ChartAreas.Add(chartArea3);
             this.chrtImplVol.Location = new System.Drawing.Point(34, 327);
             this.chrtImplVol.Name = "chrtImplVol";
             this.chrtImplVol.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
@@ -200,6 +200,7 @@
             this.btnStart.TabIndex = 5;
             this.btnStart.Text = "Let\'s do it, buddy.";
             this.btnStart.UseVisualStyleBackColor = false;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // dgvOptionDesk
             // 
@@ -271,7 +272,7 @@
             // btnSetDefaultSettings
             // 
             this.btnSetDefaultSettings.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSetDefaultSettings.Location = new System.Drawing.Point(775, 191);
+            this.btnSetDefaultSettings.Location = new System.Drawing.Point(781, 185);
             this.btnSetDefaultSettings.Name = "btnSetDefaultSettings";
             this.btnSetDefaultSettings.Size = new System.Drawing.Size(75, 23);
             this.btnSetDefaultSettings.TabIndex = 34;
@@ -282,7 +283,7 @@
             // btnSaveSettings
             // 
             this.btnSaveSettings.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSaveSettings.Location = new System.Drawing.Point(856, 191);
+            this.btnSaveSettings.Location = new System.Drawing.Point(862, 185);
             this.btnSaveSettings.Name = "btnSaveSettings";
             this.btnSaveSettings.Size = new System.Drawing.Size(75, 23);
             this.btnSaveSettings.TabIndex = 33;
@@ -292,6 +293,7 @@
             // 
             // txBxStepYValue
             // 
+            this.txBxStepYValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxStepYValue.Location = new System.Drawing.Point(831, 154);
             this.txBxStepYValue.Name = "txBxStepYValue";
             this.txBxStepYValue.Size = new System.Drawing.Size(100, 20);
@@ -299,6 +301,7 @@
             // 
             // txBxMaxYValue
             // 
+            this.txBxMaxYValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxMaxYValue.Location = new System.Drawing.Point(831, 129);
             this.txBxMaxYValue.Name = "txBxMaxYValue";
             this.txBxMaxYValue.Size = new System.Drawing.Size(100, 20);
@@ -306,6 +309,7 @@
             // 
             // txBxMinYValue
             // 
+            this.txBxMinYValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxMinYValue.Location = new System.Drawing.Point(831, 98);
             this.txBxMinYValue.Name = "txBxMinYValue";
             this.txBxMinYValue.Size = new System.Drawing.Size(100, 20);
@@ -313,6 +317,7 @@
             // 
             // txBxImplVolPeriodsDisplayedNumbers
             // 
+            this.txBxImplVolPeriodsDisplayedNumbers.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxImplVolPeriodsDisplayedNumbers.Location = new System.Drawing.Point(831, 68);
             this.txBxImplVolPeriodsDisplayedNumbers.Name = "txBxImplVolPeriodsDisplayedNumbers";
             this.txBxImplVolPeriodsDisplayedNumbers.Size = new System.Drawing.Size(100, 20);
@@ -320,6 +325,7 @@
             // 
             // txBxCentralStrChangeTimeSec
             // 
+            this.txBxCentralStrChangeTimeSec.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxCentralStrChangeTimeSec.Location = new System.Drawing.Point(831, 39);
             this.txBxCentralStrChangeTimeSec.Name = "txBxCentralStrChangeTimeSec";
             this.txBxCentralStrChangeTimeSec.Size = new System.Drawing.Size(100, 20);
@@ -327,6 +333,7 @@
             // 
             // txBxMaxVolValue
             // 
+            this.txBxMaxVolValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxMaxVolValue.Location = new System.Drawing.Point(493, 129);
             this.txBxMaxVolValue.Name = "txBxMaxVolValue";
             this.txBxMaxVolValue.Size = new System.Drawing.Size(100, 20);
@@ -334,6 +341,7 @@
             // 
             // txBxRounding
             // 
+            this.txBxRounding.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxRounding.Location = new System.Drawing.Point(493, 98);
             this.txBxRounding.Name = "txBxRounding";
             this.txBxRounding.Size = new System.Drawing.Size(100, 20);
@@ -341,6 +349,7 @@
             // 
             // txBxDaysInYear
             // 
+            this.txBxDaysInYear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxDaysInYear.Location = new System.Drawing.Point(493, 68);
             this.txBxDaysInYear.Name = "txBxDaysInYear";
             this.txBxDaysInYear.Size = new System.Drawing.Size(100, 20);
@@ -348,6 +357,7 @@
             // 
             // txBxNumberOfTrackOpt
             // 
+            this.txBxNumberOfTrackOpt.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxNumberOfTrackOpt.Location = new System.Drawing.Point(493, 41);
             this.txBxNumberOfTrackOpt.Name = "txBxNumberOfTrackOpt";
             this.txBxNumberOfTrackOpt.Size = new System.Drawing.Size(100, 20);
@@ -355,13 +365,15 @@
             // 
             // txBxPathToVolFile
             // 
+            this.txBxPathToVolFile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxPathToVolFile.Location = new System.Drawing.Point(162, 188);
             this.txBxPathToVolFile.Name = "txBxPathToVolFile";
-            this.txBxPathToVolFile.Size = new System.Drawing.Size(431, 20);
+            this.txBxPathToVolFile.Size = new System.Drawing.Size(509, 20);
             this.txBxPathToVolFile.TabIndex = 23;
             // 
             // txBxAutoWrtTimeMs
             // 
+            this.txBxAutoWrtTimeMs.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxAutoWrtTimeMs.Location = new System.Drawing.Point(162, 156);
             this.txBxAutoWrtTimeMs.Name = "txBxAutoWrtTimeMs";
             this.txBxAutoWrtTimeMs.Size = new System.Drawing.Size(100, 20);
@@ -369,6 +381,7 @@
             // 
             // txBxUniqueIndx
             // 
+            this.txBxUniqueIndx.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxUniqueIndx.Location = new System.Drawing.Point(162, 129);
             this.txBxUniqueIndx.Name = "txBxUniqueIndx";
             this.txBxUniqueIndx.Size = new System.Drawing.Size(100, 20);
@@ -376,6 +389,7 @@
             // 
             // txBxOptTableName
             // 
+            this.txBxOptTableName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxOptTableName.Location = new System.Drawing.Point(162, 98);
             this.txBxOptTableName.Name = "txBxOptTableName";
             this.txBxOptTableName.Size = new System.Drawing.Size(100, 20);
@@ -383,6 +397,7 @@
             // 
             // txBxServName
             // 
+            this.txBxServName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxServName.Location = new System.Drawing.Point(162, 44);
             this.txBxServName.Name = "txBxServName";
             this.txBxServName.Size = new System.Drawing.Size(100, 20);
@@ -390,6 +405,7 @@
             // 
             // txBxFutTableName
             // 
+            this.txBxFutTableName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.txBxFutTableName.Location = new System.Drawing.Point(162, 71);
             this.txBxFutTableName.Name = "txBxFutTableName";
             this.txBxFutTableName.Size = new System.Drawing.Size(100, 20);
@@ -489,7 +505,7 @@
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(150, 15);
             this.label7.TabIndex = 6;
-            this.label7.Text = "AutoWrittingToFileTime ms.";
+            this.label7.Text = "AutoImplVolaUpdateTime ms.";
             // 
             // label6
             // 
