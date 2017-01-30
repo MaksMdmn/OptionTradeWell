@@ -18,7 +18,6 @@ namespace OptionsTradeWell.model
 
         public event EventHandler<OptionEventArgs> OnOptionsDeskChanged;
         public event EventHandler<OptionEventArgs> OnSpotPriceChanged;
-        public event EventHandler OnBasedParametersChanged;
 
         private QuikServerDde server;
         private SortedDictionary<double, Option> callMap;
@@ -26,7 +25,6 @@ namespace OptionsTradeWell.model
 
         private Futures basicFutures;
         private Option infoOption;
-        private int numberOfTrackingOptions;
         private double lastTrackingStrike;
         private DateTime lastTrackingUpdate;
 
@@ -65,21 +63,7 @@ namespace OptionsTradeWell.model
             return resultMap;
         }
 
-        public int NumberOfTrackingOptions
-        {
-            get
-            {
-                return numberOfTrackingOptions;
-            }
-            set
-            {
-                numberOfTrackingOptions = value;
-                if (OnBasedParametersChanged != null)
-                {
-                    OnBasedParametersChanged(this, EventArgs.Empty);
-                }
-            }
-        }
+        public int NumberOfTrackingOptions { get; set; }
 
         public bool IsConnected()
         {
@@ -143,10 +127,7 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("Basic futures still null : " + basicFutures);
             }
 
-            double minMapStrike = callMap.First().Key;
-            double calculatedStrike = CalculateActualStrike() - NumberOfTrackingOptions / 2;
-
-            return calculatedStrike < minMapStrike ? minMapStrike : calculatedStrike;
+            return CalculateActualStrike() - NumberOfTrackingOptions / 2;
         }
 
         public double CalculateMaxImportantStrike()
@@ -156,15 +137,12 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("Basic futures still null : " + basicFutures);
             }
 
-            double maxMapStrike = callMap.Last().Key;
-            double calculatedStrike = CalculateActualStrike() + NumberOfTrackingOptions / 2;
-
-            return calculatedStrike > maxMapStrike ? maxMapStrike : calculatedStrike;
+            return CalculateActualStrike() + NumberOfTrackingOptions / 2;
         }
 
         public double CalculateActualStrike()
         {
-            return Math.Round(basicFutures.GetTradeBlotter().AskPrice, 0);
+            return Math.Round(basicFutures.GetTradeBlotter().AskPrice + Settings.Default.Test, 0);
         }
 
         public Option GetOption(double strike, OptionType type)
@@ -218,14 +196,6 @@ namespace OptionsTradeWell.model
                     OnSpotPriceChanged(this, new OptionEventArgs(infoOption));
                 }
 
-
-                if (OnBasedParametersChanged != null
-                    && Math.Abs(lastTrackingStrike - CalculateActualStrike()) > 0.01
-                    && DateTime.Now > lastTrackingUpdate)
-                {
-                    lastTrackingUpdate = DateTime.Now.AddSeconds(MINIMUM_UPDATE_TIME_SEC);
-                    OnBasedParametersChanged(this, EventArgs.Empty);
-                }
             }
             else if (topic.Equals(OPTIONS_DESK))
             {
@@ -233,11 +203,6 @@ namespace OptionsTradeWell.model
                 double strike = Convert.ToDouble(data[1]);
                 SortedDictionary<double, Option> suitOptionsMap = GetSuitableOptionsMap(optionType);
                 Option tempOption;
-
-                if (strike < CalculateActualStrike() - (NumberOfTrackingOptions/2) || strike > CalculateActualStrike() + (NumberOfTrackingOptions / 2))
-                {
-                    return;
-                }
 
                 if (suitOptionsMap.ContainsKey(strike))
                 {
@@ -306,8 +271,8 @@ namespace OptionsTradeWell.model
             }
 
             if (futRecievedDataFlag == true
-                && callMap.Keys.Count >= NumberOfTrackingOptions
-                && putMap.Keys.Count >= NumberOfTrackingOptions)
+                && callMap.Keys.Count >= Settings.Default.OptDeskStrikesNumber
+                && putMap.Keys.Count >= Settings.Default.OptDeskStrikesNumber)
             {
                 optRecievedDataFlag = true;
             }

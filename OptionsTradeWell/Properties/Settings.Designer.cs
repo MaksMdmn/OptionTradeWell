@@ -73,31 +73,6 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60000")]
-        public int AutoImplVolaUpdateMs {
-            get {
-                return ((int)(this["AutoImplVolaUpdateMs"]));
-            }
-            set {
-                this["AutoImplVolaUpdateMs"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("D:\\\\programming\\\\c# here\\\\Project\\\\OptionsTradeWell\\\\OptionsTradeWell\\\\assistants" +
-            "\\\\data.txt")]
-        public string PathToVolatilityFile {
-            get {
-                return ((string)(this["PathToVolatilityFile"]));
-            }
-            set {
-                this["PathToVolatilityFile"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("18")]
         public int NumberOfTrackingOptions {
             get {
@@ -158,18 +133,6 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public int DisplayedPeriodOfImplVol {
-            get {
-                return ((int)(this["DisplayedPeriodOfImplVol"]));
-            }
-            set {
-                this["DisplayedPeriodOfImplVol"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public double ChartsMinYValue {
             get {
@@ -201,6 +164,30 @@ namespace OptionsTradeWell.Properties {
             }
             set {
                 this["ChartsStepYValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double Test {
+            get {
+                return ((double)(this["Test"]));
+            }
+            set {
+                this["Test"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("26")]
+        public double OptDeskStrikesNumber {
+            get {
+                return ((double)(this["OptDeskStrikesNumber"]));
+            }
+            set {
+                this["OptDeskStrikesNumber"] = value;
             }
         }
     }

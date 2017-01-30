@@ -20,7 +20,6 @@ namespace OptionsTradeWell
 {
     public partial class MainForm : Form, IMainForm
     {
-        public static int VIEW_NUMBER_OF_IMPL_VOL_VALUES = Settings.Default.DisplayedPeriodOfImplVol;
         public static double minValueY = Settings.Default.ChartsMinYValue;
         public static double maxValueY = Settings.Default.ChartsMaxYValue;
         public static double stepY = Settings.Default.ChartsStepYValue;
@@ -28,8 +27,10 @@ namespace OptionsTradeWell
         public event EventHandler OnStartUp;
         public event EventHandler OnSettingsInFormChanged;
 
+        private object threadLock = new object();
+
         private bool onTimeStartUpClick;
-        private SortedDictionary<double, OptTableDataRow> rowMap;
+        private SortedDictionary<double, OptionsTableRow> rowMap;
         private List<string> columnsNames;
         private System.Timers.Timer statusBarReducingTimer;
 
@@ -41,13 +42,11 @@ namespace OptionsTradeWell
         private Series buyPutVolSeries;
         private Series sellPutVolSeries;
         private Series midPutVolSeries;
-        private Series implVolCallSeries;
-        private Series implVolPutSeries;
 
         public MainForm()
         {
             statusBarReducingTimer = new System.Timers.Timer();
-            rowMap = new SortedDictionary<double, OptTableDataRow>();
+            rowMap = new SortedDictionary<double, OptionsTableRow>();
 
             InitializeComponent();
 
@@ -66,52 +65,6 @@ namespace OptionsTradeWell
             onTimeStartUpClick = true;
         }
 
-        public void UpdatePrimaryViewData(List<double[]> tableDataList, int uniqueValueIndex)
-        {
-            if (tableDataList.Count == 0)
-            {
-                throw new IllegalViewDataException("data for display is incorrect or empty: " + tableDataList);
-            }
-
-            if (optionsDataTable.Rows.Count != 0)
-            {
-                optionsDataTable.Clear();
-                rowMap.Clear();
-            }
-
-            for (int i = 0; i < tableDataList.Count; i++)
-            {
-                //Create and fulfill row in options table and projected that data to table and charts
-                OptTableDataRow tempRow = new OptTableDataRow(i, uniqueValueIndex, tableDataList[i]);
-                rowMap.Add(tempRow.UniqueValue, tempRow);
-                optionsDataTable.Rows.Add();
-
-                FulfilOptionsDataTableRow(tempRow);
-            }
-        }
-
-
-        public void UpdateRowInViewDataMap(double[] updatedData, int uniqueValueIndex)
-        {
-
-            double tempKey = updatedData[uniqueValueIndex];
-            if (this.rowMap.Count == 0)
-            {
-                throw new IllegalViewDataException("data for display is incorrect or empty: " + this.rowMap);
-            }
-
-            if (this.rowMap.ContainsKey(tempKey))
-            {
-                OptTableDataRow tempRow = this.rowMap[tempKey];
-                tempRow.DataArr = updatedData;
-                FulfilOptionsDataTableRow(tempRow);
-            }
-            else
-            {
-                throw new IllegalViewDataException("row with such a unique value does not exist in table: " + tempKey);
-            }
-        }
-
         public void UpdateFuturesData(string[] data)
         {
             while (this.IsHandleCreated == false)
@@ -122,54 +75,18 @@ namespace OptionsTradeWell
             {
                 this.lblSpotPrice.Text = data[0];
                 this.toolStripStLbAsset.Text = string.Format("{0} {1}", "underlying asset:", data[1]);
-                this.toolStripStLbDaysToExp.Text = string.Format("{0} {1}", "opt. days left:", data[2]);
+                this.lblDaysToExp.Text = data[2];
                 this.toolStripStLbLastUpd.Text = string.Format("{0} {1:dd-MM-yyyy HH:mm:ss}", "last update:", DateTime.Now);
                 this.toolStripPrBrConnection.Value = 100; //TODO
             }));
 
         }
 
-        public void UpdateImplVolChartData(string[] data)
-        {
-            while (this.IsHandleCreated == false)
-            {
-            }
-
-            this.BeginInvoke((Action)(() =>
-            {
-                if (implVolCallSeries.Points.Count > VIEW_NUMBER_OF_IMPL_VOL_VALUES)
-                {
-                    implVolCallSeries.Points.RemoveAt(0);
-                    implVolPutSeries.Points.RemoveAt(0);
-                }
-
-                implVolCallSeries.Points.AddXY(data[0], Convert.ToDouble(data[1]));
-                implVolPutSeries.Points.AddXY(data[0], Convert.ToDouble(data[2]));
-            }));
-        }
-
-        public void ReloadImplVolChartData(string[] data)
-        {
-            while (this.IsHandleCreated == false)
-            {
-            }
-
-            this.BeginInvoke((Action)(() =>
-            {
-                implVolCallSeries.Points.Clear();
-                implVolPutSeries.Points.Clear();
-            }));
-
-            UpdateImplVolChartData(data);
-        }
-
         public void InitPrimarySettingsView()
         {
-            txBxAutoWrtTimeMs.Text = Settings.Default.AutoImplVolaUpdateMs.ToString();
             txBxCentralStrChangeTimeSec.Text = Settings.Default.MinActualStrikeUpdateTimeSec.ToString();
             txBxDaysInYear.Text = Settings.Default.DaysInYear.ToString();
             txBxFutTableName.Text = Settings.Default.FuturesTableName;
-            txBxImplVolPeriodsDisplayedNumbers.Text = Settings.Default.DisplayedPeriodOfImplVol.ToString();
             txBxMaxVolValue.Text = Settings.Default.MaxValueOfImplVol.ToString();
             txBxMaxYValue.Text = Settings.Default.ChartsMaxYValue.ToString();
             txBxMinYValue.Text = Settings.Default.ChartsMinYValue.ToString();
@@ -177,9 +94,117 @@ namespace OptionsTradeWell
             txBxOptTableName.Text = Settings.Default.OptionsTableName;
             txBxStepYValue.Text = Settings.Default.ChartsStepYValue.ToString();
             txBxServName.Text = Settings.Default.ServerName;
-            txBxPathToVolFile.Text = Settings.Default.PathToVolatilityFile;
             txBxUniqueIndx.Text = Settings.Default.UniqueIndexInDdeDataArray.ToString();
             txBxRounding.Text = Settings.Default.RoundTo.ToString();
+            txBxStrikesNumber.Text = Settings.Default.OptDeskStrikesNumber.ToString();
+        }
+        public void UpdateViewData(List<double[]> tableDataList)
+        {
+            lock (threadLock)
+            {
+                if (rowMap.Count == 0)
+                {
+                    FirstCreationOfDataMap(tableDataList);
+                }
+                else
+                {
+                    UsualUpdateDataInRowMap(tableDataList);
+                }
+            }
+        }
+
+        private void FirstCreationOfDataMap(List<double[]> tableDataList)
+        {
+            for (int i = 0; i < tableDataList.Count; i++)
+            {
+                OptionsTableRow row = new OptionsTableRow(tableDataList[i]);
+                row.IndexInTable = GetDataRowIndex(optionsDataTable.Rows.Add());
+                rowMap.Add(row.UniqueValue, row);
+                RowDataArrToOptionsTable(row);
+            }
+        }
+
+        private void UsualUpdateDataInRowMap(List<double[]> tableDataList)
+        {
+            foreach (double[] dataArr in tableDataList)
+            {
+                OptionsTableRow row = new OptionsTableRow(dataArr);
+                double minKey = rowMap.Keys.Min();
+                double maxKey = rowMap.Keys.Max();
+
+                if (dataArr[Settings.Default.UniqueIndexInDdeDataArray] < minKey)
+                {
+                    AddFirstRemoveLastRow(row);
+                }
+                else if (dataArr[Settings.Default.UniqueIndexInDdeDataArray] > maxKey)
+                {
+                    AddLastRemoveFirstRow(row);
+                }
+                else
+                {
+                    ChangeExistingRow(row);
+                }
+            }
+        }
+
+        private void AddFirstRemoveLastRow(OptionsTableRow row)
+        {
+            DataRow tempDataRow = optionsDataTable.NewRow();
+
+            row.IndexInTable = 0;
+
+            optionsDataTable.Rows.InsertAt(tempDataRow, 0);
+            optionsDataTable.Rows.RemoveAt(optionsDataTable.Rows.Count - 1);
+
+            rowMap.Remove(rowMap.Keys.Max());
+            rowMap.Add(row.UniqueValue, row);
+
+            RowDataArrToOptionsTable(row);
+        }
+
+        private void AddLastRemoveFirstRow(OptionsTableRow row)
+        {
+            DataRow tempDataRow = optionsDataTable.NewRow();
+
+            row.IndexInTable = optionsDataTable.Rows.Count - 1;
+
+            optionsDataTable.Rows.InsertAt(tempDataRow, optionsDataTable.Rows.Count);
+            optionsDataTable.Rows.RemoveAt(0);
+
+            rowMap.Remove(rowMap.Keys.Min());
+            rowMap.Add(row.UniqueValue, row);
+
+            RowDataArrToOptionsTable(row);
+        }
+
+        private void ChangeExistingRow(OptionsTableRow row)
+        {
+            OptionsTableRow actualRow = rowMap[row.UniqueValue];
+            actualRow.DataArr = row.DataArr;
+            RowDataArrToOptionsTable(actualRow);
+        }
+
+        private int GetDataRowIndex(DataRow row)
+        {
+            return optionsDataTable.Rows.IndexOf(row);
+        }
+
+        private void RowDataArrToOptionsTable(OptionsTableRow row)
+        {
+            for (int i = 0; i < row.DataArr.Length; i++)
+            {
+                if (i == OptionsTableRow.buyVollPutIndex
+                    || i == OptionsTableRow.sellVollPutIndex
+                    || i == OptionsTableRow.buyVollCallIndex
+                    || i == OptionsTableRow.sellVollCallIndex)
+                {
+                    optionsDataTable.Rows[row.IndexInTable][i] = OptionsTableRow.GetPectentageViewOfVola(row.DataArr[i]);
+                }
+                else
+                {
+                    optionsDataTable.Rows[row.IndexInTable][i] = row.DataArr[i];
+                }
+            }
         }
 
         private void InitializeOptionsDataTable()
@@ -213,7 +238,6 @@ namespace OptionsTradeWell
             }
 
             dgvOptionDesk.DataSource = optionsDataTable;
-
         }
 
         private void SetupOptionDeskTableLayout()
@@ -270,11 +294,10 @@ namespace OptionsTradeWell
 
         }
 
-
         private void SetupChartsLayouts()
         {
             string toolTipFormat = "strike: #VALX{F2}\nvol: #VALY{F2}";
-            Chart[] allCharts = new Chart[] { chrtImplVol, chrtCallVol, chrtPutVol };
+            Chart[] allCharts = new Chart[] { chrtCallVol, chrtPutVol };
             foreach (Chart chart in allCharts)
             {
                 chart.BackColor = Color.SlateGray;
@@ -294,23 +317,12 @@ namespace OptionsTradeWell
                 chart.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
             }
 
-            implVolCallSeries = new Series();
-            implVolPutSeries = new Series();
             buyCallVolSeries = new Series();
             sellCallVolSeries = new Series();
             midCallVolSeries = new Series();
             buyPutVolSeries = new Series();
             sellPutVolSeries = new Series();
             midPutVolSeries = new Series();
-
-            implVolCallSeries.ChartType = SeriesChartType.Spline;
-            implVolCallSeries.Color = Color.LightGreen;
-            implVolCallSeries.MarkerSize = 5;
-
-            implVolPutSeries.ChartType = SeriesChartType.Spline;
-            implVolPutSeries.Color = Color.LightCoral;
-            implVolPutSeries.MarkerSize = 5;
-
 
             buyCallVolSeries.ChartType = SeriesChartType.Point;
             buyCallVolSeries.MarkerStyle = MarkerStyle.Circle;
@@ -343,9 +355,6 @@ namespace OptionsTradeWell
             midPutVolSeries.ChartType = SeriesChartType.Spline;
             midPutVolSeries.Color = Color.DarkRed;
             midPutVolSeries.MarkerSize = 5;
-
-            chrtImplVol.Series.Add(implVolCallSeries);
-            chrtImplVol.Series.Add(implVolPutSeries);
 
             chrtCallVol.Series.Add(buyCallVolSeries);
             chrtCallVol.Series.Add(sellCallVolSeries);
@@ -412,53 +421,83 @@ namespace OptionsTradeWell
                 if (tempVal > 0)
                 {
                     toolStripPrBrConnection.Value = tempVal - 2;
-
-                    chrtCallVol.DataBind();
-                    chrtPutVol.DataBind();
+                    lock (threadLock)
+                    {
+                        chrtCallVol.DataBind();
+                        chrtPutVol.DataBind();
+                    }
                 }
             }));
         }
 
-
-        private void FulfilOptionsDataTableRow(OptTableDataRow row)
+        private void btnSetDefaultSettings_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < row.DataArr.Length; i++)
+            InitPrimarySettingsView();
+        }
+
+        private void btnSaveSettings_Click(object sender, EventArgs e)
+        {
+            Settings.Default.MinActualStrikeUpdateTimeSec = Convert.ToInt32(txBxCentralStrChangeTimeSec.Text);
+            Settings.Default.DaysInYear = Convert.ToDouble(txBxDaysInYear.Text);
+            Settings.Default.FuturesTableName = txBxFutTableName.Text;
+            Settings.Default.MaxValueOfImplVol = Convert.ToDouble(txBxMaxVolValue.Text);
+            Settings.Default.ChartsMaxYValue = Convert.ToDouble(txBxMaxYValue.Text);
+            Settings.Default.ChartsMinYValue = Convert.ToDouble(txBxMinYValue.Text);
+            Settings.Default.NumberOfTrackingOptions = Convert.ToInt32(txBxNumberOfTrackOpt.Text);
+            Settings.Default.OptionsTableName = txBxOptTableName.Text;
+            Settings.Default.ChartsStepYValue = Convert.ToDouble(txBxStepYValue.Text);
+            Settings.Default.ServerName = txBxServName.Text;
+            Settings.Default.UniqueIndexInDdeDataArray = Convert.ToInt32(txBxUniqueIndx.Text);
+            Settings.Default.RoundTo = Convert.ToInt32(txBxRounding.Text);
+            Settings.Default.OptDeskStrikesNumber = Convert.ToInt32(txBxStrikesNumber.Text);
+            Settings.Default.Save();
+
+            if (OnSettingsInFormChanged != null)
             {
-                if (i == row.buyVollCallIndex
-                    || i == row.sellVollCallIndex
-                    || i == row.buyVollPutIndex
-                    || i == row.sellVollPutIndex)
-                {
-                    optionsDataTable.Rows[row.RowNumber][i] = row.DataArr[i] * 100 + "%";
-                }
-                else
-                {
-                    optionsDataTable.Rows[row.RowNumber][i] = row.DataArr[i];
-                }
+                OnSettingsInFormChanged(sender, e);
             }
         }
 
-        private class OptTableDataRow
+        private void btnStart_Click(object sender, EventArgs e)
         {
-            internal readonly int buyVollCallIndex = 5;
-            internal readonly int sellVollCallIndex = 6;
-            internal readonly int buyVollPutIndex = 7;
-            internal readonly int sellVollPutIndex = 8;
+            if (onTimeStartUpClick)
+            {
+                btnStart.BackColor = Color.Gray;
+                btnStart.Text = "Starting...";
+
+                if (OnStartUp != null)
+                {
+                    OnStartUp(sender, e);
+                }
+                btnStart.ForeColor = Color.SkyBlue;
+                btnStart.Text = "Started";
+
+                onTimeStartUpClick = false;
+            }
+            else
+            {
+                MessageBox.Show("Program is working now, buddy.");
+            }
+        }
+
+        private class OptionsTableRow
+        {
+            internal static readonly int buyVollCallIndex = 5;
+            internal static readonly int sellVollCallIndex = 6;
+            internal static readonly int buyVollPutIndex = 7;
+            internal static readonly int sellVollPutIndex = 8;
 
             private double[] dataArr;
 
-            public OptTableDataRow(int rowNumber, int uniqueValueInDataArrIndex, double[] dataArr)
+            public OptionsTableRow(double[] dataArr)
             {
-                RowNumber = rowNumber;
-                UniqueValueInDataArrIndex = uniqueValueInDataArrIndex;
+                UniqueValueInDataArrIndex = Settings.Default.UniqueIndexInDdeDataArray;
                 DataArr = dataArr;
                 SetValuesFromDataArr();
             }
 
-            public int RowNumber
-            {
-                get; private set;
-            }
+            public int IndexInTable { get; set; }
+
             public int UniqueValueInDataArrIndex
             {
                 get; private set;
@@ -495,6 +534,11 @@ namespace OptionsTradeWell
 
             public double MidPutVol { get; set; }
 
+            public static string GetPectentageViewOfVola(double vol)
+            {
+                return vol * 100 + "%";
+            }
+
             private void SetValuesFromDataArr()
             {
                 Strike = DataArr[UniqueValueInDataArrIndex];
@@ -505,57 +549,11 @@ namespace OptionsTradeWell
                 SellPutVol = DataArr[sellVollPutIndex] * 100.0;
                 MidPutVol = ((DataArr[buyVollPutIndex] + DataArr[sellVollPutIndex]) / 2.0) * 100.0;
             }
+
         }
 
-        private void btnSetDefaultSettings_Click(object sender, EventArgs e)
+        private void btnUpdatePos_Click(object sender, EventArgs e)
         {
-            InitPrimarySettingsView();
-        }
-
-        private void btnSaveSettings_Click(object sender, EventArgs e)
-        {
-            Settings.Default.AutoImplVolaUpdateMs = Convert.ToInt32(txBxAutoWrtTimeMs.Text);
-            Settings.Default.MinActualStrikeUpdateTimeSec = Convert.ToInt32(txBxCentralStrChangeTimeSec.Text);
-            Settings.Default.DaysInYear = Convert.ToDouble(txBxDaysInYear.Text);
-            Settings.Default.FuturesTableName = txBxFutTableName.Text;
-            Settings.Default.DisplayedPeriodOfImplVol = Convert.ToInt32(txBxImplVolPeriodsDisplayedNumbers.Text);
-            Settings.Default.MaxValueOfImplVol = Convert.ToDouble(txBxMaxVolValue.Text);
-            Settings.Default.ChartsMaxYValue = Convert.ToDouble(txBxMaxYValue.Text);
-            Settings.Default.ChartsMinYValue = Convert.ToDouble(txBxMinYValue.Text);
-            Settings.Default.NumberOfTrackingOptions = Convert.ToInt32(txBxNumberOfTrackOpt.Text);
-            Settings.Default.OptionsTableName = txBxOptTableName.Text;
-            Settings.Default.ChartsStepYValue = Convert.ToDouble(txBxStepYValue.Text);
-            Settings.Default.ServerName = txBxServName.Text;
-            Settings.Default.PathToVolatilityFile = txBxPathToVolFile.Text;
-            Settings.Default.UniqueIndexInDdeDataArray = Convert.ToInt32(txBxUniqueIndx.Text);
-            Settings.Default.RoundTo = Convert.ToInt32(txBxRounding.Text);
-            Settings.Default.Save();
-
-            if (OnSettingsInFormChanged != null)
-            {
-                OnSettingsInFormChanged(sender, e);
-            }
-        }
-
-        private void btnStart_Click(object sender, EventArgs e)
-        {
-            if (onTimeStartUpClick)
-            {
-                btnStart.BackColor = Color.Gray;
-
-                if (OnStartUp != null)
-                {
-                    OnStartUp(sender, e);
-                }
-                btnStart.ForeColor = Color.SkyBlue;
-                btnStart.Text = "Started";
-
-                onTimeStartUpClick = false;
-            }
-            else
-            {
-                MessageBox.Show("Program is working now, buddy.");
-            }
         }
     }
 }

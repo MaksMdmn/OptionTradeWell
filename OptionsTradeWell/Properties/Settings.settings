@@ -14,12 +14,6 @@
     <Setting Name="UniqueIndexInDdeDataArray" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
-    <Setting Name="AutoImplVolaUpdateMs" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">60000</Value>
-    </Setting>
-    <Setting Name="PathToVolatilityFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)">D:\\programming\\c# here\\Project\\OptionsTradeWell\\OptionsTradeWell\\assistants\\data.txt</Value>
-    </Setting>
     <Setting Name="NumberOfTrackingOptions" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">18</Value>
     </Setting>
@@ -35,9 +29,6 @@
     <Setting Name="MinActualStrikeUpdateTimeSec" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10</Value>
     </Setting>
-    <Setting Name="DisplayedPeriodOfImplVol" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100</Value>
-    </Setting>
     <Setting Name="ChartsMinYValue" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
@@ -46,6 +37,12 @@
     </Setting>
     <Setting Name="ChartsStepYValue" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="Test" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="OptDeskStrikesNumber" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">26</Value>
     </Setting>
   </Settings>
 </SettingsFile>

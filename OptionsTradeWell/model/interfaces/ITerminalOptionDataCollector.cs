@@ -6,8 +6,6 @@ namespace OptionsTradeWell.model.interfaces
     {
         event EventHandler<OptionEventArgs> OnOptionsDeskChanged;
         event EventHandler<OptionEventArgs> OnSpotPriceChanged;
-        event EventHandler OnBasedParametersChanged;
-
         int NumberOfTrackingOptions { get; set; }
         double GetBid(double strike, OptionType type);
         double GetAsk(double strike, OptionType type);
