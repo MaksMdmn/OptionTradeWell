@@ -15,6 +15,7 @@ namespace OptionsTradeWell.model
             this.MarginRequirement = marginRequirement;
             this.PriceStep = priceStep;
             this.PriceStepValue = priceStepValue;
+            this.Position = new Position();
         }
 
         public string Ticker { get; }
@@ -28,6 +29,17 @@ namespace OptionsTradeWell.model
         public double PriceStep { get; }
 
         public double PriceStepValue { get; }
+
+        public Position Position { get; }
+
+        public static Futures GetFakeFutures(double enterFutPrice, int futPosition, TradeBlotter blotter, double priceStep, double priceVal)
+        {
+            Futures fut = new Futures("", DateTime.Now, 0.0, 0.0, priceStep, priceVal);
+            fut.AssignTradeBlotter(blotter);
+            fut.Position.Quantity = futPosition;
+            fut.Position.EnterPrice = enterFutPrice;
+            return fut;
+        }
 
         public override string ToString()
         {

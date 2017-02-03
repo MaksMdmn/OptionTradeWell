@@ -1,4 +1,5 @@
 ﻿using System;
+using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.Properties;
 
 namespace OptionsTradeWell.model
@@ -201,6 +202,80 @@ namespace OptionsTradeWell.model
         public static double GetFilteredVolatilityValue(double value)
         {
             return value > MAX_VOLA_VALUE || value < 0 ? 0.00 : value;
+        }
+
+        public static double CalculateOptionPnLOnExpiration(Option option, double expirPrice)
+        {
+            double result = 0.0;
+
+            if (option.Position.Quantity == 0)
+            {
+                throw new ModelCalcsException("option's position is zero, PnL calculations are impossible to do.");
+            }
+            else
+            {
+                if (option.OptionType == OptionType.Call)
+                {
+                    double deltaInPrices = expirPrice - option.Strike;
+                    double optPremium = -1 * option.Position.EnterPrice * option.Position.Quantity;
+                    int optPosizion = option.Position.Quantity;
+
+                    if (option.Position.Quantity > 0)
+                    {
+                        if (expirPrice > option.Strike)
+                        {
+                            result = deltaInPrices * optPosizion + optPremium;
+                        }
+                        else
+                        {
+                            result = optPremium;
+                        }
+                    }
+                    else
+                    {
+                        if (expirPrice < option.Strike)
+                        {
+                            result = optPremium;
+                        }
+                        else
+                        {
+                            result = deltaInPrices * optPosizion + optPremium;
+                        }
+                    }
+                }
+
+                if (option.OptionType == OptionType.Put)
+                {
+                    double deltaInPrices = option.Strike - expirPrice;
+                    double optPremium = -1 * option.Position.EnterPrice * option.Position.Quantity;
+                    int optPosizion = option.Position.Quantity;
+
+                    if (option.Position.Quantity > 0)
+                    {
+                        if (expirPrice < option.Strike)
+                        {
+                            result = deltaInPrices * optPosizion + optPremium;
+                        }
+                        else
+                        {
+                            result = optPremium;
+                        }
+                    }
+                    else
+                    {
+                        if (expirPrice > option.Strike)
+                        {
+                            result = optPremium;
+                        }
+                        else
+                        {
+                            result = deltaInPrices * optPosizion + optPremium;
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
 
 

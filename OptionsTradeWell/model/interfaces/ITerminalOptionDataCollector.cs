@@ -16,6 +16,7 @@ namespace OptionsTradeWell.model.interfaces
         double GetPriceStep(double strike, OptionType type);
         double GetPriceStepValue(double strike, OptionType type);
         Option GetOption(double strike, OptionType type);
+        Futures GetBasicFutures();
         double CalculateMinImportantStrike();
         double CalculateMaxImportantStrike();
         double CalculateActualStrike();

@@ -64,10 +64,13 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="model\exceptions\ModelCalcsException.cs" />
     <Compile Include="model\exceptions\QuikDdeException.cs" />
     <Compile Include="model\exceptions\IllegalViewDataException.cs" />
-    <Compile Include="model\exceptions\WrongOptionsPairException.cs" />
+    <Compile Include="model\exceptions\RenderingDerivativesException.cs" />
     <Compile Include="model\OptionsQuikDdeDataCollector.cs" />
+    <Compile Include="model\PositionManager.cs" />
+    <Compile Include="model\Position.cs" />
     <Compile Include="model\QuikServerDde.cs" />
     <Compile Include="presenter\MainPresenter.cs" />
     <Compile Include="Program.cs" />
@@ -87,6 +90,7 @@
     <Compile Include="view\DerivativesDataRender.cs" />
     <Compile Include="view\interfaces\IDerivativesDataRender.cs" />
     <Compile Include="view\interfaces\IMainForm.cs" />
+    <Compile Include="view\UserPosTableTypes.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

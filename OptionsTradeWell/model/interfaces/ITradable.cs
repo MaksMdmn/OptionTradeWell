@@ -7,5 +7,6 @@
         TradeBlotter GetTradeBlotter();
 
         bool IsTradeBlotterAssigned();
+
     }
 }

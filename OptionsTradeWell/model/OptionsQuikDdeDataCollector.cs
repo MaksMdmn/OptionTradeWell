@@ -150,6 +150,11 @@ namespace OptionsTradeWell.model
             return GetSuitableOptionsMap(type)[strike];
         }
 
+        public Futures GetBasicFutures()
+        {
+            return basicFutures;
+        }
+
         private void CollectAndSortServerDataByMaps(string topic, string[] data)
         {
             if (futRecievedDataFlag == false || optRecievedDataFlag == false)

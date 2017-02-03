@@ -36,11 +36,13 @@
             this.chrtPutVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chrtCallVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabMain = new System.Windows.Forms.TabPage();
+            this.dgvTotalInfo = new System.Windows.Forms.DataGridView();
+            this.btnCleanSelected = new System.Windows.Forms.Button();
+            this.btnCleanPos = new System.Windows.Forms.Button();
             this.txBxInfo = new System.Windows.Forms.TextBox();
             this.chrtPos = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.btnUpdatePos = new System.Windows.Forms.Button();
-            this.txBxTickersPos = new System.Windows.Forms.TextBox();
-            this.dgvPosParts = new System.Windows.Forms.DataGridView();
+            this.dgvPositions = new System.Windows.Forms.DataGridView();
             this.label21 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.lblDaysToExp = new System.Windows.Forms.Label();
@@ -90,8 +92,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.chrtPutVol)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtCallVol)).BeginInit();
             this.tabMain.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvTotalInfo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPos)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvPosParts)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPositions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOptionDesk)).BeginInit();
             this.tabs.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -152,11 +155,13 @@
             // 
             this.tabMain.AutoScroll = true;
             this.tabMain.BackColor = System.Drawing.Color.Gainsboro;
+            this.tabMain.Controls.Add(this.dgvTotalInfo);
+            this.tabMain.Controls.Add(this.btnCleanSelected);
+            this.tabMain.Controls.Add(this.btnCleanPos);
             this.tabMain.Controls.Add(this.txBxInfo);
             this.tabMain.Controls.Add(this.chrtPos);
             this.tabMain.Controls.Add(this.btnUpdatePos);
-            this.tabMain.Controls.Add(this.txBxTickersPos);
-            this.tabMain.Controls.Add(this.dgvPosParts);
+            this.tabMain.Controls.Add(this.dgvPositions);
             this.tabMain.Controls.Add(this.label21);
             this.tabMain.Controls.Add(this.label20);
             this.tabMain.Controls.Add(this.lblDaysToExp);
@@ -171,49 +176,69 @@
             this.tabMain.TabIndex = 0;
             this.tabMain.Text = "MainPage";
             // 
+            // dgvTotalInfo
+            // 
+            this.dgvTotalInfo.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvTotalInfo.Location = new System.Drawing.Point(630, 427);
+            this.dgvTotalInfo.Name = "dgvTotalInfo";
+            this.dgvTotalInfo.Size = new System.Drawing.Size(115, 220);
+            this.dgvTotalInfo.TabIndex = 22;
+            // 
+            // btnCleanSelected
+            // 
+            this.btnCleanSelected.Location = new System.Drawing.Point(646, 369);
+            this.btnCleanSelected.Name = "btnCleanSelected";
+            this.btnCleanSelected.Size = new System.Drawing.Size(88, 23);
+            this.btnCleanSelected.TabIndex = 21;
+            this.btnCleanSelected.Text = "cleanSelected";
+            this.btnCleanSelected.UseVisualStyleBackColor = true;
+            this.btnCleanSelected.Click += new System.EventHandler(this.btnDeleteOne_Click);
+            // 
+            // btnCleanPos
+            // 
+            this.btnCleanPos.Location = new System.Drawing.Point(646, 398);
+            this.btnCleanPos.Name = "btnCleanPos";
+            this.btnCleanPos.Size = new System.Drawing.Size(88, 23);
+            this.btnCleanPos.TabIndex = 20;
+            this.btnCleanPos.Text = "cleanAll";
+            this.btnCleanPos.UseVisualStyleBackColor = true;
+            this.btnCleanPos.Click += new System.EventHandler(this.btnCleanPos_Click);
+            // 
             // txBxInfo
             // 
-            this.txBxInfo.Location = new System.Drawing.Point(950, 175);
+            this.txBxInfo.Location = new System.Drawing.Point(950, 91);
             this.txBxInfo.Multiline = true;
             this.txBxInfo.Name = "txBxInfo";
-            this.txBxInfo.Size = new System.Drawing.Size(362, 146);
+            this.txBxInfo.Size = new System.Drawing.Size(362, 230);
             this.txBxInfo.TabIndex = 19;
             // 
             // chrtPos
             // 
             chartArea3.Name = "ChartArea1";
             this.chrtPos.ChartAreas.Add(chartArea3);
-            this.chrtPos.Location = new System.Drawing.Point(754, 336);
+            this.chrtPos.Location = new System.Drawing.Point(751, 340);
             this.chrtPos.Name = "chrtPos";
-            this.chrtPos.Size = new System.Drawing.Size(558, 315);
+            this.chrtPos.Size = new System.Drawing.Size(561, 311);
             this.chrtPos.TabIndex = 18;
             this.chrtPos.Text = "chart1";
             // 
             // btnUpdatePos
             // 
-            this.btnUpdatePos.Location = new System.Drawing.Point(677, 336);
+            this.btnUpdatePos.Location = new System.Drawing.Point(646, 340);
             this.btnUpdatePos.Name = "btnUpdatePos";
-            this.btnUpdatePos.Size = new System.Drawing.Size(71, 42);
+            this.btnUpdatePos.Size = new System.Drawing.Size(88, 23);
             this.btnUpdatePos.TabIndex = 17;
-            this.btnUpdatePos.Text = "button1";
+            this.btnUpdatePos.Text = "update";
             this.btnUpdatePos.UseVisualStyleBackColor = true;
             this.btnUpdatePos.Click += new System.EventHandler(this.btnUpdatePos_Click);
             // 
-            // txBxTickersPos
+            // dgvPositions
             // 
-            this.txBxTickersPos.Location = new System.Drawing.Point(677, 384);
-            this.txBxTickersPos.Multiline = true;
-            this.txBxTickersPos.Name = "txBxTickersPos";
-            this.txBxTickersPos.Size = new System.Drawing.Size(71, 267);
-            this.txBxTickersPos.TabIndex = 16;
-            // 
-            // dgvPosParts
-            // 
-            this.dgvPosParts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvPosParts.Location = new System.Drawing.Point(34, 336);
-            this.dgvPosParts.Name = "dgvPosParts";
-            this.dgvPosParts.Size = new System.Drawing.Size(637, 315);
-            this.dgvPosParts.TabIndex = 15;
+            this.dgvPositions.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvPositions.Location = new System.Drawing.Point(34, 340);
+            this.dgvPositions.Name = "dgvPositions";
+            this.dgvPositions.Size = new System.Drawing.Size(590, 310);
+            this.dgvPositions.TabIndex = 15;
             // 
             // label21
             // 
@@ -649,8 +674,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.chrtCallVol)).EndInit();
             this.tabMain.ResumeLayout(false);
             this.tabMain.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvTotalInfo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPos)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvPosParts)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPositions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOptionDesk)).EndInit();
             this.tabs.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
@@ -715,9 +741,11 @@
         private System.Windows.Forms.TextBox txBxInfo;
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtPos;
         private System.Windows.Forms.Button btnUpdatePos;
-        private System.Windows.Forms.TextBox txBxTickersPos;
-        private System.Windows.Forms.DataGridView dgvPosParts;
+        private System.Windows.Forms.DataGridView dgvPositions;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.Button btnCleanSelected;
+        private System.Windows.Forms.Button btnCleanPos;
+        private System.Windows.Forms.DataGridView dgvTotalInfo;
     }
 }
 

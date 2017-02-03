@@ -7,7 +7,7 @@ namespace OptionsTradeWell.model
     {
         private TradeBlotter blotter = null;
 
-        public Option(Futures futures, OptionType optionType, double strike, double marginRequirementCover, double marginRequirementNotCover, double marginRequirementBuyer, string ticker, double priceStep, double priceStepValue, DateTime expirationDate, int remainingDays)
+        public Option(Futures futures, OptionType optionType, double strike, double marginRequirementCover, double marginRequirementNotCover, double marginRequirementBuyer, string ticker, double priceStep, double priceStepValue, DateTime expirationDate, double remainingDays)
         {
             this.Futures = futures;
             this.MarginRequirementCover = marginRequirementCover;
@@ -20,6 +20,7 @@ namespace OptionsTradeWell.model
             this.OptionType = optionType;
             this.RemainingDays = remainingDays;
             this.Strike = strike;
+            this.Position = new Position();
         }
 
         public Futures Futures { get; }
@@ -54,6 +55,24 @@ namespace OptionsTradeWell.model
         public double BuyVol { get; private set; }
 
         public double SellVol { get; private set; }
+
+        public Position Position { get; }
+
+        public static Option GetFakeOption(OptionType type, double strike, double enterOptPrice,
+              double remainingDays, int optPosition, TradeBlotter futBlotter, TradeBlotter optBlotter, double priceStep, double priceVal)
+        {
+            Futures fut = Futures.GetFakeFutures(0.0, 0, futBlotter, priceStep, priceVal);
+
+            Option option = new Option(fut, type, strike, 0.0, 0.0, 0.0, "", priceStep, priceVal, DateTime.Now, remainingDays);
+            option.AssignTradeBlotter(optBlotter);
+            option.Position.EnterPrice = enterOptPrice;
+            option.Position.Quantity = optPosition;
+
+            option.UpdateAllGreeksTogether();
+
+            return option;
+
+        }
 
         public void AssignTradeBlotter(TradeBlotter blotter)
         {
@@ -124,6 +143,61 @@ namespace OptionsTradeWell.model
                     this.GetTradeBlotter().BidPrice,
                     0.5));
 
+        }
+
+        public double DependOnPosDelta()
+        {
+            if (this.Position.Quantity == 0)
+            {
+                return this.Delta;
+            }
+            else
+            {
+                return this.Position.Quantity * Delta;
+            }
+        }
+
+        public double DependOnPosGamma()
+        {
+            if (this.Position.Quantity == 0)
+            {
+                return this.Gamma;
+            }
+            else
+            {
+                return this.Position.Quantity * Gamma;
+            }
+        }
+
+        public double DependOnPosVega()
+        {
+            if (this.Position.Quantity == 0)
+            {
+                return this.Vega;
+            }
+            else
+            {
+                return this.Position.Quantity * Vega;
+            }
+        }
+
+        public double DependOnPosTheta()
+        {
+            if (this.Position.Quantity == 0)
+            {
+                return this.Theta;
+            }
+            else
+            {
+                if (this.Position.Quantity == 0)
+                {
+                    return this.Theta;
+                }
+                else
+                {
+                    return this.Position.Quantity * Theta;
+                }
+            }
         }
 
         public override string ToString()

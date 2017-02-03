@@ -24,17 +24,21 @@ namespace OptionsTradeWell
         public static double maxValueY = Settings.Default.ChartsMaxYValue;
         public static double stepY = Settings.Default.ChartsStepYValue;
 
+        private static int NUMBER_OF_POSDATATABLE_ROWS_HARDCORE = 30;
+
         public event EventHandler OnStartUp;
         public event EventHandler OnSettingsInFormChanged;
+        public event EventHandler<PositionTableArgs> OnPosUpdateButtonClick;
 
         private object threadLock = new object();
 
-        private bool onTimeStartUpClick;
         private SortedDictionary<double, OptionsTableRow> rowMap;
-        private List<string> columnsNames;
         private System.Timers.Timer statusBarReducingTimer;
 
         private DataTable optionsDataTable;
+        private DataTable posDataTable;
+
+        private string[] totalInfoNames;
 
         private Series buyCallVolSeries;
         private Series sellCallVolSeries;
@@ -42,6 +46,8 @@ namespace OptionsTradeWell
         private Series buyPutVolSeries;
         private Series sellPutVolSeries;
         private Series midPutVolSeries;
+        private Series curPosSeries;
+        private Series expirPosSeries;
 
         public MainForm()
         {
@@ -54,15 +60,15 @@ namespace OptionsTradeWell
 
             InitializeOptionsDataTable();
 
-            SetupOptionDeskTableLayout();
+            InitializePosDataTable();
+
+            InitializeTotalInfoTable();
 
             SetupChartsLayouts();
 
             StartUpdateTimer();
 
             toolStripPrBrConnection.Value = 100;
-
-            onTimeStartUpClick = true;
         }
 
         public void UpdateFuturesData(string[] data)
@@ -111,6 +117,63 @@ namespace OptionsTradeWell
                     UsualUpdateDataInRowMap(tableDataList);
                 }
             }
+        }
+
+        public void UpdatePositionTableData(List<string[]> tableDataList)
+        {
+            while (this.IsHandleCreated == false)
+            {
+            }
+
+            this.BeginInvoke((Action)(() =>
+            {
+                for (int i = 0; i < tableDataList.Count; i++)
+                {
+                    StringArrToPosTable(tableDataList[i], i);
+                }
+            }));
+        }
+
+        public void UpdatePositionChartData(List<double[]> tableDataList)
+        {
+            while (this.IsHandleCreated == false)
+            {
+            }
+
+            this.BeginInvoke((Action)(() =>
+            {
+                curPosSeries.Points.Clear();
+                expirPosSeries.Points.Clear();
+                foreach (double[] dataArr in tableDataList)
+                {
+                    curPosSeries.Points.AddXY(dataArr[0], dataArr[1]);
+                    expirPosSeries.Points.AddXY(dataArr[0], dataArr[2]);
+                }
+            }));
+        }
+
+
+        public void UpdateTotalInfoTable(double[] dataArr)
+        {
+            while (this.IsHandleCreated == false)
+            {
+            }
+
+            this.BeginInvoke((Action)(() =>
+            {
+                for (int i = 0; i < dataArr.Length; i++)
+                {
+                    dgvTotalInfo[0, i + 1].Value = totalInfoNames[i] + " " + dataArr[i];
+                    if (dataArr[i] >= 0)
+                    {
+                        dgvTotalInfo[0, i + 1].Style.BackColor = Color.LightGreen;
+                    }
+                    else
+                    {
+                        dgvTotalInfo[0, i + 1].Style.BackColor = Color.LightCoral;
+                    }
+                }
+            }));
         }
 
         private void FirstCreationOfDataMap(List<double[]> tableDataList)
@@ -207,11 +270,19 @@ namespace OptionsTradeWell
             }
         }
 
+        private void StringArrToPosTable(string[] strArr, int rowNumber)
+        {
+            for (int i = 0; i < strArr.Length; i++)
+            {
+                posDataTable.Rows[rowNumber][i] = strArr[i];
+            }
+        }
+
         private void InitializeOptionsDataTable()
         {
             optionsDataTable = new DataTable();
 
-            columnsNames = new List<string>()
+            List<string> columnsNames = new List<string>()
             {
                 "Bid call",
                 "Ask call",
@@ -238,10 +309,8 @@ namespace OptionsTradeWell
             }
 
             dgvOptionDesk.DataSource = optionsDataTable;
-        }
 
-        private void SetupOptionDeskTableLayout()
-        {
+            //SETUP TABLE LAYOUT
             for (int i = 0; i < columnsNames.Count; i++)
             {
                 dgvOptionDesk.Columns[i].HeaderText = columnsNames[i];
@@ -286,18 +355,120 @@ namespace OptionsTradeWell
             dgvOptionDesk.RowsDefaultCellStyle.SelectionForeColor = System.Drawing.Color.Black;
             dgvOptionDesk.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.BottomCenter;
 
-            dgvOptionDesk.ScrollBars = ScrollBars.Vertical;
             dgvOptionDesk.Height = 315;
             dgvOptionDesk.Width = dgvOptionDesk.ColumnCount * 50 + 50 + 10;
 
             dgvOptionDesk.ScrollBars = ScrollBars.Vertical;
+        }
 
+        private void InitializePosDataTable()
+        {
+            posDataTable = new DataTable();
+
+            List<string> columnsNames = new List<string>()
+            {
+                "Type",
+                "Strike",
+                "Ent.Price",
+                "Quantity",
+                "Cur.Price",
+                "Cur.Vol",
+                "PnL usd",
+                "PnL rub",
+                "Delta",
+                "Gamma",
+                "Vega",
+                "Theta",
+            };
+
+            for (int i = 0; i < columnsNames.Count; i++)
+            {
+                posDataTable.Columns.Add(columnsNames[i]);
+            }
+
+            //hardcore 30 row
+            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            {
+                posDataTable.Rows.Add();
+            }
+
+            dgvPositions.DataSource = posDataTable;
+
+            for (int i = 0; i < columnsNames.Count; i++)
+            {
+                dgvPositions.Columns[i].HeaderText = columnsNames[i];
+                dgvPositions.Columns[i].Width = 60;
+                dgvPositions.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+                dgvPositions.Columns[i].ReadOnly = false;
+                dgvPositions.MultiSelect = false;
+                dgvPositions.Columns[i].Resizable = DataGridViewTriState.False;
+            }
+
+            dgvPositions.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
+            dgvPositions.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+            dgvPositions.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+            dgvPositions.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dgvPositions.RowsDefaultCellStyle.SelectionBackColor = System.Drawing.Color.Aquamarine;
+            dgvPositions.RowsDefaultCellStyle.SelectionForeColor = System.Drawing.Color.Black;
+            dgvPositions.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.BottomCenter;
+            dgvPositions.AllowUserToDeleteRows = false;
+            dgvPositions.AllowUserToAddRows = false;
+
+            dgvPositions.Height = 310;
+            dgvPositions.Width = 590;
+
+            dgvPositions.ScrollBars = ScrollBars.Both;
+        }
+
+        private void InitializeTotalInfoTable()
+        {
+
+            dgvTotalInfo.Columns.Add("totalInfo", "");
+            dgvTotalInfo.Columns[0].Width = 115;
+
+            for (int i = 0; i < 12; i++)
+            {
+                dgvTotalInfo.Rows.Add();
+            }
+
+            dgvTotalInfo.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgvTotalInfo.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+            dgvTotalInfo.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+            dgvTotalInfo.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dgvTotalInfo.RowHeadersVisible = false;
+            dgvTotalInfo.ColumnHeadersVisible = false;
+            dgvTotalInfo.GridColor = Color.WhiteSmoke;
+            dgvTotalInfo.SelectionChanged += DgvTotalInfo_SelectionChanged;
+            dgvTotalInfo.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+            dgvTotalInfo.ScrollBars = ScrollBars.None;
+
+            totalInfoNames = new string[]
+            {
+                "rub_PnL:",
+                "usd_PnL:",
+                "fixPnL:",
+                "delta:",
+                "gamma:",
+                "vega:",
+                "theta:"
+            };
+
+            dgvTotalInfo[0, 0].Value = "TOTAL";
+            dgvTotalInfo[0, 0].Style.BackColor = Color.LightGray;
+            dgvTotalInfo[0, 0].Style.Font = new Font("Microsoft Sans Serif", 10.0f, FontStyle.Bold);
+        }
+
+        private void DgvTotalInfo_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvTotalInfo.SelectedCells.Count > 0)
+                dgvTotalInfo.ClearSelection();
         }
 
         private void SetupChartsLayouts()
         {
             string toolTipFormat = "strike: #VALX{F2}\nvol: #VALY{F2}";
-            Chart[] allCharts = new Chart[] { chrtCallVol, chrtPutVol };
+            Chart[] allCharts = new Chart[] { chrtCallVol, chrtPutVol, chrtPos };
             foreach (Chart chart in allCharts)
             {
                 chart.BackColor = Color.SlateGray;
@@ -314,7 +485,6 @@ namespace OptionsTradeWell
                 chart.ChartAreas[0].AxisY.MajorGrid.LineColor = Color.WhiteSmoke;
                 chart.ChartAreas[0].AxisY.LineColor = Color.WhiteSmoke;
                 chart.ChartAreas[0].AxisY.ScaleBreakStyle.LineColor = Color.WhiteSmoke;
-                chart.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
             }
 
             buyCallVolSeries = new Series();
@@ -391,6 +561,7 @@ namespace OptionsTradeWell
             chrtCallVol.Titles[0].Alignment = ContentAlignment.TopCenter;
             chrtCallVol.Titles[0].ForeColor = Color.WhiteSmoke;
             chrtCallVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
+            chrtCallVol.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
 
             chrtPutVol.ChartAreas[0].AxisY.Minimum = minValueY;
             chrtPutVol.ChartAreas[0].AxisY.Maximum = maxValueY;
@@ -399,6 +570,21 @@ namespace OptionsTradeWell
             chrtPutVol.Titles[0].Alignment = ContentAlignment.TopCenter;
             chrtPutVol.Titles[0].ForeColor = Color.WhiteSmoke;
             chrtPutVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
+            chrtPutVol.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
+
+            curPosSeries = new Series();
+            expirPosSeries = new Series();
+
+            curPosSeries.ChartType = SeriesChartType.Spline;
+            curPosSeries.Color = Color.DarkOrchid;
+            curPosSeries.BorderWidth = 3;
+
+            expirPosSeries.ChartType = SeriesChartType.Line;
+            expirPosSeries.Color = Color.Yellow;
+            expirPosSeries.BorderWidth = 3;
+
+            chrtPos.Series.Add(curPosSeries);
+            chrtPos.Series.Add(expirPosSeries);
 
         }
 
@@ -460,23 +646,68 @@ namespace OptionsTradeWell
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            if (onTimeStartUpClick)
+            btnStart.BackColor = Color.Gray;
+            btnStart.Text = "Starting...";
+
+            if (OnStartUp != null)
             {
-                btnStart.BackColor = Color.Gray;
-                btnStart.Text = "Starting...";
-
-                if (OnStartUp != null)
-                {
-                    OnStartUp(sender, e);
-                }
-                btnStart.ForeColor = Color.SkyBlue;
-                btnStart.Text = "Started";
-
-                onTimeStartUpClick = false;
+                OnStartUp(sender, e);
             }
-            else
+            btnStart.ForeColor = Color.SkyBlue;
+            btnStart.Text = "Started";
+
+            btnStart.Enabled = false;
+        }
+
+        private void btnDeleteOne_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCleanPos_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnUpdatePos_Click(object sender, EventArgs e)
+        {
+            PositionTableArgs args = new PositionTableArgs(GetPosTableArgs());
+            CleanPosTableData();
+
+            if (OnPosUpdateButtonClick != null)
             {
-                MessageBox.Show("Program is working now, buddy.");
+                OnPosUpdateButtonClick(sender, args);
+            }
+        }
+
+        private List<string[]> GetPosTableArgs()
+        {
+            List<string[]> result = new List<string[]>();
+
+            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            {
+                string[] tempArgs = new string[4];
+                tempArgs[0] = posDataTable.Rows[i]["Type"].ToString();
+                tempArgs[1] = posDataTable.Rows[i]["Strike"].ToString();
+                tempArgs[2] = posDataTable.Rows[i]["Ent.Price"].ToString();
+                tempArgs[3] = posDataTable.Rows[i]["Quantity"].ToString();
+
+                if (!String.IsNullOrEmpty(tempArgs[0]))
+                {
+                    result.Add(tempArgs);
+                }
+            }
+
+            return result;
+        }
+
+        private void CleanPosTableData()
+        {
+            posDataTable.Rows.Clear();
+            //hardcore 30 row
+            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            {
+                posDataTable.Rows.Add();
             }
         }
 
@@ -549,11 +780,6 @@ namespace OptionsTradeWell
                 SellPutVol = DataArr[sellVollPutIndex] * 100.0;
                 MidPutVol = ((DataArr[buyVollPutIndex] + DataArr[sellVollPutIndex]) / 2.0) * 100.0;
             }
-
-        }
-
-        private void btnUpdatePos_Click(object sender, EventArgs e)
-        {
         }
     }
 }
