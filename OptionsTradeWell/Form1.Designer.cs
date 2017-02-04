@@ -36,9 +36,12 @@
             this.chrtPutVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chrtCallVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabMain = new System.Windows.Forms.TabPage();
+            this.btnRes = new System.Windows.Forms.Button();
+            this.btnMinusOneFut = new System.Windows.Forms.Button();
+            this.btnPlusOneFut = new System.Windows.Forms.Button();
             this.dgvTotalInfo = new System.Windows.Forms.DataGridView();
             this.btnCleanSelected = new System.Windows.Forms.Button();
-            this.btnCleanPos = new System.Windows.Forms.Button();
+            this.btnAddFromTable = new System.Windows.Forms.Button();
             this.txBxInfo = new System.Windows.Forms.TextBox();
             this.chrtPos = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.btnUpdatePos = new System.Windows.Forms.Button();
@@ -155,9 +158,12 @@
             // 
             this.tabMain.AutoScroll = true;
             this.tabMain.BackColor = System.Drawing.Color.Gainsboro;
+            this.tabMain.Controls.Add(this.btnRes);
+            this.tabMain.Controls.Add(this.btnMinusOneFut);
+            this.tabMain.Controls.Add(this.btnPlusOneFut);
             this.tabMain.Controls.Add(this.dgvTotalInfo);
             this.tabMain.Controls.Add(this.btnCleanSelected);
-            this.tabMain.Controls.Add(this.btnCleanPos);
+            this.tabMain.Controls.Add(this.btnAddFromTable);
             this.tabMain.Controls.Add(this.txBxInfo);
             this.tabMain.Controls.Add(this.chrtPos);
             this.tabMain.Controls.Add(this.btnUpdatePos);
@@ -176,6 +182,39 @@
             this.tabMain.TabIndex = 0;
             this.tabMain.Text = "MainPage";
             // 
+            // btnRes
+            // 
+            this.btnRes.Font = new System.Drawing.Font("Microsoft Sans Serif", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnRes.Location = new System.Drawing.Point(709, 396);
+            this.btnRes.Name = "btnRes";
+            this.btnRes.Size = new System.Drawing.Size(36, 23);
+            this.btnRes.TabIndex = 25;
+            this.btnRes.Text = "RESET";
+            this.btnRes.UseVisualStyleBackColor = true;
+            this.btnRes.Click += new System.EventHandler(this.btnRes_Click);
+            // 
+            // btnMinusOneFut
+            // 
+            this.btnMinusOneFut.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnMinusOneFut.Location = new System.Drawing.Point(709, 355);
+            this.btnMinusOneFut.Name = "btnMinusOneFut";
+            this.btnMinusOneFut.Size = new System.Drawing.Size(37, 23);
+            this.btnMinusOneFut.TabIndex = 24;
+            this.btnMinusOneFut.Text = "-1 fut";
+            this.btnMinusOneFut.UseVisualStyleBackColor = true;
+            this.btnMinusOneFut.Click += new System.EventHandler(this.btnMinusOneFut_Click);
+            // 
+            // btnPlusOneFut
+            // 
+            this.btnPlusOneFut.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnPlusOneFut.Location = new System.Drawing.Point(708, 327);
+            this.btnPlusOneFut.Name = "btnPlusOneFut";
+            this.btnPlusOneFut.Size = new System.Drawing.Size(37, 22);
+            this.btnPlusOneFut.TabIndex = 23;
+            this.btnPlusOneFut.Text = "+1 fut";
+            this.btnPlusOneFut.UseVisualStyleBackColor = true;
+            this.btnPlusOneFut.Click += new System.EventHandler(this.btnPlusOneFut_Click);
+            // 
             // dgvTotalInfo
             // 
             this.dgvTotalInfo.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -186,23 +225,25 @@
             // 
             // btnCleanSelected
             // 
-            this.btnCleanSelected.Location = new System.Drawing.Point(646, 369);
+            this.btnCleanSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.btnCleanSelected.Location = new System.Drawing.Point(630, 396);
             this.btnCleanSelected.Name = "btnCleanSelected";
-            this.btnCleanSelected.Size = new System.Drawing.Size(88, 23);
+            this.btnCleanSelected.Size = new System.Drawing.Size(73, 23);
             this.btnCleanSelected.TabIndex = 21;
-            this.btnCleanSelected.Text = "cleanSelected";
+            this.btnCleanSelected.Text = "cleanRows";
             this.btnCleanSelected.UseVisualStyleBackColor = true;
-            this.btnCleanSelected.Click += new System.EventHandler(this.btnDeleteOne_Click);
+            this.btnCleanSelected.Click += new System.EventHandler(this.btnCleanSelected_Click);
             // 
-            // btnCleanPos
+            // btnAddFromTable
             // 
-            this.btnCleanPos.Location = new System.Drawing.Point(646, 398);
-            this.btnCleanPos.Name = "btnCleanPos";
-            this.btnCleanPos.Size = new System.Drawing.Size(88, 23);
-            this.btnCleanPos.TabIndex = 20;
-            this.btnCleanPos.Text = "cleanAll";
-            this.btnCleanPos.UseVisualStyleBackColor = true;
-            this.btnCleanPos.Click += new System.EventHandler(this.btnCleanPos_Click);
+            this.btnAddFromTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.btnAddFromTable.Location = new System.Drawing.Point(630, 326);
+            this.btnAddFromTable.Name = "btnAddFromTable";
+            this.btnAddFromTable.Size = new System.Drawing.Size(72, 36);
+            this.btnAddFromTable.TabIndex = 20;
+            this.btnAddFromTable.Text = "add row\r\nfrom desk\r\n";
+            this.btnAddFromTable.UseVisualStyleBackColor = true;
+            this.btnAddFromTable.Click += new System.EventHandler(this.btnAddFromTable_Click);
             // 
             // txBxInfo
             // 
@@ -216,17 +257,17 @@
             // 
             chartArea3.Name = "ChartArea1";
             this.chrtPos.ChartAreas.Add(chartArea3);
-            this.chrtPos.Location = new System.Drawing.Point(751, 340);
+            this.chrtPos.Location = new System.Drawing.Point(752, 340);
             this.chrtPos.Name = "chrtPos";
-            this.chrtPos.Size = new System.Drawing.Size(561, 311);
+            this.chrtPos.Size = new System.Drawing.Size(560, 307);
             this.chrtPos.TabIndex = 18;
             this.chrtPos.Text = "chart1";
             // 
             // btnUpdatePos
             // 
-            this.btnUpdatePos.Location = new System.Drawing.Point(646, 340);
+            this.btnUpdatePos.Location = new System.Drawing.Point(630, 368);
             this.btnUpdatePos.Name = "btnUpdatePos";
-            this.btnUpdatePos.Size = new System.Drawing.Size(88, 23);
+            this.btnUpdatePos.Size = new System.Drawing.Size(72, 22);
             this.btnUpdatePos.TabIndex = 17;
             this.btnUpdatePos.Text = "update";
             this.btnUpdatePos.UseVisualStyleBackColor = true;
@@ -237,7 +278,7 @@
             this.dgvPositions.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvPositions.Location = new System.Drawing.Point(34, 340);
             this.dgvPositions.Name = "dgvPositions";
-            this.dgvPositions.Size = new System.Drawing.Size(590, 310);
+            this.dgvPositions.Size = new System.Drawing.Size(590, 307);
             this.dgvPositions.TabIndex = 15;
             // 
             // label21
@@ -744,8 +785,11 @@
         private System.Windows.Forms.DataGridView dgvPositions;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.Button btnCleanSelected;
-        private System.Windows.Forms.Button btnCleanPos;
+        private System.Windows.Forms.Button btnAddFromTable;
         private System.Windows.Forms.DataGridView dgvTotalInfo;
+        private System.Windows.Forms.Button btnMinusOneFut;
+        private System.Windows.Forms.Button btnPlusOneFut;
+        private System.Windows.Forms.Button btnRes;
     }
 }
 

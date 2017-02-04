@@ -7,6 +7,7 @@ namespace OptionsTradeWell.view.interfaces
     {
         event EventHandler OnStartUp;
         event EventHandler OnSettingsInFormChanged;
+        event EventHandler OnTotalResetPositionInfo;
         event EventHandler<PositionTableArgs> OnPosUpdateButtonClick;
 
         void UpdateViewData(List<double[]> tableDataList);

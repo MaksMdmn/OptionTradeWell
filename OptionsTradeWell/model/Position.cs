@@ -34,6 +34,14 @@ namespace OptionsTradeWell.model
             }
         }
 
+        public double CalcCurrentPnL(double price)
+        {
+            TradeBlotter tradeBlotter = new TradeBlotter();
+            tradeBlotter.AskPrice = price;
+            tradeBlotter.BidPrice = price;
+            return CalcCurrentPnL(tradeBlotter);
+        }
+
         public double CalcCurrentPnLInCurrency(TradeBlotter blotter, double step, double stepVal)
         {
             return PosCalcsRoudning(CalcCurrentPnL(blotter) / step * stepVal);

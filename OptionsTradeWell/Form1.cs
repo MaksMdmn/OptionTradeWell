@@ -28,6 +28,7 @@ namespace OptionsTradeWell
 
         public event EventHandler OnStartUp;
         public event EventHandler OnSettingsInFormChanged;
+        public event EventHandler OnTotalResetPositionInfo;
         public event EventHandler<PositionTableArgs> OnPosUpdateButtonClick;
 
         private object threadLock = new object();
@@ -83,7 +84,7 @@ namespace OptionsTradeWell
                 this.toolStripStLbAsset.Text = string.Format("{0} {1}", "underlying asset:", data[1]);
                 this.lblDaysToExp.Text = data[2];
                 this.toolStripStLbLastUpd.Text = string.Format("{0} {1:dd-MM-yyyy HH:mm:ss}", "last update:", DateTime.Now);
-                this.toolStripPrBrConnection.Value = 100; //TODO
+                this.toolStripPrBrConnection.Value = 100;
             }));
 
         }
@@ -144,11 +145,48 @@ namespace OptionsTradeWell
             {
                 curPosSeries.Points.Clear();
                 expirPosSeries.Points.Clear();
+
+                double expandVisibilityKoef = 1.5;
+                double numberOfStepsAtChart = 10;
+
+                double tempMinValY = 9999.99;
+                double tempMaxValY = 0.0;
+                double xVal = 0.0;
+                double curPosVal = 0.0;
+                double expPosVal = 0.0;
+
                 foreach (double[] dataArr in tableDataList)
                 {
-                    curPosSeries.Points.AddXY(dataArr[0], dataArr[1]);
-                    expirPosSeries.Points.AddXY(dataArr[0], dataArr[2]);
+                    xVal = dataArr[0];
+                    curPosVal = dataArr[1];
+                    expPosVal = dataArr[2];
+
+                    if (expPosVal > tempMaxValY)
+                    {
+                        tempMaxValY = expPosVal;
+                    }
+
+                    if (curPosVal > tempMaxValY)
+                    {
+                        tempMaxValY = curPosVal;
+                    }
+
+                    if (expPosVal < tempMinValY)
+                    {
+                        tempMinValY = expPosVal;
+                    }
+
+                    if (curPosVal < tempMinValY)
+                    {
+                        tempMinValY = curPosVal;
+                    }
+                    curPosSeries.Points.AddXY(xVal, curPosVal);
+                    expirPosSeries.Points.AddXY(xVal, expPosVal);
                 }
+
+                chrtPos.ChartAreas[0].AxisY.Minimum = tempMinValY < 0 ? tempMinValY * expandVisibilityKoef : 0;
+                chrtPos.ChartAreas[0].AxisY.Maximum = tempMaxValY < 0 ? 0 : tempMaxValY * expandVisibilityKoef;
+                chrtPos.ChartAreas[0].AxisY.Interval = Math.Round((tempMaxValY - tempMinValY) / numberOfStepsAtChart, 0);
             }));
         }
 
@@ -400,10 +438,9 @@ namespace OptionsTradeWell
                 dgvPositions.Columns[i].Width = 60;
                 dgvPositions.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
                 dgvPositions.Columns[i].ReadOnly = false;
-                dgvPositions.MultiSelect = false;
                 dgvPositions.Columns[i].Resizable = DataGridViewTriState.False;
             }
-
+            dgvPositions.MultiSelect = true;
             dgvPositions.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
             dgvPositions.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             dgvPositions.CellBorderStyle = DataGridViewCellBorderStyle.Single;
@@ -572,12 +609,17 @@ namespace OptionsTradeWell
             chrtPutVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
             chrtPutVol.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
 
+
+            chrtPos.ChartAreas[0].AxisX.Interval = 1.0;
+            chrtPos.ChartAreas[0].AxisX.LabelStyle.Font = new Font("Microsoft Sans Serif", 8.0f);
+
             curPosSeries = new Series();
             expirPosSeries = new Series();
 
             curPosSeries.ChartType = SeriesChartType.Spline;
             curPosSeries.Color = Color.DarkOrchid;
             curPosSeries.BorderWidth = 3;
+            curPosSeries.SetCustomProperty("LineTension", "0");
 
             expirPosSeries.ChartType = SeriesChartType.Line;
             expirPosSeries.Color = Color.Yellow;
@@ -614,6 +656,51 @@ namespace OptionsTradeWell
                     }
                 }
             }));
+        }
+
+
+        private List<string[]> GetPosTableArgs()
+        {
+            List<string[]> result = new List<string[]>();
+
+            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            {
+                string[] tempArgs = new string[4];
+                tempArgs[0] = posDataTable.Rows[i]["Type"].ToString().ToUpper();
+                tempArgs[1] = posDataTable.Rows[i]["Strike"].ToString();
+                tempArgs[2] = posDataTable.Rows[i]["Ent.Price"].ToString();
+                tempArgs[3] = posDataTable.Rows[i]["Quantity"].ToString();
+
+                double checkIfDouble;
+                int checkIfNotZero;
+                UserPosTableTypes checkIfCorrectType;
+
+                if (!String.IsNullOrEmpty(tempArgs[0])
+                    && UserPosTableTypes.TryParse(tempArgs[0], out checkIfCorrectType)
+                    && Double.TryParse(tempArgs[2], out checkIfDouble)
+                    && Int32.TryParse(tempArgs[3], out checkIfNotZero)
+                    && checkIfNotZero != 0)
+                {
+
+                    if (tempArgs[0].Equals(UserPosTableTypes.F))
+                    {
+                        tempArgs[1] = "";
+                    }
+                    result.Add(tempArgs);
+                }
+            }
+
+            return result;
+        }
+
+        private void CleanPosTableData()
+        {
+            posDataTable.Rows.Clear();
+            //hardcore 30 row
+            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            {
+                posDataTable.Rows.Add();
+            }
         }
 
         private void btnSetDefaultSettings_Click(object sender, EventArgs e)
@@ -659,16 +746,6 @@ namespace OptionsTradeWell
             btnStart.Enabled = false;
         }
 
-        private void btnDeleteOne_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnCleanPos_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void btnUpdatePos_Click(object sender, EventArgs e)
         {
             PositionTableArgs args = new PositionTableArgs(GetPosTableArgs());
@@ -680,34 +757,116 @@ namespace OptionsTradeWell
             }
         }
 
-        private List<string[]> GetPosTableArgs()
+        private void btnAddFromTable_Click(object sender, EventArgs e)
         {
-            List<string[]> result = new List<string[]>();
+            int sellCallIndex = 0;
+            int buyCallIndex = 1;
+            int strikeIndex = 2;
+            int sellPutIndex = 3;
+            int buyPutIndex = 4;
+
+            int rowIndex = dgvOptionDesk.SelectedCells[0].RowIndex;
+
+            string type = null;
+            string strike = null;
+            string price = null;
+            string number = null;
+
+            strike = Convert.ToString(dgvOptionDesk[strikeIndex, rowIndex].Value);
+            price = Convert.ToString(dgvOptionDesk.SelectedCells[0].Value);
+
+            if (dgvOptionDesk.SelectedCells[0].ColumnIndex == sellCallIndex)
+            {
+                type = "C";
+                number = "-1";
+            }
+
+            if (dgvOptionDesk.SelectedCells[0].ColumnIndex == buyCallIndex)
+            {
+                type = "C";
+                number = "1";
+            }
+
+            if (dgvOptionDesk.SelectedCells[0].ColumnIndex == sellPutIndex)
+            {
+                type = "P";
+                number = "-1";
+            }
+
+            if (dgvOptionDesk.SelectedCells[0].ColumnIndex == buyPutIndex)
+            {
+                type = "P";
+                number = "1";
+            }
+
+            if (type == null)
+            {
+                return;
+            }
 
             for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
             {
-                string[] tempArgs = new string[4];
-                tempArgs[0] = posDataTable.Rows[i]["Type"].ToString();
-                tempArgs[1] = posDataTable.Rows[i]["Strike"].ToString();
-                tempArgs[2] = posDataTable.Rows[i]["Ent.Price"].ToString();
-                tempArgs[3] = posDataTable.Rows[i]["Quantity"].ToString();
-
-                if (!String.IsNullOrEmpty(tempArgs[0]))
+                if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
                 {
-                    result.Add(tempArgs);
+                    dgvPositions[0, i].Value = type;
+                    dgvPositions[1, i].Value = strike;
+                    dgvPositions[2, i].Value = price;
+                    dgvPositions[3, i].Value = number;
+                    break;
+                }
+            }
+        }
+
+        private void btnCleanSelected_Click(object sender, EventArgs e)
+        {
+            int selectedCellsCount = dgvPositions.GetCellCount(DataGridViewElementStates.Selected);
+
+            for (int i = 0; i < selectedCellsCount; i++)
+            {
+                for (int j = 0; j < posDataTable.Columns.Count; j++)
+                {
+                    posDataTable.Rows[dgvPositions.SelectedCells[i].RowIndex][j] = "";
                 }
             }
 
-            return result;
         }
 
-        private void CleanPosTableData()
+        private void btnPlusOneFut_Click(object sender, EventArgs e)
         {
-            posDataTable.Rows.Clear();
-            //hardcore 30 row
             for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
             {
-                posDataTable.Rows.Add();
+                if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
+                {
+                    dgvPositions[0, i].Value = "F";
+                    dgvPositions[1, i].Value = "";
+                    dgvPositions[2, i].Value = lblSpotPrice.Text;
+                    dgvPositions[3, i].Value = "1";
+                    break;
+                }
+            }
+        }
+
+        private void btnMinusOneFut_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            {
+                if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
+                {
+                    dgvPositions[0, i].Value = "F";
+                    dgvPositions[1, i].Value = "";
+                    dgvPositions[2, i].Value = lblSpotPrice.Text;
+                    dgvPositions[3, i].Value = "-1";
+                    break;
+                }
+            }
+        }
+
+        private void btnRes_Click(object sender, EventArgs e)
+        {
+            if (OnTotalResetPositionInfo != null)
+            {
+                CleanPosTableData();
+                OnTotalResetPositionInfo(sender, e);
             }
         }
 

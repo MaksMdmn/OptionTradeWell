@@ -6,10 +6,10 @@
       <Value Profile="(Default)">OTWserver</Value>
     </Setting>
     <Setting Name="FuturesTableName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">FUTURES_DESK</Value>
+      <Value Profile="(Default)">FUT</Value>
     </Setting>
     <Setting Name="OptionsTableName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">OPTIONS_DESK</Value>
+      <Value Profile="(Default)">OPT</Value>
     </Setting>
     <Setting Name="UniqueIndexInDdeDataArray" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
@@ -33,7 +33,7 @@
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="ChartsMaxYValue" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">80</Value>
+      <Value Profile="(Default)">120</Value>
     </Setting>
     <Setting Name="ChartsStepYValue" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5</Value>

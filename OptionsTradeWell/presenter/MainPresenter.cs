@@ -29,7 +29,20 @@ namespace OptionsTradeWell.presenter
 
             mainForm.OnStartUp += MainForm_OnStartUp;
             mainForm.OnPosUpdateButtonClick += MainForm_OnPosUpdateButtonClick;
+            mainForm.OnTotalResetPositionInfo += MainForm_OnTotalResetPositionInfo;
 
+        }
+
+        private void MainForm_OnTotalResetPositionInfo(object sender, EventArgs e)
+        {
+            if (positionManager != null)
+            {
+                positionManager.CleanAllPositions();
+                positionManager.ResetFixedPnLValue();
+                mainForm.UpdatePositionTableData(new List<string[]>() { });
+                mainForm.UpdateTotalInfoTable(new double[] { 0, 0, 0, 0, 0, 0, 0 });
+                mainForm.UpdatePositionChartData(new List<double[]>() { });
+            }
         }
 
         private void MainForm_OnPosUpdateButtonClick(object sender, PositionTableArgs e)
@@ -42,7 +55,7 @@ namespace OptionsTradeWell.presenter
 
             List<string[]> userData = e.userArgs;
 
-            string type;
+            UserPosTableTypes type;
             double enterPrice;
             int quantity;
             double strike;
@@ -55,7 +68,11 @@ namespace OptionsTradeWell.presenter
 
             foreach (string[] data in userData)
             {
-                type = data[0];
+                if (!UserPosTableTypes.TryParse(data[0], out type))
+                {
+                    return;
+                }
+
                 enterPrice = Convert.ToDouble(data[2]);
                 quantity = Convert.ToInt32(data[3]);
 
@@ -69,7 +86,7 @@ namespace OptionsTradeWell.presenter
                 }
 
 
-                if (type.Equals(UserPosTableTypes.TYPE_CALL))
+                if (type.Equals(UserPosTableTypes.C))
                 {
                     futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
                     optBlotter = dataCollector.GetOption(strike, OptionType.Call).GetTradeBlotter();
@@ -80,7 +97,7 @@ namespace OptionsTradeWell.presenter
                     positionManager.AddOption(Option.GetFakeOption(OptionType.Call, strike, enterPrice, remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
                 }
 
-                else if (type.Equals(UserPosTableTypes.TYPE_PUT))
+                else if (type.Equals(UserPosTableTypes.P))
                 {
                     futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
                     optBlotter = dataCollector.GetOption(strike, OptionType.Put).GetTradeBlotter();
@@ -90,7 +107,7 @@ namespace OptionsTradeWell.presenter
 
                     positionManager.AddOption(Option.GetFakeOption(OptionType.Put, strike, enterPrice, remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
                 }
-                else if (type.Equals(UserPosTableTypes.TYPE_FUT))
+                else if (type.Equals(UserPosTableTypes.F))
                 {
                     futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
                     priceStep = dataCollector.GetBasicFutures().PriceStep;
@@ -130,12 +147,15 @@ namespace OptionsTradeWell.presenter
 
             double minStr = dataCollector.CalculateMinImportantStrike();
             double maxStr = dataCollector.CalculateMaxImportantStrike();
+
+
+
             for (double i = minStr; i <= maxStr; i++)
             {
                 tempPosChartData.Add(new double[]
                 {
                     i,
-                    positionManager.CalculateCurApproxPnL(i, minStr, maxStr),
+                    positionManager.CalculateCurApproxPnL(i),
                     positionManager.CalculateExpirationPnL(i)
                 });
             }

@@ -37,7 +37,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("FUTURES_DESK")]
+        [global::System.Configuration.DefaultSettingValueAttribute("FUT")]
         public string FuturesTableName {
             get {
                 return ((string)(this["FuturesTableName"]));
@@ -49,7 +49,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("OPTIONS_DESK")]
+        [global::System.Configuration.DefaultSettingValueAttribute("OPT")]
         public string OptionsTableName {
             get {
                 return ((string)(this["OptionsTableName"]));
@@ -145,7 +145,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        [global::System.Configuration.DefaultSettingValueAttribute("120")]
         public double ChartsMaxYValue {
             get {
                 return ((double)(this["ChartsMaxYValue"]));

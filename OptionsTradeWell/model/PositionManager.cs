@@ -7,13 +7,21 @@ namespace OptionsTradeWell.model
 {
     public class PositionManager
     {
-        private double[] guidelineArrForApproxPos;
+
+        private double[] myLogArr = new double[]
+        {
+            0.9,
+            0.8,
+            0.6,
+            0.25,
+            0.05,
+            0.01,
+        };
 
         public PositionManager()
         {
             Options = new List<Option>();
             Futures = null;
-            guidelineArrForApproxPos = GetGuidelineArr();
         }
 
         public List<Option> Options { get; set; }
@@ -115,17 +123,18 @@ namespace OptionsTradeWell.model
         }
 
 
-        public double CalculateCurApproxPnL(double futPrice, double minStr, double maxStr)
+        public double CalculateCurApproxPnL(double futPrice)
         {
             double result = 0.0;
-            for (double i = minStr; i <= maxStr; i++)
+            double exitPrice;
+            foreach (Option opt in Options)
             {
-                if (i >= futPrice)
-                {
-                    result = guidelineArrForApproxPos[(int)(i - minStr)] * CalculateExpirationPnL(futPrice);
-                    break;
-                }
+                exitPrice = GreeksCalculator.CalculateOptionPrice_BS(opt.OptionType, futPrice, opt.Strike,
+                    opt.RemainingDays, GreeksCalculator.DAYS_IN_YEAR, opt.ImplVol);
+                result += opt.Position.CalcCurrentPnL(exitPrice);
             }
+
+            result += Futures == null ? 0.0 : Futures.Position.CalcCurrentPnL(futPrice);
 
             return result;
 
@@ -186,35 +195,16 @@ namespace OptionsTradeWell.model
             return answer;
         }
 
-        private double[] GetGuidelineArr()
+        private double CalcMyKoef(double distance, double calcStep)
         {
-            int n = Convert.ToInt32(Settings.Default.OptDeskStrikesNumber);
-            double tempI = 0.001;
-            double koefI = 1.5;
-            double[] answer = new double[n];
+            int tempIndex = (int)(distance / calcStep);
 
-            if (n % 2 == 0)
+            if (tempIndex >= myLogArr.Length)
             {
-                for (int i = 0; i < n / 2; i++)
-                {
-                    tempI = tempI * koefI;
-                    answer[n / 2 - 1 - i] = 1 + tempI;
-                    answer[n / 2 + i] = 1 + tempI;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < (n - 1) / 2; i++)
-                {
-                    tempI = tempI * koefI;
-                    answer[(n - 1) / 2 - 1 - i] = 1 + tempI;
-                    answer[(n - 1) / 2 + 1 + i] = 1 + tempI;
-                }
-                tempI = tempI * koefI;
-                answer[(n - 1) / 2] = 1 + tempI;
+                tempIndex = myLogArr.Length - 1;
             }
 
-            return answer;
+            return myLogArr[tempIndex];
         }
     }
 }
