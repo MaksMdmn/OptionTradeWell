@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             this.tabSettings = new System.Windows.Forms.TabPage();
             this.chrtPutVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chrtCallVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -42,7 +42,7 @@
             this.dgvTotalInfo = new System.Windows.Forms.DataGridView();
             this.btnCleanSelected = new System.Windows.Forms.Button();
             this.btnAddFromTable = new System.Windows.Forms.Button();
-            this.txBxInfo = new System.Windows.Forms.TextBox();
+            this.txBxMsgInfo = new System.Windows.Forms.TextBox();
             this.chrtPos = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.btnUpdatePos = new System.Windows.Forms.Button();
             this.dgvPositions = new System.Windows.Forms.DataGridView();
@@ -124,8 +124,8 @@
             this.chrtPutVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtPutVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtPutVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea1.Name = "ChartArea1";
-            this.chrtPutVol.ChartAreas.Add(chartArea1);
+            chartArea7.Name = "ChartArea1";
+            this.chrtPutVol.ChartAreas.Add(chartArea7);
             this.chrtPutVol.Location = new System.Drawing.Point(665, 6);
             this.chrtPutVol.MaximumSize = new System.Drawing.Size(647, 642);
             this.chrtPutVol.MinimumSize = new System.Drawing.Size(647, 642);
@@ -143,8 +143,8 @@
             this.chrtCallVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtCallVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtCallVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea2.Name = "ChartArea1";
-            this.chrtCallVol.ChartAreas.Add(chartArea2);
+            chartArea8.Name = "ChartArea1";
+            this.chrtCallVol.ChartAreas.Add(chartArea8);
             this.chrtCallVol.Location = new System.Drawing.Point(12, 6);
             this.chrtCallVol.MaximumSize = new System.Drawing.Size(647, 642);
             this.chrtCallVol.MinimumSize = new System.Drawing.Size(647, 642);
@@ -164,7 +164,7 @@
             this.tabMain.Controls.Add(this.dgvTotalInfo);
             this.tabMain.Controls.Add(this.btnCleanSelected);
             this.tabMain.Controls.Add(this.btnAddFromTable);
-            this.tabMain.Controls.Add(this.txBxInfo);
+            this.tabMain.Controls.Add(this.txBxMsgInfo);
             this.tabMain.Controls.Add(this.chrtPos);
             this.tabMain.Controls.Add(this.btnUpdatePos);
             this.tabMain.Controls.Add(this.dgvPositions);
@@ -245,18 +245,20 @@
             this.btnAddFromTable.UseVisualStyleBackColor = true;
             this.btnAddFromTable.Click += new System.EventHandler(this.btnAddFromTable_Click);
             // 
-            // txBxInfo
+            // txBxMsgInfo
             // 
-            this.txBxInfo.Location = new System.Drawing.Point(950, 91);
-            this.txBxInfo.Multiline = true;
-            this.txBxInfo.Name = "txBxInfo";
-            this.txBxInfo.Size = new System.Drawing.Size(362, 230);
-            this.txBxInfo.TabIndex = 19;
+            this.txBxMsgInfo.Location = new System.Drawing.Point(950, 91);
+            this.txBxMsgInfo.Multiline = true;
+            this.txBxMsgInfo.Name = "txBxMsgInfo";
+            this.txBxMsgInfo.ReadOnly = true;
+            this.txBxMsgInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txBxMsgInfo.Size = new System.Drawing.Size(362, 230);
+            this.txBxMsgInfo.TabIndex = 19;
             // 
             // chrtPos
             // 
-            chartArea3.Name = "ChartArea1";
-            this.chrtPos.ChartAreas.Add(chartArea3);
+            chartArea9.Name = "ChartArea1";
+            this.chrtPos.ChartAreas.Add(chartArea9);
             this.chrtPos.Location = new System.Drawing.Point(752, 340);
             this.chrtPos.Name = "chrtPos";
             this.chrtPos.Size = new System.Drawing.Size(560, 307);
@@ -779,7 +781,7 @@
         private System.Windows.Forms.Label lblDaysToExp;
         private System.Windows.Forms.TextBox txBxStrikesNumber;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox txBxInfo;
+        private System.Windows.Forms.TextBox txBxMsgInfo;
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtPos;
         private System.Windows.Forms.Button btnUpdatePos;
         private System.Windows.Forms.DataGridView dgvPositions;

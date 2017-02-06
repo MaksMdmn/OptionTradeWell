@@ -9,12 +9,12 @@ namespace OptionsTradeWell.view.interfaces
         event EventHandler OnSettingsInFormChanged;
         event EventHandler OnTotalResetPositionInfo;
         event EventHandler<PositionTableArgs> OnPosUpdateButtonClick;
-
         void UpdateViewData(List<double[]> tableDataList);
         void UpdateFuturesData(string[] data);
         void UpdatePositionTableData(List<string[]> tableDataList);
         void UpdatePositionChartData(List<double[]> tableDataList);
         void UpdateTotalInfoTable(double[] dataArr);
+        void UpdateMessageWindow(string message);
     }
 
     public class PositionTableArgs : EventArgs

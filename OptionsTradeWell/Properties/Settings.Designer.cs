@@ -169,18 +169,6 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double Test {
-            get {
-                return ((double)(this["Test"]));
-            }
-            set {
-                this["Test"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("26")]
         public double OptDeskStrikesNumber {
             get {

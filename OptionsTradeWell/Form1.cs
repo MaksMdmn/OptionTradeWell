@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -25,6 +26,7 @@ namespace OptionsTradeWell
         public static double stepY = Settings.Default.ChartsStepYValue;
 
         private static int NUMBER_OF_POSDATATABLE_ROWS_HARDCORE = 30;
+        private static string POS_SAVE_FILE_NAME = "posData.xml";
 
         public event EventHandler OnStartUp;
         public event EventHandler OnSettingsInFormChanged;
@@ -70,6 +72,7 @@ namespace OptionsTradeWell
             StartUpdateTimer();
 
             toolStripPrBrConnection.Value = 100;
+
         }
 
         public void UpdateFuturesData(string[] data)
@@ -105,6 +108,7 @@ namespace OptionsTradeWell
             txBxRounding.Text = Settings.Default.RoundTo.ToString();
             txBxStrikesNumber.Text = Settings.Default.OptDeskStrikesNumber.ToString();
         }
+
         public void UpdateViewData(List<double[]> tableDataList)
         {
             lock (threadLock)
@@ -155,6 +159,10 @@ namespace OptionsTradeWell
                 double curPosVal = 0.0;
                 double expPosVal = 0.0;
 
+                double chartMin;
+                double chartMax;
+                double chartStep;
+
                 foreach (double[] dataArr in tableDataList)
                 {
                     xVal = dataArr[0];
@@ -184,12 +192,22 @@ namespace OptionsTradeWell
                     expirPosSeries.Points.AddXY(xVal, expPosVal);
                 }
 
-                chrtPos.ChartAreas[0].AxisY.Minimum = tempMinValY < 0 ? tempMinValY * expandVisibilityKoef : 0;
-                chrtPos.ChartAreas[0].AxisY.Maximum = tempMaxValY < 0 ? 0 : tempMaxValY * expandVisibilityKoef;
-                chrtPos.ChartAreas[0].AxisY.Interval = Math.Round((tempMaxValY - tempMinValY) / numberOfStepsAtChart, 0);
+                chartMin = tempMinValY < 0 ? tempMinValY * expandVisibilityKoef : 0;
+                chartMax = tempMaxValY < 0 ? 0 : tempMaxValY * expandVisibilityKoef;
+                chartStep = Math.Round((tempMaxValY - tempMinValY) / numberOfStepsAtChart, 0);
+
+                if (chartMin >= chartMax)
+                {
+                    chartMin = 0;
+                    chartMax = 10;
+                    chartStep = 1;
+                }
+
+                chrtPos.ChartAreas[0].AxisY.Minimum = chartMin;
+                chrtPos.ChartAreas[0].AxisY.Maximum = chartMax;
+                chrtPos.ChartAreas[0].AxisY.Interval = chartStep;
             }));
         }
-
 
         public void UpdateTotalInfoTable(double[] dataArr)
         {
@@ -211,6 +229,26 @@ namespace OptionsTradeWell
                         dgvTotalInfo[0, i + 1].Style.BackColor = Color.LightCoral;
                     }
                 }
+            }));
+        }
+
+        public void UpdateMessageWindow(string message)
+        {
+            while (this.IsHandleCreated == false)
+            {
+            }
+
+            this.BeginInvoke((Action)(() =>
+            {
+                StringBuilder sb = new StringBuilder();
+                string headMessage = string.Format("{0:dd-MM-yyyy HH:mm:ss}", DateTime.Now);
+                string oldMessage = txBxMsgInfo.Text;
+
+                sb.AppendLine(headMessage);
+                sb.AppendLine(message);
+                sb.AppendLine(oldMessage);
+
+                txBxMsgInfo.Text = sb.ToString();
             }));
         }
 
@@ -402,6 +440,7 @@ namespace OptionsTradeWell
         private void InitializePosDataTable()
         {
             posDataTable = new DataTable();
+            posDataTable.TableName = "posDataTable";
 
             List<string> columnsNames = new List<string>()
             {
@@ -424,11 +463,19 @@ namespace OptionsTradeWell
                 posDataTable.Columns.Add(columnsNames[i]);
             }
 
-            //hardcore 30 row
-            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            if (File.Exists(POS_SAVE_FILE_NAME))
             {
-                posDataTable.Rows.Add();
+                posDataTable.ReadXml(POS_SAVE_FILE_NAME);
             }
+            else
+            {
+                //hardcore 30 row
+                for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+                {
+                    posDataTable.Rows.Add();
+                }
+            }
+           
 
             dgvPositions.DataSource = posDataTable;
 
@@ -599,6 +646,7 @@ namespace OptionsTradeWell
             chrtCallVol.Titles[0].ForeColor = Color.WhiteSmoke;
             chrtCallVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
             chrtCallVol.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
+            chrtCallVol.ChartAreas[0].AxisX.Interval = 1.0;
 
             chrtPutVol.ChartAreas[0].AxisY.Minimum = minValueY;
             chrtPutVol.ChartAreas[0].AxisY.Maximum = maxValueY;
@@ -608,7 +656,7 @@ namespace OptionsTradeWell
             chrtPutVol.Titles[0].ForeColor = Color.WhiteSmoke;
             chrtPutVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
             chrtPutVol.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
-
+            chrtPutVol.ChartAreas[0].AxisX.Interval = 1.0;
 
             chrtPos.ChartAreas[0].AxisX.Interval = 1.0;
             chrtPos.ChartAreas[0].AxisX.LabelStyle.Font = new Font("Microsoft Sans Serif", 8.0f);
@@ -748,6 +796,7 @@ namespace OptionsTradeWell
 
         private void btnUpdatePos_Click(object sender, EventArgs e)
         {
+            posDataTable.WriteXml(POS_SAVE_FILE_NAME);
             PositionTableArgs args = new PositionTableArgs(GetPosTableArgs());
             CleanPosTableData();
 

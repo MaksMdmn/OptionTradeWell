@@ -82,47 +82,47 @@ namespace OptionsTradeWell.model
 
         public double GetBid(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike].GetTradeBlotter().BidPrice;
+            return GetOption(strike, type).GetTradeBlotter().BidPrice;
         }
 
         public double GetAsk(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike].GetTradeBlotter().AskPrice;
+            return GetOption(strike, type).GetTradeBlotter().AskPrice;
         }
 
         public double GetCoverMarginRequirement(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike].MarginRequirementCover;
+            return GetOption(strike, type).MarginRequirementCover;
         }
 
         public double GetNotCoverMarginRequirement(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike].MarginRequirementNotCover;
+            return GetOption(strike, type).MarginRequirementNotCover;
         }
 
         public double GetBuyerMarginRequirement(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike].MarginRequirementBuyer;
+            return GetOption(strike, type).MarginRequirementBuyer;
         }
 
         public DateTime GetExpirationDate(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike].ExpirationDate;
+            return GetOption(strike, type).ExpirationDate;
         }
 
         public double GetPriceStep(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike].PriceStep;
+            return GetOption(strike, type).PriceStep;
         }
 
         public double GetPriceStepValue(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike].PriceStepValue;
+            return GetOption(strike, type).PriceStepValue;
         }
 
         public double CalculateMinImportantStrike()
         {
-            if (basicFutures == null)
+            if (GetBasicFutures() == null)
             {
                 throw new QuikDdeException("Basic futures still null : " + basicFutures);
             }
@@ -132,9 +132,9 @@ namespace OptionsTradeWell.model
 
         public double CalculateMaxImportantStrike()
         {
-            if (basicFutures == null)
+            if (GetBasicFutures() == null)
             {
-                throw new QuikDdeException("Basic futures still null : " + basicFutures);
+                throw new QuikDdeException("Basic futures is still null : " + basicFutures);
             }
 
             return CalculateActualStrike() + NumberOfTrackingOptions / 2;
@@ -142,12 +142,18 @@ namespace OptionsTradeWell.model
 
         public double CalculateActualStrike()
         {
-            return Math.Round(basicFutures.GetTradeBlotter().AskPrice + Settings.Default.Test, 0);
+            return Math.Round(basicFutures.GetTradeBlotter().AskPrice, 0);
         }
 
         public Option GetOption(double strike, OptionType type)
         {
-            return GetSuitableOptionsMap(type)[strike];
+            Option tempOption;
+            if (!GetSuitableOptionsMap(type).TryGetValue(strike, out tempOption))
+            {
+                throw new QuikDdeException("Such option does not represent in map yet. Check DDE-data export. " + type + " " + strike);
+            }
+
+            return tempOption;
         }
 
         public Futures GetBasicFutures()
@@ -165,7 +171,7 @@ namespace OptionsTradeWell.model
             //DDE ORDER IS: futures -> options
             if (topic.Equals(FUTURES_DESK))
             {
-                if (basicFutures == null)
+                if (GetBasicFutures() == null)
                 {
                     string ticker = data[0];
                     DateTime maturity = DateTime.Parse(data[1]);
@@ -270,7 +276,7 @@ namespace OptionsTradeWell.model
 
         private void CheckConnectionFlags()
         {
-            if (basicFutures != null)
+            if (GetBasicFutures() != null)
             {
                 futRecievedDataFlag = true;
             }

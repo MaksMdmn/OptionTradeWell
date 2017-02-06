@@ -88,24 +88,39 @@ namespace OptionsTradeWell.presenter
 
                 if (type.Equals(UserPosTableTypes.C))
                 {
-                    futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
-                    optBlotter = dataCollector.GetOption(strike, OptionType.Call).GetTradeBlotter();
-                    remainingDays = dataCollector.GetOption(strike, OptionType.Call).RemainingDays;
-                    priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
-                    priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
+                    try
+                    {
+                        futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
+                        optBlotter = dataCollector.GetOption(strike, OptionType.Call).GetTradeBlotter();
+                        remainingDays = dataCollector.GetOption(strike, OptionType.Call).RemainingDays;
+                        priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
+                        priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
 
-                    positionManager.AddOption(Option.GetFakeOption(OptionType.Call, strike, enterPrice, remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
+                        positionManager.AddOption(Option.GetFakeOption(OptionType.Call, strike, enterPrice,
+                            remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
+                    }
+                    catch (QuikDdeException e1)
+                    {
+                        mainForm.UpdateMessageWindow(e1.Message);
+                    }
                 }
 
                 else if (type.Equals(UserPosTableTypes.P))
                 {
-                    futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
-                    optBlotter = dataCollector.GetOption(strike, OptionType.Put).GetTradeBlotter();
-                    remainingDays = dataCollector.GetOption(strike, OptionType.Put).RemainingDays;
-                    priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
-                    priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
+                    try
+                    {
+                        futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
+                        optBlotter = dataCollector.GetOption(strike, OptionType.Put).GetTradeBlotter();
+                        remainingDays = dataCollector.GetOption(strike, OptionType.Put).RemainingDays;
+                        priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
+                        priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
 
-                    positionManager.AddOption(Option.GetFakeOption(OptionType.Put, strike, enterPrice, remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
+                        positionManager.AddOption(Option.GetFakeOption(OptionType.Put, strike, enterPrice, remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
+                    }
+                    catch (QuikDdeException e1)
+                    {
+                        mainForm.UpdateMessageWindow(e1.Message);
+                    }
                 }
                 else if (type.Equals(UserPosTableTypes.F))
                 {
@@ -117,7 +132,7 @@ namespace OptionsTradeWell.presenter
                 }
                 else
                 {
-                    throw new IllegalViewDataException("incorrect type of instrument in posTable: " + type);
+                    mainForm.UpdateMessageWindow("incorrect type of instrument: " + type);
                 }
             }
 

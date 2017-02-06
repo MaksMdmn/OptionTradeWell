@@ -38,9 +38,6 @@
     <Setting Name="ChartsStepYValue" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
-    <Setting Name="Test" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
     <Setting Name="OptDeskStrikesNumber" Type="System.Double" Scope="User">
       <Value Profile="(Default)">26</Value>
     </Setting>
