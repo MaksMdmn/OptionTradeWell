@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             this.tabSettings = new System.Windows.Forms.TabPage();
             this.chrtPutVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chrtCallVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -55,6 +55,8 @@
             this.dgvOptionDesk = new System.Windows.Forms.DataGridView();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.txBxStrStep = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.txBxStrikesNumber = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.btnSetDefaultSettings = new System.Windows.Forms.Button();
@@ -124,8 +126,8 @@
             this.chrtPutVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtPutVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtPutVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea7.Name = "ChartArea1";
-            this.chrtPutVol.ChartAreas.Add(chartArea7);
+            chartArea1.Name = "ChartArea1";
+            this.chrtPutVol.ChartAreas.Add(chartArea1);
             this.chrtPutVol.Location = new System.Drawing.Point(665, 6);
             this.chrtPutVol.MaximumSize = new System.Drawing.Size(647, 642);
             this.chrtPutVol.MinimumSize = new System.Drawing.Size(647, 642);
@@ -143,8 +145,8 @@
             this.chrtCallVol.BackColor = System.Drawing.Color.Transparent;
             this.chrtCallVol.BorderlineColor = System.Drawing.Color.Black;
             this.chrtCallVol.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea8.Name = "ChartArea1";
-            this.chrtCallVol.ChartAreas.Add(chartArea8);
+            chartArea2.Name = "ChartArea1";
+            this.chrtCallVol.ChartAreas.Add(chartArea2);
             this.chrtCallVol.Location = new System.Drawing.Point(12, 6);
             this.chrtCallVol.MaximumSize = new System.Drawing.Size(647, 642);
             this.chrtCallVol.MinimumSize = new System.Drawing.Size(647, 642);
@@ -257,8 +259,8 @@
             // 
             // chrtPos
             // 
-            chartArea9.Name = "ChartArea1";
-            this.chrtPos.ChartAreas.Add(chartArea9);
+            chartArea3.Name = "ChartArea1";
+            this.chrtPos.ChartAreas.Add(chartArea3);
             this.chrtPos.Location = new System.Drawing.Point(752, 340);
             this.chrtPos.Name = "chrtPos";
             this.chrtPos.Size = new System.Drawing.Size(560, 307);
@@ -373,6 +375,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.txBxStrStep);
+            this.tabPage1.Controls.Add(this.label8);
             this.tabPage1.Controls.Add(this.txBxStrikesNumber);
             this.tabPage1.Controls.Add(this.label7);
             this.tabPage1.Controls.Add(this.btnSetDefaultSettings);
@@ -412,21 +416,37 @@
             this.tabPage1.Text = "Settings";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // txBxStrStep
+            // 
+            this.txBxStrStep.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.txBxStrStep.Location = new System.Drawing.Point(162, 155);
+            this.txBxStrStep.Name = "txBxStrStep";
+            this.txBxStrStep.Size = new System.Drawing.Size(100, 20);
+            this.txBxStrStep.TabIndex = 38;
+            // 
+            // label8
+            // 
+            this.label8.Location = new System.Drawing.Point(6, 155);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(150, 15);
+            this.label8.TabIndex = 37;
+            this.label8.Text = "StrikeStep";
+            // 
             // txBxStrikesNumber
             // 
             this.txBxStrikesNumber.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxStrikesNumber.Location = new System.Drawing.Point(162, 163);
+            this.txBxStrikesNumber.Location = new System.Drawing.Point(162, 182);
             this.txBxStrikesNumber.Name = "txBxStrikesNumber";
             this.txBxStrikesNumber.Size = new System.Drawing.Size(100, 20);
             this.txBxStrikesNumber.TabIndex = 36;
             // 
             // label7
             // 
-            this.label7.Location = new System.Drawing.Point(6, 163);
+            this.label7.Location = new System.Drawing.Point(6, 182);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(150, 15);
             this.label7.TabIndex = 35;
-            this.label7.Text = "OptionDeskStrikesNumber";
+            this.label7.Text = "MaxOptionStrikeInQuikDesk";
             // 
             // btnSetDefaultSettings
             // 
@@ -792,6 +812,8 @@
         private System.Windows.Forms.Button btnMinusOneFut;
         private System.Windows.Forms.Button btnPlusOneFut;
         private System.Windows.Forms.Button btnRes;
+        private System.Windows.Forms.TextBox txBxStrStep;
+        private System.Windows.Forms.Label label8;
     }
 }
 

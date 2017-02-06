@@ -29,7 +29,7 @@ namespace OptionsTradeWell
 
             MainPresenter presenter = new MainPresenter(dataCollector, mainForm, dataRender);
 
-            Application.Run(mainForm);
+             Application.Run(mainForm);
         }
 
     }

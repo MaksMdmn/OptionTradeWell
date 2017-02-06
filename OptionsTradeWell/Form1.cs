@@ -33,8 +33,6 @@ namespace OptionsTradeWell
         public event EventHandler OnTotalResetPositionInfo;
         public event EventHandler<PositionTableArgs> OnPosUpdateButtonClick;
 
-        private object threadLock = new object();
-
         private SortedDictionary<double, OptionsTableRow> rowMap;
         private System.Timers.Timer statusBarReducingTimer;
 
@@ -51,6 +49,8 @@ namespace OptionsTradeWell
         private Series midPutVolSeries;
         private Series curPosSeries;
         private Series expirPosSeries;
+        private Series spotPriceSeries;
+        private Series zeroSeries;
 
         public MainForm()
         {
@@ -67,11 +67,15 @@ namespace OptionsTradeWell
 
             InitializeTotalInfoTable();
 
-            SetupChartsLayouts();
+            InitializeChartsLayouts();
 
             StartUpdateTimer();
 
             toolStripPrBrConnection.Value = 100;
+
+            dgvOptionDesk.DataError += DgvAll_DataError;
+            dgvPositions.DataError += DgvAll_DataError;
+            dgvTotalInfo.DataError += DgvAll_DataError;
 
         }
 
@@ -106,21 +110,19 @@ namespace OptionsTradeWell
             txBxServName.Text = Settings.Default.ServerName;
             txBxUniqueIndx.Text = Settings.Default.UniqueIndexInDdeDataArray.ToString();
             txBxRounding.Text = Settings.Default.RoundTo.ToString();
-            txBxStrikesNumber.Text = Settings.Default.OptDeskStrikesNumber.ToString();
+            txBxStrikesNumber.Text = Settings.Default.MaxOptionStrikeInQuikDesk.ToString();
+            txBxStrStep.Text = Settings.Default.StrikeStep.ToString();
         }
 
         public void UpdateViewData(List<double[]> tableDataList)
         {
-            lock (threadLock)
+            if (rowMap.Count == 0)
             {
-                if (rowMap.Count == 0)
-                {
-                    FirstCreationOfDataMap(tableDataList);
-                }
-                else
-                {
-                    UsualUpdateDataInRowMap(tableDataList);
-                }
+                FirstCreationOfDataMap(tableDataList);
+            }
+            else
+            {
+                UsualUpdateDataInRowMap(tableDataList);
             }
         }
 
@@ -163,6 +165,13 @@ namespace OptionsTradeWell
                 double chartMax;
                 double chartStep;
 
+                double tempSpotPrice = 0.0;
+                if (Double.TryParse(lblSpotPrice.Text, out tempSpotPrice))
+                {
+                    tempSpotPrice = Math.Round(tempSpotPrice / Settings.Default.StrikeStep, 0) *
+                                    Settings.Default.StrikeStep;
+                }
+
                 foreach (double[] dataArr in tableDataList)
                 {
                     xVal = dataArr[0];
@@ -190,6 +199,17 @@ namespace OptionsTradeWell
                     }
                     curPosSeries.Points.AddXY(xVal, curPosVal);
                     expirPosSeries.Points.AddXY(xVal, expPosVal);
+                    zeroSeries.Points.AddXY(xVal, 0.0);
+
+                    if (tempSpotPrice > 0.0)
+                    {
+                        if (Math.Abs(tempSpotPrice - xVal) < 0.0001)
+                        {
+                            spotPriceSeries.Points.AddXY(xVal, curPosVal);
+                            spotPriceSeries.Points.AddXY(xVal, expPosVal);
+                        }
+
+                    }
                 }
 
                 chartMin = tempMinValY < 0 ? tempMinValY * expandVisibilityKoef : 0;
@@ -206,6 +226,7 @@ namespace OptionsTradeWell
                 chrtPos.ChartAreas[0].AxisY.Minimum = chartMin;
                 chrtPos.ChartAreas[0].AxisY.Maximum = chartMax;
                 chrtPos.ChartAreas[0].AxisY.Interval = chartStep;
+
             }));
         }
 
@@ -475,7 +496,7 @@ namespace OptionsTradeWell
                     posDataTable.Rows.Add();
                 }
             }
-           
+
 
             dgvPositions.DataSource = posDataTable;
 
@@ -549,7 +570,7 @@ namespace OptionsTradeWell
                 dgvTotalInfo.ClearSelection();
         }
 
-        private void SetupChartsLayouts()
+        private void InitializeChartsLayouts()
         {
             string toolTipFormat = "strike: #VALX{F2}\nvol: #VALY{F2}";
             Chart[] allCharts = new Chart[] { chrtCallVol, chrtPutVol, chrtPos };
@@ -563,6 +584,7 @@ namespace OptionsTradeWell
                 chart.ChartAreas[0].AxisX.MajorGrid.LineColor = Color.WhiteSmoke;
                 chart.ChartAreas[0].AxisX.LineColor = Color.WhiteSmoke;
                 chart.ChartAreas[0].AxisX.ScaleBreakStyle.LineColor = Color.WhiteSmoke;
+                chart.ChartAreas[0].AxisX.IsMarginVisible = false;
 
                 chart.ChartAreas[0].AxisY.LabelStyle.ForeColor = Color.WhiteSmoke;
                 chart.ChartAreas[0].AxisY.MajorTickMark.LineColor = Color.WhiteSmoke;
@@ -646,7 +668,7 @@ namespace OptionsTradeWell
             chrtCallVol.Titles[0].ForeColor = Color.WhiteSmoke;
             chrtCallVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
             chrtCallVol.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
-            chrtCallVol.ChartAreas[0].AxisX.Interval = 1.0;
+            chrtCallVol.ChartAreas[0].AxisX.Interval = Settings.Default.StrikeStep;
 
             chrtPutVol.ChartAreas[0].AxisY.Minimum = minValueY;
             chrtPutVol.ChartAreas[0].AxisY.Maximum = maxValueY;
@@ -656,26 +678,37 @@ namespace OptionsTradeWell
             chrtPutVol.Titles[0].ForeColor = Color.WhiteSmoke;
             chrtPutVol.Titles[0].Font = new Font("Microsoft Sans Serif", 10.0f);
             chrtPutVol.ChartAreas[0].AxisY.LabelStyle.Format = "{0.00} %";
-            chrtPutVol.ChartAreas[0].AxisX.Interval = 1.0;
+            chrtPutVol.ChartAreas[0].AxisX.Interval = Settings.Default.StrikeStep;
 
-            chrtPos.ChartAreas[0].AxisX.Interval = 1.0;
+            chrtPos.ChartAreas[0].AxisX.Interval = Settings.Default.StrikeStep * 2;
             chrtPos.ChartAreas[0].AxisX.LabelStyle.Font = new Font("Microsoft Sans Serif", 8.0f);
 
             curPosSeries = new Series();
             expirPosSeries = new Series();
+            spotPriceSeries = new Series();
+            zeroSeries = new Series();
 
             curPosSeries.ChartType = SeriesChartType.Spline;
-            curPosSeries.Color = Color.DarkOrchid;
+            curPosSeries.Color = Color.Aqua;
             curPosSeries.BorderWidth = 3;
             curPosSeries.SetCustomProperty("LineTension", "0");
 
             expirPosSeries.ChartType = SeriesChartType.Line;
-            expirPosSeries.Color = Color.Yellow;
+            expirPosSeries.Color = Color.LimeGreen;
             expirPosSeries.BorderWidth = 3;
+
+            zeroSeries.ChartType = SeriesChartType.Line;
+            zeroSeries.Color = Color.Red;
+            zeroSeries.BorderWidth = 1;
+
+            spotPriceSeries.ChartType = SeriesChartType.Point;
+            spotPriceSeries.Color = Color.Yellow;
+            spotPriceSeries.BorderWidth = 10;
 
             chrtPos.Series.Add(curPosSeries);
             chrtPos.Series.Add(expirPosSeries);
-
+            chrtPos.Series.Add(spotPriceSeries);
+            chrtPos.Series.Add(zeroSeries);
         }
 
         private void StartUpdateTimer()
@@ -697,12 +730,11 @@ namespace OptionsTradeWell
                 if (tempVal > 0)
                 {
                     toolStripPrBrConnection.Value = tempVal - 2;
-                    lock (threadLock)
-                    {
-                        chrtCallVol.DataBind();
-                        chrtPutVol.DataBind();
-                    }
                 }
+
+                chrtCallVol.DataBind();
+                chrtPutVol.DataBind();
+
             }));
         }
 
@@ -751,6 +783,12 @@ namespace OptionsTradeWell
             }
         }
 
+        private void DgvAll_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            UpdateMessageWindow(e.Exception.StackTrace);
+            UpdateMessageWindow(e.Exception.Message);
+        }
+
         private void btnSetDefaultSettings_Click(object sender, EventArgs e)
         {
             InitPrimarySettingsView();
@@ -770,7 +808,8 @@ namespace OptionsTradeWell
             Settings.Default.ServerName = txBxServName.Text;
             Settings.Default.UniqueIndexInDdeDataArray = Convert.ToInt32(txBxUniqueIndx.Text);
             Settings.Default.RoundTo = Convert.ToInt32(txBxRounding.Text);
-            Settings.Default.OptDeskStrikesNumber = Convert.ToInt32(txBxStrikesNumber.Text);
+            Settings.Default.MaxOptionStrikeInQuikDesk = Convert.ToInt32(txBxStrikesNumber.Text);
+            Settings.Default.StrikeStep = Convert.ToDouble(txBxStrStep.Text);
             Settings.Default.Save();
 
             if (OnSettingsInFormChanged != null)

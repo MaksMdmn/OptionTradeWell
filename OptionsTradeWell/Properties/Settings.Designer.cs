@@ -169,13 +169,25 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("26")]
-        public double OptDeskStrikesNumber {
+        [global::System.Configuration.DefaultSettingValueAttribute("70000")]
+        public double MaxOptionStrikeInQuikDesk {
             get {
-                return ((double)(this["OptDeskStrikesNumber"]));
+                return ((double)(this["MaxOptionStrikeInQuikDesk"]));
             }
             set {
-                this["OptDeskStrikesNumber"] = value;
+                this["MaxOptionStrikeInQuikDesk"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double StrikeStep {
+            get {
+                return ((double)(this["StrikeStep"]));
+            }
+            set {
+                this["StrikeStep"] = value;
             }
         }
     }

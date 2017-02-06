@@ -127,7 +127,7 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("Basic futures still null : " + basicFutures);
             }
 
-            return CalculateActualStrike() - NumberOfTrackingOptions / 2;
+            return CalculateActualStrike() - Settings.Default.StrikeStep * NumberOfTrackingOptions / 2;
         }
 
         public double CalculateMaxImportantStrike()
@@ -137,12 +137,12 @@ namespace OptionsTradeWell.model
                 throw new QuikDdeException("Basic futures is still null : " + basicFutures);
             }
 
-            return CalculateActualStrike() + NumberOfTrackingOptions / 2;
+            return CalculateActualStrike() + Settings.Default.StrikeStep * NumberOfTrackingOptions / 2;
         }
 
         public double CalculateActualStrike()
         {
-            return Math.Round(basicFutures.GetTradeBlotter().AskPrice, 0);
+            return Math.Round(basicFutures.GetTradeBlotter().AskPrice / Settings.Default.StrikeStep, 0) * Settings.Default.StrikeStep;
         }
 
         public Option GetOption(double strike, OptionType type)
@@ -159,6 +159,11 @@ namespace OptionsTradeWell.model
         public Futures GetBasicFutures()
         {
             return basicFutures;
+        }
+
+        public bool IsOptionExist(double strike, OptionType type)
+        {
+            return GetSuitableOptionsMap(type).ContainsKey(strike);
         }
 
         private void CollectAndSortServerDataByMaps(string topic, string[] data)
@@ -202,7 +207,7 @@ namespace OptionsTradeWell.model
                     futuresBlotter.AskSize = Convert.ToDouble(data[9]);
                 }
 
-                if (OnSpotPriceChanged != null && infoOption != null)
+                if (OnSpotPriceChanged != null && infoOption != null && futRecievedDataFlag == true)
                 {
                     OnSpotPriceChanged(this, new OptionEventArgs(infoOption));
                 }
@@ -262,7 +267,10 @@ namespace OptionsTradeWell.model
                     infoOption = suitOptionsMap[strike];
                 }
 
-                if (OnOptionsDeskChanged != null)
+                if (OnOptionsDeskChanged != null
+                    && optRecievedDataFlag == true
+                    && tempOption.Strike <= CalculateMaxImportantStrike()
+                    && tempOption.Strike >= CalculateMinImportantStrike())
                 {
                     OnOptionsDeskChanged(this, new OptionEventArgs(tempOption));
                 }
@@ -282,8 +290,10 @@ namespace OptionsTradeWell.model
             }
 
             if (futRecievedDataFlag == true
-                && callMap.Keys.Count >= Settings.Default.OptDeskStrikesNumber
-                && putMap.Keys.Count >= Settings.Default.OptDeskStrikesNumber)
+                && callMap.Count > 0
+                && putMap.Count > 0
+                && callMap.Keys.Max() >= Settings.Default.MaxOptionStrikeInQuikDesk
+                && putMap.Keys.Max() >= Settings.Default.MaxOptionStrikeInQuikDesk)
             {
                 optRecievedDataFlag = true;
             }

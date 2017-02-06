@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 using OptionsTradeWell.model;
 using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.model.interfaces;
@@ -165,7 +166,7 @@ namespace OptionsTradeWell.presenter
 
 
 
-            for (double i = minStr; i <= maxStr; i++)
+            for (double i = minStr; i <= maxStr; i += Settings.Default.StrikeStep)
             {
                 tempPosChartData.Add(new double[]
                 {
@@ -221,7 +222,7 @@ namespace OptionsTradeWell.presenter
             List<double[]> resultList = new List<double[]>();
             Option call;
             Option put;
-            for (double i = minStrike; i <= maxStrike; i++)
+            for (double i = minStrike; i <= maxStrike; i += Settings.Default.StrikeStep)
             {
                 call = dataCollector.GetOption(i, OptionType.Call);
                 put = dataCollector.GetOption(i, OptionType.Put);
