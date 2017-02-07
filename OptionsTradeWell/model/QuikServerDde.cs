@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Timers;
 using NDde.Server;
+using NLog;
 using OptionsTradeWell.assistants;
 
 namespace OptionsTradeWell.model
 {
     public class QuikServerDde : DdeServer
     {
+        private static Logger LOGGER = LogManager.GetCurrentClassLogger();
+
         private readonly string serverName;
         private System.Timers.Timer timer = new System.Timers.Timer();
         private readonly Dictionary<string, int> topicRowLengthMap;
@@ -17,35 +20,41 @@ namespace OptionsTradeWell.model
 
         internal QuikServerDde(string serverName, Dictionary<string, int> topicRowLengthMap) : base(serverName)
         {
+            LOGGER.Info("QuikServerDde creation...");
             this.serverName = serverName;
             this.topicRowLengthMap = topicRowLengthMap;
             timer.Elapsed += this.OnTimerElapsed;
             timer.Interval = 1000;
             timer.SynchronizingObject = this.Context;
+            LOGGER.Info("QuikServerDde created");
         }
 
         public override void Register()
         {
             base.Register();
             timer.Start();
+            LOGGER.Info("QuikServerDde started.");
         }
 
         public override void Unregister()
         {
             timer.Stop();
             base.Unregister();
+            LOGGER.Info("QuikServerDde turn off.");
         }
 
         protected override void OnDisconnect(DdeConversation conversation)
         {
-            throw new NotImplementedException();
+            LOGGER.Info("QuikServerDde disconnected.");
         }
 
         protected override PokeResult OnPoke(DdeConversation conversation, string item, byte[] data, int format)
         {
             int rowLength = topicRowLengthMap[conversation.Topic];
             string[] dataArr = new string[rowLength];
-            int dataCounter = -2; //because of 2 metadata symbols like: some number (D:) and type
+            int dataCounter = -2; //because of 2 metadata symbols like: some number and type     D: 
+
+            LOGGER.Debug("recieved information from quik: topic={0}, data={1}", conversation.Topic, String.Join(" ", dataArr));
 
             {
                 foreach (Object o in XlTableFormat.Read(data))
@@ -67,6 +76,8 @@ namespace OptionsTradeWell.model
                     }
                 }
             }
+
+            LOGGER.Debug("Successfully recieved and sended to data collector.");
 
             return PokeResult.Processed;
         }

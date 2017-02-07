@@ -1,4 +1,5 @@
 ﻿using System;
+using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.model.interfaces;
 
 namespace OptionsTradeWell.model
@@ -43,7 +44,7 @@ namespace OptionsTradeWell.model
 
         public override string ToString()
         {
-            return $"{nameof(Ticker)}: {Ticker}, {nameof(Maturity)}: {Maturity}, {nameof(Commission)}: {Commission}, {nameof(MarginRequirement)}: {MarginRequirement}, {nameof(PriceStep)}: {PriceStep}, {nameof(PriceStepValue)}: {PriceStepValue}";
+            return $"{nameof(blotter)}: {blotter}, {nameof(Ticker)}: {Ticker}, {nameof(Maturity)}: {Maturity}, {nameof(Commission)}: {Commission}, {nameof(MarginRequirement)}: {MarginRequirement}, {nameof(PriceStep)}: {PriceStep}, {nameof(PriceStepValue)}: {PriceStepValue}, {nameof(Position)}: {Position}";
         }
 
         public void AssignTradeBlotter(TradeBlotter blotter)
@@ -54,7 +55,7 @@ namespace OptionsTradeWell.model
             }
             else
             {
-                Console.WriteLine("argument is null, bud.");
+                throw new BasicModelException("Passed blotter to futures is null: " + blotter);
             }
         }
 

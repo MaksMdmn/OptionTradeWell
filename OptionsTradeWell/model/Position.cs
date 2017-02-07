@@ -68,7 +68,7 @@ namespace OptionsTradeWell.model
             int tempPos = Quantity + quantity;
             if (tempPos == 0)
             {
-                throw new ModelCalcsException("Position wouldn't be added, but closed. Please use another method CloseExistingPosAndGetFixedPnL for that.");
+                throw new BasicModelException("Position wouldn't be added, but closed. Please use another method CloseExistingPosAndGetFixedPnL for that.");
             }
 
             double tempMoney = price * quantity * -1 + CalcMoney();
@@ -82,6 +82,11 @@ namespace OptionsTradeWell.model
             double result = PosCalcsRoudning(CalcCurrentPnL(blotter));
             Quantity = 0;
             return result;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Quantity)}: {Quantity}, {nameof(EnterPrice)}: {EnterPrice}";
         }
 
         private double PosCalcsRoudning(double value)

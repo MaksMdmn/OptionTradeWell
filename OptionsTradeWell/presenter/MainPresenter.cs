@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using NLog;
 using OptionsTradeWell.model;
 using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.model.interfaces;
@@ -13,6 +15,8 @@ namespace OptionsTradeWell.presenter
 {
     public class MainPresenter
     {
+        private static Logger LOGGER = LogManager.GetCurrentClassLogger();
+
         private readonly ITerminalOptionDataCollector dataCollector;
         private readonly IMainForm mainForm;
         private readonly IDerivativesDataRender dataRender;
@@ -22,6 +26,8 @@ namespace OptionsTradeWell.presenter
 
         public MainPresenter(ITerminalOptionDataCollector dataCollector, IMainForm mainForm, IDerivativesDataRender dataRender)
         {
+            LOGGER.Info("MainPresenter creation...");
+
             this.dataCollector = dataCollector;
             this.mainForm = mainForm;
             this.dataRender = dataRender;
@@ -31,6 +37,8 @@ namespace OptionsTradeWell.presenter
             mainForm.OnStartUp += MainForm_OnStartUp;
             mainForm.OnPosUpdateButtonClick += MainForm_OnPosUpdateButtonClick;
             mainForm.OnTotalResetPositionInfo += MainForm_OnTotalResetPositionInfo;
+
+            LOGGER.Info("MainPresenter created.");
 
         }
 
@@ -48,173 +56,209 @@ namespace OptionsTradeWell.presenter
 
         private void MainForm_OnPosUpdateButtonClick(object sender, PositionTableArgs e)
         {
-
-            positionManager.CleanAllPositions();
-
-            List<string[]> tempPosTableData = new List<string[]>();
-            List<double[]> tempPosChartData = new List<double[]>();
-
-            List<string[]> userData = e.userArgs;
-
-            UserPosTableTypes type;
-            double enterPrice;
-            int quantity;
-            double strike;
-
-            double remainingDays;
-            double priceStep;
-            double priceVal;
-            TradeBlotter futBlotter;
-            TradeBlotter optBlotter;
-
-            foreach (string[] data in userData)
+            try
             {
-                if (!UserPosTableTypes.TryParse(data[0], out type))
-                {
-                    return;
-                }
+                positionManager.CleanAllPositions();
 
-                enterPrice = Convert.ToDouble(data[2]);
-                quantity = Convert.ToInt32(data[3]);
+                List<string[]> tempPosTableData = new List<string[]>();
+                List<double[]> tempPosChartData = new List<double[]>();
 
-                if (!String.IsNullOrEmpty(data[1]))
+                List<string[]> userData = e.userArgs;
+
+                UserPosTableTypes type;
+                double enterPrice;
+                int quantity;
+                double strike;
+
+                double remainingDays;
+                double priceStep;
+                double priceVal;
+                TradeBlotter futBlotter;
+                TradeBlotter optBlotter;
+
+                foreach (string[] data in userData)
                 {
-                    strike = Convert.ToDouble(data[1]);
-                }
-                else
-                {
-                    strike = 0.0;
-                }
+                    if (!UserPosTableTypes.TryParse(data[0], out type))
+                    {
+                        return;
+                    }
+
+                    enterPrice = Convert.ToDouble(data[2]);
+                    quantity = Convert.ToInt32(data[3]);
+
+                    if (!String.IsNullOrEmpty(data[1]))
+                    {
+                        strike = Convert.ToDouble(data[1]);
+                    }
+                    else
+                    {
+                        strike = 0.0;
+                    }
 
 
-                if (type.Equals(UserPosTableTypes.C))
-                {
-                    try
+                    if (type.Equals(UserPosTableTypes.C))
+                    {
+                        try
+                        {
+                            futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
+                            optBlotter = dataCollector.GetOption(strike, OptionType.Call).GetTradeBlotter();
+                            remainingDays = dataCollector.GetOption(strike, OptionType.Call).RemainingDays;
+                            priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
+                            priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
+
+                            positionManager.AddOption(Option.GetFakeOption(OptionType.Call, strike, enterPrice,
+                                remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
+                        }
+                        catch (QuikDdeException e1)
+                        {
+                            mainForm.UpdateMessageWindow(e1.Message);
+                            LOGGER.Error("Update position event, exception in call section: {0}", e1.ToString());
+                        }
+                    }
+
+                    else if (type.Equals(UserPosTableTypes.P))
+                    {
+                        try
+                        {
+                            futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
+                            optBlotter = dataCollector.GetOption(strike, OptionType.Put).GetTradeBlotter();
+                            remainingDays = dataCollector.GetOption(strike, OptionType.Put).RemainingDays;
+                            priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
+                            priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
+
+                            positionManager.AddOption(Option.GetFakeOption(OptionType.Put, strike, enterPrice,
+                                remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
+                        }
+                        catch (QuikDdeException e1)
+                        {
+                            mainForm.UpdateMessageWindow(e1.Message);
+                            LOGGER.Error("Update position event, exception in put section: {0}", e1.ToString());
+                        }
+                    }
+                    else if (type.Equals(UserPosTableTypes.F))
                     {
                         futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
-                        optBlotter = dataCollector.GetOption(strike, OptionType.Call).GetTradeBlotter();
-                        remainingDays = dataCollector.GetOption(strike, OptionType.Call).RemainingDays;
-                        priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
-                        priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
+                        priceStep = dataCollector.GetBasicFutures().PriceStep;
+                        priceVal = dataCollector.GetBasicFutures().PriceStepValue;
 
-                        positionManager.AddOption(Option.GetFakeOption(OptionType.Call, strike, enterPrice,
-                            remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
+                        positionManager.AddFutures(Futures.GetFakeFutures(enterPrice, quantity, futBlotter, priceStep,
+                            priceVal));
                     }
-                    catch (QuikDdeException e1)
+                    else
                     {
-                        mainForm.UpdateMessageWindow(e1.Message);
+                        mainForm.UpdateMessageWindow("incorrect type of instrument: " + type);
+                        LOGGER.Error("incorrect type of instrument, futures section: {0}", type);
                     }
                 }
 
-                else if (type.Equals(UserPosTableTypes.P))
-                {
-                    try
-                    {
-                        futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
-                        optBlotter = dataCollector.GetOption(strike, OptionType.Put).GetTradeBlotter();
-                        remainingDays = dataCollector.GetOption(strike, OptionType.Put).RemainingDays;
-                        priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
-                        priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
+                positionManager.UpdateGeneralParametres();
 
-                        positionManager.AddOption(Option.GetFakeOption(OptionType.Put, strike, enterPrice, remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
-                    }
-                    catch (QuikDdeException e1)
-                    {
-                        mainForm.UpdateMessageWindow(e1.Message);
-                    }
+                if (positionManager.Futures != null)
+                {
+                    tempPosTableData.Add(CreatePosTableDataRowFromFut(positionManager.Futures));
                 }
-                else if (type.Equals(UserPosTableTypes.F))
-                {
-                    futBlotter = dataCollector.GetBasicFutures().GetTradeBlotter();
-                    priceStep = dataCollector.GetBasicFutures().PriceStep;
-                    priceVal = dataCollector.GetBasicFutures().PriceStepValue;
 
-                    positionManager.AddFutures(Futures.GetFakeFutures(enterPrice, quantity, futBlotter, priceStep, priceVal));
+                foreach (Option opt in positionManager.Options)
+                {
+                    tempPosTableData.Add(CreatePosTableDataRowFromOpt(opt));
                 }
-                else
+
+                mainForm.UpdatePositionTableData(tempPosTableData);
+                mainForm.UpdateTotalInfoTable(new double[]
                 {
-                    mainForm.UpdateMessageWindow("incorrect type of instrument: " + type);
-                }
-            }
-
-            positionManager.UpdateGeneralParametres();
-
-            if (positionManager.Futures != null)
-            {
-                tempPosTableData.Add(CreatePosTableDataRowFromFut(positionManager.Futures));
-            }
-
-            foreach (Option opt in positionManager.Options)
-            {
-                tempPosTableData.Add(CreatePosTableDataRowFromOpt(opt));
-            }
-
-            mainForm.UpdatePositionTableData(tempPosTableData);
-            mainForm.UpdateTotalInfoTable(new double[]
-            {
-                Math.Round(positionManager.CalculatePositionCurPnL(),0),
-                Math.Round(positionManager.CalculatePositionPnL(),2),
-                Math.Round(positionManager.FixedPnL,2),
-                Math.Round(positionManager.TotalDelta,4),
-                Math.Round(positionManager.TotalGamma,4),
-                Math.Round(positionManager.TotalVega,4),
-                Math.Round(positionManager.TotalTheta,4)
-            });
-
-            double minStr = dataCollector.CalculateMinImportantStrike();
-            double maxStr = dataCollector.CalculateMaxImportantStrike();
-
-
-
-            for (double i = minStr; i <= maxStr; i += Settings.Default.StrikeStep)
-            {
-                tempPosChartData.Add(new double[]
-                {
-                    i,
-                    positionManager.CalculateCurApproxPnL(i),
-                    positionManager.CalculateExpirationPnL(i)
+                    Math.Round(positionManager.CalculatePositionCurPnL(), 0),
+                    Math.Round(positionManager.CalculatePositionPnL(), 2),
+                    Math.Round(positionManager.FixedPnL, 2),
+                    Math.Round(positionManager.TotalDelta, 4),
+                    Math.Round(positionManager.TotalGamma, 4),
+                    Math.Round(positionManager.TotalVega, 4),
+                    Math.Round(positionManager.TotalTheta, 4)
                 });
-            }
 
-            mainForm.UpdatePositionChartData(tempPosChartData);
+                double minStr = dataCollector.CalculateMinImportantStrike();
+                double maxStr = dataCollector.CalculateMaxImportantStrike();
+
+
+
+                for (double i = minStr; i <= maxStr; i += Settings.Default.StrikeStep)
+                {
+                    tempPosChartData.Add(new double[]
+                    {
+                        i,
+                        positionManager.CalculateCurApproxPnL(i),
+                        positionManager.CalculateExpirationPnL(i)
+                    });
+                }
+
+                mainForm.UpdatePositionChartData(tempPosChartData);
+            }
+            catch (Exception e2)
+            {
+                LOGGER.Error("An exception when event of position update was enabled:{0}", e2.ToString());
+                throw;
+            }
         }
 
         private void MainForm_OnStartUp(object sender, EventArgs e)
         {
-            dataCollector.EstablishConnection();
-
-            while (!dataCollector.IsConnected())
+            try
             {
+                dataCollector.EstablishConnection();
+
+                while (!dataCollector.IsConnected())
+                {
+                    Thread.Sleep(500);
+                }
+
+                dataCollector.OnOptionsDeskChanged += DataCollector_OnOptionsDeskChanged;
+                dataCollector.OnSpotPriceChanged += DataCollector_OnSpotPriceChanged;
+
+                double minStrike = dataCollector.CalculateMinImportantStrike();
+                double maxStrike = dataCollector.CalculateMaxImportantStrike();
+
+                mainForm.UpdateViewData(
+                    MakeDataList(minStrike, maxStrike));
             }
-
-            dataCollector.OnOptionsDeskChanged += DataCollector_OnOptionsDeskChanged;
-            dataCollector.OnSpotPriceChanged += DataCollector_OnSpotPriceChanged;
-
-            double minStrike = dataCollector.CalculateMinImportantStrike();
-            double maxStrike = dataCollector.CalculateMaxImportantStrike();
-
-            mainForm.UpdateViewData(
-                MakeDataList(minStrike, maxStrike));
-
+            catch (Exception e3)
+            {
+                LOGGER.Error("An exception when event of startUp was enabled:{0}", e3.ToString());
+                throw;
+            }
         }
 
         private void DataCollector_OnOptionsDeskChanged(object sender, OptionEventArgs e)
         {
-            double tempStrike = e.opt.Strike;
-            mainForm.UpdateViewData(
-                 MakeDataList(tempStrike, tempStrike));
+            try
+            {
+                double tempStrike = e.opt.Strike;
+                mainForm.UpdateViewData(
+                     MakeDataList(tempStrike, tempStrike));
+            }
+            catch (Exception e4)
+            {
+                LOGGER.Error("An exception when event of options desk data changed was enabled:{0}", e4.ToString());
+                throw;
+            }
         }
 
         private void DataCollector_OnSpotPriceChanged(object sender, OptionEventArgs e)
         {
-            string[] data = new[]
+            try
             {
+                string[] data = new[]
+                {
                 Convert.ToString(e.opt.Futures.GetTradeBlotter().AskPrice),
                 e.opt.Futures.Ticker,
                 Convert.ToString(e.opt.RemainingDays)
 
             };
-            mainForm.UpdateFuturesData(data);
+                mainForm.UpdateFuturesData(data);
+            }
+            catch (Exception e5)
+            {
+                LOGGER.Error("An exception when event of options desk data changed was enabled:{0}", e5.ToString());
+                throw;
+            }
         }
 
         private List<double[]> MakeDataList(double minStrike, double maxStrike)

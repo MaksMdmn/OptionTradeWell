@@ -708,15 +708,13 @@
             // 
             this.toolStripStLbAsset.Margin = new System.Windows.Forms.Padding(0, 3, 70, 2);
             this.toolStripStLbAsset.Name = "toolStripStLbAsset";
-            this.toolStripStLbAsset.Size = new System.Drawing.Size(118, 17);
-            this.toolStripStLbAsset.Text = "toolStripStatusLabel1";
+            this.toolStripStLbAsset.Size = new System.Drawing.Size(0, 17);
             // 
             // toolStripStLbLastUpd
             // 
             this.toolStripStLbLastUpd.Margin = new System.Windows.Forms.Padding(0, 3, 70, 2);
             this.toolStripStLbLastUpd.Name = "toolStripStLbLastUpd";
-            this.toolStripStLbLastUpd.Size = new System.Drawing.Size(118, 17);
-            this.toolStripStLbLastUpd.Text = "toolStripStatusLabel1";
+            this.toolStripStLbLastUpd.Size = new System.Drawing.Size(0, 17);
             // 
             // contextMenuStrip1
             // 

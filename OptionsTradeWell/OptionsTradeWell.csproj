@@ -36,16 +36,12 @@
     <ApplicationIcon>lobsta32.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LiveCharts, Version=0.8.1.1, Culture=neutral, PublicKeyToken=c5935629d38af058, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiveCharts.0.8.1.1\lib\net40\LiveCharts.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="LiveCharts.Wpf, Version=0.8.1.1, Culture=neutral, PublicKeyToken=3b585c2a5f1a92c1, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiveCharts.Wpf.0.8.1.1\lib\net45\LiveCharts.Wpf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="NDde">
       <HintPath>..\..\..\xLibs\NDde.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.2\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,7 +63,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="model\exceptions\ModelCalcsException.cs" />
+    <Compile Include="model\exceptions\BasicModelException.cs" />
     <Compile Include="model\exceptions\QuikDdeException.cs" />
     <Compile Include="model\exceptions\IllegalViewDataException.cs" />
     <Compile Include="model\exceptions\RenderingDerivativesException.cs" />
@@ -106,6 +102,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -120,9 +122,10 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="assistants\data.txt" />
+    <Folder Include="zLogs\" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="lobsta32.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

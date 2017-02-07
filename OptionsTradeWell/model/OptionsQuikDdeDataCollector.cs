@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NLog;
 using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.model.interfaces;
 using OptionsTradeWell.Properties;
@@ -9,6 +10,7 @@ namespace OptionsTradeWell.model
 {
     public class OptionsQuikDdeDataCollector : ITerminalOptionDataCollector
     {
+        private static Logger LOGGER = LogManager.GetCurrentClassLogger();
         private static string SERVER_NAME = Settings.Default.ServerName;
         private static string OPTIONS_DESK = Settings.Default.OptionsTableName;
         private static string FUTURES_DESK = Settings.Default.FuturesTableName;
@@ -33,6 +35,7 @@ namespace OptionsTradeWell.model
 
         public OptionsQuikDdeDataCollector()
         {
+            LOGGER.Info("OptionsQuikDdeDataCollector creation...");
             this.server = new QuikServerDde(SERVER_NAME, TOPICS_AND_ROWS_LENGTH_MAP);
             server.OnDataUpdate += CollectAndSortServerDataByMaps;
 
@@ -52,6 +55,7 @@ namespace OptionsTradeWell.model
 
             this.futRecievedDataFlag = false;
             this.optRecievedDataFlag = false;
+            LOGGER.Info("OptionsQuikDdeDataCollector created");
         }
 
         private static Dictionary<string, int> CreateCustomDdeTableMap()
@@ -67,6 +71,7 @@ namespace OptionsTradeWell.model
 
         public bool IsConnected()
         {
+            LOGGER.Debug("checking IsConnected flags: {0}, {1}, {2}", server.IsRegistered, futRecievedDataFlag, optRecievedDataFlag);
             return server.IsRegistered && futRecievedDataFlag && optRecievedDataFlag;
         }
 
@@ -168,6 +173,7 @@ namespace OptionsTradeWell.model
 
         private void CollectAndSortServerDataByMaps(string topic, string[] data)
         {
+            LOGGER.Debug("Starting process of colleting and sorting data. Topic: {0}, data array: {1} ", topic, String.Join(" ", data));
             if (futRecievedDataFlag == false || optRecievedDataFlag == false)
             {
                 CheckConnectionFlags();
@@ -178,6 +184,7 @@ namespace OptionsTradeWell.model
             {
                 if (GetBasicFutures() == null)
                 {
+                    LOGGER.Debug("Initializing basic futures.");
                     string ticker = data[0];
                     DateTime maturity = DateTime.Parse(data[1]);
                     double commission = Convert.ToDouble(data[2]);
@@ -197,14 +204,20 @@ namespace OptionsTradeWell.model
                     basicFutures.AssignTradeBlotter(futuresBlotter);
 
                     lastTrackingStrike = CalculateActualStrike();
+
+                    LOGGER.Debug("Initializing completed. Futures instance: {0}", basicFutures);
                 }
                 else
                 {
+                    LOGGER.Debug("Updating basic futures.");
+
                     TradeBlotter futuresBlotter = basicFutures.GetTradeBlotter();
                     futuresBlotter.BidPrice = Convert.ToDouble(data[6]);
                     futuresBlotter.BidSize = Convert.ToDouble(data[7]);
                     futuresBlotter.AskPrice = Convert.ToDouble(data[8]);
                     futuresBlotter.AskSize = Convert.ToDouble(data[9]);
+
+                    LOGGER.Debug("Updating completed.");
                 }
 
                 if (OnSpotPriceChanged != null && infoOption != null && futRecievedDataFlag == true)
@@ -222,6 +235,8 @@ namespace OptionsTradeWell.model
 
                 if (suitOptionsMap.ContainsKey(strike))
                 {
+                    LOGGER.Debug("Initializing option: {0}, {1}", optionType, strike);
+
                     tempOption = suitOptionsMap[strike];
                     tempOption.MarginRequirementNotCover = Convert.ToDouble(data[2]);
                     tempOption.MarginRequirementCover = Convert.ToDouble(data[3]);
@@ -232,9 +247,13 @@ namespace OptionsTradeWell.model
                     optionsBlotter.BidSize = Convert.ToDouble(data[11]);
                     optionsBlotter.AskPrice = Convert.ToDouble(data[12]);
                     optionsBlotter.AskSize = Convert.ToDouble(data[13]);
+
+                    LOGGER.Debug("Initializing completed. Option instance: {0}", tempOption);
                 }
                 else
                 {
+                    LOGGER.Debug("Updating option: {0}, {1}", optionType, strike);
+
                     double marginRequirementCover = Convert.ToDouble(data[2]); ;
                     double marginRequirementNotCover = Convert.ToDouble(data[3]); ;
                     double marginRequirementBuyer = Convert.ToDouble(data[4]); ;
@@ -258,6 +277,7 @@ namespace OptionsTradeWell.model
 
                     suitOptionsMap.Add(strike, tempOption);
 
+                    LOGGER.Debug("Updating completed.");
                 }
 
 
@@ -265,6 +285,7 @@ namespace OptionsTradeWell.model
                 {
                     //just for access to general options field
                     infoOption = suitOptionsMap[strike];
+                    LOGGER.Debug("info option created: {0}", infoOption);
                 }
 
                 if (OnOptionsDeskChanged != null
@@ -277,7 +298,7 @@ namespace OptionsTradeWell.model
             }
             else
             {
-                throw new QuikDdeException("table with a such name wasn't mapped: " + TOPICS_AND_ROWS_LENGTH_MAP.Keys);
+                throw new QuikDdeException("table with a such name wasn't mapped: " + String.Join(" ", TOPICS_AND_ROWS_LENGTH_MAP.Keys));
             }
 
         }
@@ -287,6 +308,7 @@ namespace OptionsTradeWell.model
             if (GetBasicFutures() != null)
             {
                 futRecievedDataFlag = true;
+                LOGGER.Debug("Futures flag changed on {0}", futRecievedDataFlag);
             }
 
             if (futRecievedDataFlag == true
@@ -296,6 +318,7 @@ namespace OptionsTradeWell.model
                 && putMap.Keys.Max() >= Settings.Default.MaxOptionStrikeInQuikDesk)
             {
                 optRecievedDataFlag = true;
+                LOGGER.Debug("Options flag changed on {0}", optRecievedDataFlag);
             }
         }
 

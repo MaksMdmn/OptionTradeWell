@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using NLog;
 using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.Properties;
 using OptionsTradeWell.view;
@@ -27,6 +28,7 @@ namespace OptionsTradeWell
 
         private static int NUMBER_OF_POSDATATABLE_ROWS_HARDCORE = 30;
         private static string POS_SAVE_FILE_NAME = "posData.xml";
+        private static Logger LOGGER = LogManager.GetCurrentClassLogger();
 
         public event EventHandler OnStartUp;
         public event EventHandler OnSettingsInFormChanged;
@@ -54,20 +56,33 @@ namespace OptionsTradeWell
 
         public MainForm()
         {
+            LOGGER.Info("Creation of MainForm...");
             statusBarReducingTimer = new System.Timers.Timer();
             rowMap = new SortedDictionary<double, OptionsTableRow>();
 
             InitializeComponent();
 
+            LOGGER.Info("Components initialized");
+
             InitPrimarySettingsView();
+
+            LOGGER.Info("Primary settings initialized");
 
             InitializeOptionsDataTable();
 
+            LOGGER.Info("OptionsDataTable initialized");
+
             InitializePosDataTable();
+
+            LOGGER.Info("PositionDataTable initialized");
 
             InitializeTotalInfoTable();
 
+            LOGGER.Info("TotalInfoTable initialized");
+
             InitializeChartsLayouts();
+
+            LOGGER.Info("Charts initialized");
 
             StartUpdateTimer();
 
@@ -76,7 +91,7 @@ namespace OptionsTradeWell
             dgvOptionDesk.DataError += DgvAll_DataError;
             dgvPositions.DataError += DgvAll_DataError;
             dgvTotalInfo.DataError += DgvAll_DataError;
-
+            LOGGER.Info("MainForm created");
         }
 
         public void UpdateFuturesData(string[] data)
@@ -166,9 +181,10 @@ namespace OptionsTradeWell
                 double chartStep;
 
                 double tempSpotPrice = 0.0;
-                if (Double.TryParse(lblSpotPrice.Text, out tempSpotPrice))
+                double notRoundedSpotPrice;
+                if (Double.TryParse(lblSpotPrice.Text, out notRoundedSpotPrice))
                 {
-                    tempSpotPrice = Math.Round(tempSpotPrice / Settings.Default.StrikeStep, 0) *
+                    tempSpotPrice = Math.Round(notRoundedSpotPrice / Settings.Default.StrikeStep, 0) *
                                     Settings.Default.StrikeStep;
                 }
 
@@ -199,14 +215,16 @@ namespace OptionsTradeWell
                     }
                     curPosSeries.Points.AddXY(xVal, curPosVal);
                     expirPosSeries.Points.AddXY(xVal, expPosVal);
+                    zeroSeries.Points.Clear();
                     zeroSeries.Points.AddXY(xVal, 0.0);
 
                     if (tempSpotPrice > 0.0)
                     {
                         if (Math.Abs(tempSpotPrice - xVal) < 0.0001)
                         {
-                            spotPriceSeries.Points.AddXY(xVal, curPosVal);
-                            spotPriceSeries.Points.AddXY(xVal, expPosVal);
+                            spotPriceSeries.Points.Clear();
+                            spotPriceSeries.Points.AddXY(notRoundedSpotPrice, curPosVal);
+                            spotPriceSeries.Points.AddXY(notRoundedSpotPrice, expPosVal);
                         }
 
                     }
@@ -704,6 +722,7 @@ namespace OptionsTradeWell
             spotPriceSeries.ChartType = SeriesChartType.Point;
             spotPriceSeries.Color = Color.Yellow;
             spotPriceSeries.BorderWidth = 10;
+            spotPriceSeries.ToolTip = "price: #VALX{F2}\nPnL: #VALY{F2}";
 
             chrtPos.Series.Add(curPosSeries);
             chrtPos.Series.Add(expirPosSeries);
@@ -737,7 +756,6 @@ namespace OptionsTradeWell
 
             }));
         }
-
 
         private List<string[]> GetPosTableArgs()
         {
@@ -787,15 +805,19 @@ namespace OptionsTradeWell
         {
             UpdateMessageWindow(e.Exception.StackTrace);
             UpdateMessageWindow(e.Exception.Message);
+
+            LOGGER.Error("Table: {0}, dataGridError event was activated: {1}", sender, e.Exception.ToString());
         }
 
         private void btnSetDefaultSettings_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnSetDefaultSettings_Click");
             InitPrimarySettingsView();
         }
 
         private void btnSaveSettings_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnSaveSettings_Click");
             Settings.Default.MinActualStrikeUpdateTimeSec = Convert.ToInt32(txBxCentralStrChangeTimeSec.Text);
             Settings.Default.DaysInYear = Convert.ToDouble(txBxDaysInYear.Text);
             Settings.Default.FuturesTableName = txBxFutTableName.Text;
@@ -820,6 +842,8 @@ namespace OptionsTradeWell
 
         private void btnStart_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnStart_Click");
+
             btnStart.BackColor = Color.Gray;
             btnStart.Text = "Starting...";
 
@@ -835,6 +859,8 @@ namespace OptionsTradeWell
 
         private void btnUpdatePos_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnUpdatePos_Click");
+
             posDataTable.WriteXml(POS_SAVE_FILE_NAME);
             PositionTableArgs args = new PositionTableArgs(GetPosTableArgs());
             CleanPosTableData();
@@ -847,6 +873,8 @@ namespace OptionsTradeWell
 
         private void btnAddFromTable_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnAddFromTable_Click");
+
             int sellCallIndex = 0;
             int buyCallIndex = 1;
             int strikeIndex = 2;
@@ -907,6 +935,8 @@ namespace OptionsTradeWell
 
         private void btnCleanSelected_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnCleanSelected_Click");
+
             int selectedCellsCount = dgvPositions.GetCellCount(DataGridViewElementStates.Selected);
 
             for (int i = 0; i < selectedCellsCount; i++)
@@ -921,6 +951,8 @@ namespace OptionsTradeWell
 
         private void btnPlusOneFut_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnPlusOneFut_Click");
+
             for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
             {
                 if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
@@ -936,6 +968,8 @@ namespace OptionsTradeWell
 
         private void btnMinusOneFut_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnMinusOneFut_Click");
+
             for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
             {
                 if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
@@ -951,6 +985,8 @@ namespace OptionsTradeWell
 
         private void btnRes_Click(object sender, EventArgs e)
         {
+            LOGGER.Info("btnRes_Click");
+
             if (OnTotalResetPositionInfo != null)
             {
                 CleanPosTableData();

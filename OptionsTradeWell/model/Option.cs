@@ -1,4 +1,6 @@
 ﻿using System;
+using NLog;
+using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.model.interfaces;
 
 namespace OptionsTradeWell.model
@@ -6,7 +8,7 @@ namespace OptionsTradeWell.model
     public class Option : ITradable
     {
         private TradeBlotter blotter = null;
-
+        private static Logger LOGGER = LogManager.GetCurrentClassLogger();
         public Option(Futures futures, OptionType optionType, double strike, double marginRequirementCover, double marginRequirementNotCover, double marginRequirementBuyer, string ticker, double priceStep, double priceStepValue, DateTime expirationDate, double remainingDays)
         {
             this.Futures = futures;
@@ -82,7 +84,7 @@ namespace OptionsTradeWell.model
             }
             else
             {
-                Console.WriteLine("argument is null, bud.");
+                throw new BasicModelException("Passed blotter to option is null: " + blotter);
             }
         }
 
@@ -98,6 +100,7 @@ namespace OptionsTradeWell.model
 
         public void UpdateAllGreeksTogether()
         {
+            LOGGER.Debug("All greeks update requested.");
             double optionTime = this.RemainingDays / GreeksCalculator.DAYS_IN_YEAR;
             double spotPrice = this.Futures.GetTradeBlotter().AskPrice;
 
@@ -143,6 +146,9 @@ namespace OptionsTradeWell.model
                     this.GetTradeBlotter().BidPrice,
                     0.5));
 
+            LOGGER.Debug("Greeks update complete, result: Delta: {0}, Gamma: {1}, Vega: {2}, Theta: {3}, ImplVol: {4}, BuyVol: {5}, SellVol: {6}",
+                Delta, Gamma, Vega, Theta, ImplVol, BuyVol, SellVol)
+            ;
         }
 
         public double DependOnPosDelta()
@@ -202,18 +208,7 @@ namespace OptionsTradeWell.model
 
         public override string ToString()
         {
-            return $"{nameof(RemainingDays)}: {RemainingDays}, {nameof(ExpirationDate)}: {ExpirationDate}, {nameof(Strike)}: {Strike}, {nameof(Ticker)}: {Ticker}, {nameof(PriceStep)}: {PriceStep}, {nameof(PriceStepValue)}: {PriceStepValue}, {nameof(MarginRequirementCover)}: {MarginRequirementCover}, {nameof(MarginRequirementNotCover)}: {MarginRequirementNotCover}, {nameof(MarginRequirementBuyer)}: {MarginRequirementBuyer}, {nameof(OptionType)}: {OptionType}, {nameof(Delta)}: {Delta}, {nameof(Gamma)}: {Gamma}, {nameof(Vega)}: {Vega}, {nameof(Theta)}: {Theta}, {nameof(ImplVol)}: {ImplVol}, {nameof(BuyVol)}: {BuyVol}, {nameof(SellVol)}: {SellVol}";
+            return $"{nameof(blotter)}: {blotter}, {nameof(Futures)}: {Futures}, {nameof(RemainingDays)}: {RemainingDays}, {nameof(ExpirationDate)}: {ExpirationDate}, {nameof(Strike)}: {Strike}, {nameof(Ticker)}: {Ticker}, {nameof(PriceStep)}: {PriceStep}, {nameof(PriceStepValue)}: {PriceStepValue}, {nameof(MarginRequirementCover)}: {MarginRequirementCover}, {nameof(MarginRequirementNotCover)}: {MarginRequirementNotCover}, {nameof(MarginRequirementBuyer)}: {MarginRequirementBuyer}, {nameof(OptionType)}: {OptionType}, {nameof(Delta)}: {Delta}, {nameof(Gamma)}: {Gamma}, {nameof(Vega)}: {Vega}, {nameof(Theta)}: {Theta}, {nameof(ImplVol)}: {ImplVol}, {nameof(BuyVol)}: {BuyVol}, {nameof(SellVol)}: {SellVol}, {nameof(Position)}: {Position}";
         }
-
-        public string ShowGreeks()
-        {
-            return "Type: " + OptionType + "\n"
-                   + "Delta: " + Delta + "\n"
-                   + "Gamma: " + Gamma + "\n"
-                   + "Vega: " + Vega + "\n"
-                   + "Theta: " + Theta + "\n"
-                   + "ImplVol, BuyVol, SellVol:  " + ImplVol + " | " + BuyVol + " | " + SellVol;
-        }
-
     }
 }
