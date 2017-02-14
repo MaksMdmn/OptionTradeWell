@@ -1,4 +1,6 @@
-﻿namespace OptionsTradeWell.model.interfaces
+﻿using OptionsTradeWell.model;
+
+namespace OptionsTradeWell.presenter.interfaces
 {
     public interface ITradable
     {

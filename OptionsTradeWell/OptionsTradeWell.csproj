@@ -36,7 +36,8 @@
     <ApplicationIcon>lobsta32.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NDde">
+    <Reference Include="NDde, Version=2.1.563.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\xLibs\NDde.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
@@ -57,6 +58,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="assistants\T2Q.cs" />
+    <Compile Include="assistants\T2QParametres.cs" />
+    <Compile Include="assistants\T2QResultsCode.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,11 +71,19 @@
     <Compile Include="model\exceptions\QuikDdeException.cs" />
     <Compile Include="model\exceptions\IllegalViewDataException.cs" />
     <Compile Include="model\exceptions\RenderingDerivativesException.cs" />
-    <Compile Include="model\OptionsQuikDdeDataCollector.cs" />
-    <Compile Include="model\PositionManager.cs" />
+    <Compile Include="presenter\DeltaHedger.cs" />
+    <Compile Include="model\DerivativesClasses.cs" />
+    <Compile Include="presenter\interfaces\ITerminalTransactionsImporter.cs" />
+    <Compile Include="model\QuikOrder.cs" />
+    <Compile Include="model\QuikOrderOperation.cs" />
+    <Compile Include="model\QuikOrderStatus.cs" />
+    <Compile Include="model\QuikOrderType.cs" />
     <Compile Include="model\Position.cs" />
     <Compile Include="model\QuikServerDde.cs" />
     <Compile Include="presenter\MainPresenter.cs" />
+    <Compile Include="presenter\PositionManager.cs" />
+    <Compile Include="presenter\QuikDdeDataCollector.cs" />
+    <Compile Include="presenter\QuikTransactionsImporter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,9 +91,9 @@
     <Compile Include="assistants\XlTableFormat.cs" />
     <Compile Include="model\Futures.cs" />
     <Compile Include="model\GreeksCalculator.cs" />
-    <Compile Include="model\interfaces\ITerminalDataCollector.cs" />
-    <Compile Include="model\interfaces\ITerminalOptionDataCollector.cs" />
-    <Compile Include="model\interfaces\ITradable.cs" />
+    <Compile Include="presenter\interfaces\ITerminalDataCollector.cs" />
+    <Compile Include="presenter\interfaces\ITerminalOptionDataCollector.cs" />
+    <Compile Include="presenter\interfaces\ITradable.cs" />
     <Compile Include="model\Option.cs" />
     <Compile Include="model\OptionType.cs" />
     <Compile Include="model\TradeBlotter.cs" />

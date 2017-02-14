@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using NLog;
 using OptionsTradeWell.model;
 using OptionsTradeWell.model.exceptions;
-using OptionsTradeWell.model.interfaces;
+using OptionsTradeWell.presenter.interfaces;
 using OptionsTradeWell.Properties;
 using OptionsTradeWell.view;
 using OptionsTradeWell.view.interfaces;
@@ -21,7 +21,8 @@ namespace OptionsTradeWell.presenter
         private readonly IMainForm mainForm;
         private readonly IDerivativesDataRender dataRender;
         private readonly FileDataSaver fileDataSaver;
-        private PositionManager positionManager;
+        private PositionManager posManager;
+        private PositionManager quikPosManager;
         private System.Timers.Timer writtingTimer = new System.Timers.Timer();
 
         public MainPresenter(ITerminalOptionDataCollector dataCollector, IMainForm mainForm, IDerivativesDataRender dataRender)
@@ -31,23 +32,23 @@ namespace OptionsTradeWell.presenter
             this.dataCollector = dataCollector;
             this.mainForm = mainForm;
             this.dataRender = dataRender;
-            this.positionManager = new PositionManager();
+            this.posManager = new PositionManager();
             //fileDataSaver = new FileDataSaver(FILE_PATH, Encoding.GetEncoding("windows-1251")); //hardcore D:
 
-            mainForm.OnStartUp += MainForm_OnStartUp;
+            mainForm.OnStartUpClick += MainFormOnStartUpClick;
             mainForm.OnPosUpdateButtonClick += MainForm_OnPosUpdateButtonClick;
-            mainForm.OnTotalResetPositionInfo += MainForm_OnTotalResetPositionInfo;
+            mainForm.OnTotalResetPositionInfoClick += MainFormOnTotalResetPositionInfoClick;
 
             LOGGER.Info("MainPresenter created.");
 
         }
 
-        private void MainForm_OnTotalResetPositionInfo(object sender, EventArgs e)
+        private void MainFormOnTotalResetPositionInfoClick(object sender, EventArgs e)
         {
-            if (positionManager != null)
+            if (posManager != null)
             {
-                positionManager.CleanAllPositions();
-                positionManager.ResetFixedPnLValue();
+                posManager.CleanAllPositions();
+                posManager.ResetFixedPnLValue();
                 mainForm.UpdatePositionTableData(new List<string[]>() { });
                 mainForm.UpdateTotalInfoTable(new double[] { 0, 0, 0, 0, 0, 0, 0 });
                 mainForm.UpdatePositionChartData(new List<double[]>() { });
@@ -58,7 +59,7 @@ namespace OptionsTradeWell.presenter
         {
             try
             {
-                positionManager.CleanAllPositions();
+                posManager.CleanAllPositions();
 
                 List<string[]> tempPosTableData = new List<string[]>();
                 List<double[]> tempPosChartData = new List<double[]>();
@@ -106,7 +107,7 @@ namespace OptionsTradeWell.presenter
                             priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
                             priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
 
-                            positionManager.AddOption(Option.GetFakeOption(OptionType.Call, strike, enterPrice,
+                            posManager.AddOption(Option.GetFakeOption(OptionType.Call, strike, enterPrice,
                                 remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
                         }
                         catch (QuikDdeException e1)
@@ -126,7 +127,7 @@ namespace OptionsTradeWell.presenter
                             priceStep = dataCollector.GetOption(strike, OptionType.Call).PriceStep;
                             priceVal = dataCollector.GetOption(strike, OptionType.Call).PriceStepValue;
 
-                            positionManager.AddOption(Option.GetFakeOption(OptionType.Put, strike, enterPrice,
+                            posManager.AddOption(Option.GetFakeOption(OptionType.Put, strike, enterPrice,
                                 remainingDays, quantity, futBlotter, optBlotter, priceStep, priceVal));
                         }
                         catch (QuikDdeException e1)
@@ -141,7 +142,7 @@ namespace OptionsTradeWell.presenter
                         priceStep = dataCollector.GetBasicFutures().PriceStep;
                         priceVal = dataCollector.GetBasicFutures().PriceStepValue;
 
-                        positionManager.AddFutures(Futures.GetFakeFutures(enterPrice, quantity, futBlotter, priceStep,
+                        posManager.AddFutures(Futures.GetFakeFutures(enterPrice, quantity, futBlotter, priceStep,
                             priceVal));
                     }
                     else
@@ -151,14 +152,14 @@ namespace OptionsTradeWell.presenter
                     }
                 }
 
-                positionManager.UpdateGeneralParametres();
+                posManager.UpdateGeneralParametres();
 
-                if (positionManager.Futures != null)
+                if (posManager.Futures != null)
                 {
-                    tempPosTableData.Add(CreatePosTableDataRowFromFut(positionManager.Futures));
+                    tempPosTableData.Add(CreatePosTableDataRowFromFut(posManager.Futures));
                 }
 
-                foreach (Option opt in positionManager.Options)
+                foreach (Option opt in posManager.Options)
                 {
                     tempPosTableData.Add(CreatePosTableDataRowFromOpt(opt));
                 }
@@ -166,13 +167,13 @@ namespace OptionsTradeWell.presenter
                 mainForm.UpdatePositionTableData(tempPosTableData);
                 mainForm.UpdateTotalInfoTable(new double[]
                 {
-                    Math.Round(positionManager.CalculatePositionCurPnL(), 0),
-                    Math.Round(positionManager.CalculatePositionPnL(), 2),
-                    Math.Round(positionManager.FixedPnL, 2),
-                    Math.Round(positionManager.TotalDelta, 4),
-                    Math.Round(positionManager.TotalGamma, 4),
-                    Math.Round(positionManager.TotalVega, 4),
-                    Math.Round(positionManager.TotalTheta, 4)
+                    Math.Round(posManager.CalculatePositionCurPnL(), 0),
+                    Math.Round(posManager.CalculatePositionPnL(), 2),
+                    Math.Round(posManager.FixedPnL, 2),
+                    Math.Round(posManager.TotalDelta, 4),
+                    Math.Round(posManager.TotalGamma, 4),
+                    Math.Round(posManager.TotalVega, 4),
+                    Math.Round(posManager.TotalTheta, 4)
                 });
 
                 double minStr = dataCollector.CalculateMinImportantStrike();
@@ -185,8 +186,8 @@ namespace OptionsTradeWell.presenter
                     tempPosChartData.Add(new double[]
                     {
                         i,
-                        positionManager.CalculateCurApproxPnL(i),
-                        positionManager.CalculateExpirationPnL(i)
+                        posManager.CalculateCurApproxPnL(i),
+                        posManager.CalculateExpirationPnL(i)
                     });
                 }
 
@@ -199,7 +200,7 @@ namespace OptionsTradeWell.presenter
             }
         }
 
-        private void MainForm_OnStartUp(object sender, EventArgs e)
+        private void MainFormOnStartUpClick(object sender, EventArgs e)
         {
             try
             {
@@ -212,6 +213,7 @@ namespace OptionsTradeWell.presenter
 
                 dataCollector.OnOptionsDeskChanged += DataCollector_OnOptionsDeskChanged;
                 dataCollector.OnSpotPriceChanged += DataCollector_OnSpotPriceChanged;
+                dataCollector.OnActualPosChanged += DataCollector_OnActualPosChanged;
 
                 double minStrike = dataCollector.CalculateMinImportantStrike();
                 double maxStrike = dataCollector.CalculateMaxImportantStrike();
@@ -223,6 +225,20 @@ namespace OptionsTradeWell.presenter
             {
                 LOGGER.Error("An exception when event of startUp was enabled:{0}", e3.ToString());
                 throw;
+            }
+        }
+
+        private void DataCollector_OnActualPosChanged(object sender, TerminalPosEventArgs e)
+        {
+            if (e.cls == DerivativesClasses.FUTURES)
+            {
+                dataCollector.GetBasicFutures().Position.Quantity = e.actualPos;
+                quikPosManager.Futures = dataCollector.GetBasicFutures();
+            }
+            else if (e.cls == DerivativesClasses.OPTIONS)
+            {
+                dataCollector.GetOption(e.ticker).Position.Quantity = e.actualPos;
+                quikPosManager.AddOrChangeExistingOptionsPosition(dataCollector.GetOption(e.ticker));
             }
         }
 

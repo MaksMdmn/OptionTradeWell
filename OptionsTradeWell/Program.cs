@@ -8,8 +8,8 @@ using NDde.Server;
 using NLog;
 using OptionsTradeWell.assistants;
 using OptionsTradeWell.model;
-using OptionsTradeWell.model.interfaces;
 using OptionsTradeWell.presenter;
+using OptionsTradeWell.presenter.interfaces;
 using OptionsTradeWell.view;
 using OptionsTradeWell.view.interfaces;
 
@@ -27,7 +27,7 @@ namespace OptionsTradeWell
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                ITerminalOptionDataCollector dataCollector = new OptionsQuikDdeDataCollector();
+                ITerminalOptionDataCollector dataCollector = new QuikDdeDataCollector();
                 IDerivativesDataRender dataRender = new DerivativesDataRender();
                 MainForm mainForm = new MainForm();
 

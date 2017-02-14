@@ -25,7 +25,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("OTWserver")]
+        [global::System.Configuration.DefaultSettingValueAttribute("OTW")]
         public string ServerName {
             get {
                 return ((string)(this["ServerName"]));
@@ -121,19 +121,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public int MinActualStrikeUpdateTimeSec {
-            get {
-                return ((int)(this["MinActualStrikeUpdateTimeSec"]));
-            }
-            set {
-                this["MinActualStrikeUpdateTimeSec"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-10")]
         public double ChartsMinYValue {
             get {
                 return ((double)(this["ChartsMinYValue"]));
@@ -145,7 +133,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("120")]
+        [global::System.Configuration.DefaultSettingValueAttribute("70")]
         public double ChartsMaxYValue {
             get {
                 return ((double)(this["ChartsMaxYValue"]));
@@ -181,13 +169,205 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("250")]
         public double StrikeStep {
             get {
                 return ((double)(this["StrikeStep"]));
             }
             set {
                 this["StrikeStep"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("POS")]
+        public string PositionTableName {
+            get {
+                return ((string)(this["PositionTableName"]));
+            }
+            set {
+                this["PositionTableName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SPBFUT26WILL")]
+        public string Account {
+            get {
+                return ((string)(this["Account"]));
+            }
+            set {
+                this["Account"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkBoxMaxFutQ {
+            get {
+                return ((bool)(this["checkBoxMaxFutQ"]));
+            }
+            set {
+                this["checkBoxMaxFutQ"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkBoxDeltaStep {
+            get {
+                return ((bool)(this["checkBoxDeltaStep"]));
+            }
+            set {
+                this["checkBoxDeltaStep"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkBoxPriceLevels {
+            get {
+                return ((bool)(this["checkBoxPriceLevels"]));
+            }
+            set {
+                this["checkBoxPriceLevels"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkBosClosePos {
+            get {
+                return ((bool)(this["checkBosClosePos"]));
+            }
+            set {
+                this["checkBosClosePos"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkBoxPriceCon {
+            get {
+                return ((bool)(this["checkBoxPriceCon"]));
+            }
+            set {
+                this["checkBoxPriceCon"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool checkBoxPnLCon {
+            get {
+                return ((bool)(this["checkBoxPnLCon"]));
+            }
+            set {
+                this["checkBoxPnLCon"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string checkBoxMaxFutQValue {
+            get {
+                return ((string)(this["checkBoxMaxFutQValue"]));
+            }
+            set {
+                this["checkBoxMaxFutQValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string checkBoxDeltaStepValue {
+            get {
+                return ((string)(this["checkBoxDeltaStepValue"]));
+            }
+            set {
+                this["checkBoxDeltaStepValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string checkBoxPriceLevelsValue {
+            get {
+                return ((string)(this["checkBoxPriceLevelsValue"]));
+            }
+            set {
+                this["checkBoxPriceLevelsValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string checkBosCloseWhatPosWillBeCloseValue {
+            get {
+                return ((string)(this["checkBosCloseWhatPosWillBeCloseValue"]));
+            }
+            set {
+                this["checkBosCloseWhatPosWillBeCloseValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string checkBosCloseTrackingInstrValue {
+            get {
+                return ((string)(this["checkBosCloseTrackingInstrValue"]));
+            }
+            set {
+                this["checkBosCloseTrackingInstrValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string checkBoxPricePriceConSignValue {
+            get {
+                return ((string)(this["checkBoxPricePriceConSignValue"]));
+            }
+            set {
+                this["checkBoxPricePriceConSignValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string checkBoxPricePriceConValue {
+            get {
+                return ((string)(this["checkBoxPricePriceConValue"]));
+            }
+            set {
+                this["checkBoxPricePriceConValue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string checkBoxPnLValue {
+            get {
+                return ((string)(this["checkBoxPnLValue"]));
+            }
+            set {
+                this["checkBoxPnLValue"] = value;
             }
         }
     }

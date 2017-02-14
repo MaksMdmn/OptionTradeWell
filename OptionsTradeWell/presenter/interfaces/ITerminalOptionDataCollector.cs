@@ -1,11 +1,14 @@
 ﻿using System;
+using OptionsTradeWell.model;
 
-namespace OptionsTradeWell.model.interfaces
+namespace OptionsTradeWell.presenter.interfaces
 {
     public interface ITerminalOptionDataCollector : ITerminalDataCollector
     {
         event EventHandler<OptionEventArgs> OnOptionsDeskChanged;
         event EventHandler<OptionEventArgs> OnSpotPriceChanged;
+        event EventHandler<TerminalPosEventArgs> OnActualPosChanged;
+
         int NumberOfTrackingOptions { get; set; }
         double GetBid(double strike, OptionType type);
         double GetAsk(double strike, OptionType type);
@@ -16,6 +19,7 @@ namespace OptionsTradeWell.model.interfaces
         double GetPriceStep(double strike, OptionType type);
         double GetPriceStepValue(double strike, OptionType type);
         Option GetOption(double strike, OptionType type);
+        Option GetOption(string ticker);
         Futures GetBasicFutures();
         bool IsOptionExist(double strike, OptionType type);
         double CalculateMinImportantStrike();
@@ -30,6 +34,20 @@ namespace OptionsTradeWell.model.interfaces
         public OptionEventArgs(Option opt)
         {
             this.opt = opt;
+        }
+    }
+
+    public class TerminalPosEventArgs : EventArgs
+    {
+        public DerivativesClasses cls;
+        public string ticker;
+        public int actualPos;
+
+        public TerminalPosEventArgs(DerivativesClasses cls, string ticker, int actualPos)
+        {
+            this.cls = cls;
+            this.ticker = ticker;
+            this.actualPos = actualPos;
         }
     }
 }

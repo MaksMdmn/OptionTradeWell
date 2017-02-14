@@ -1,41 +1,42 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
+using OptionsTradeWell.model;
 using OptionsTradeWell.model.exceptions;
-using OptionsTradeWell.model.interfaces;
+using OptionsTradeWell.presenter.interfaces;
 using OptionsTradeWell.Properties;
 
-namespace OptionsTradeWell.model
+namespace OptionsTradeWell.presenter
 {
-    public class OptionsQuikDdeDataCollector : ITerminalOptionDataCollector
+    public class QuikDdeDataCollector : ITerminalOptionDataCollector
     {
         private static Logger LOGGER = LogManager.GetCurrentClassLogger();
         private static string SERVER_NAME = Settings.Default.ServerName;
         private static string OPTIONS_DESK = Settings.Default.OptionsTableName;
         private static string FUTURES_DESK = Settings.Default.FuturesTableName;
-        private static double MINIMUM_UPDATE_TIME_SEC = Settings.Default.MinActualStrikeUpdateTimeSec;
+        private static string POS_TABLE = Settings.Default.PositionTableName;
 
         private static Dictionary<string, int> TOPICS_AND_ROWS_LENGTH_MAP = CreateCustomDdeTableMap();
 
         public event EventHandler<OptionEventArgs> OnOptionsDeskChanged;
         public event EventHandler<OptionEventArgs> OnSpotPriceChanged;
+        public event EventHandler<TerminalPosEventArgs> OnActualPosChanged;
 
         private QuikServerDde server;
         private SortedDictionary<double, Option> callMap;
         private SortedDictionary<double, Option> putMap;
+        private Dictionary<string, Option> tickerMap;
 
         private Futures basicFutures;
         private Option infoOption;
-        private double lastTrackingStrike;
-        private DateTime lastTrackingUpdate;
 
         private bool futRecievedDataFlag;
         private bool optRecievedDataFlag;
 
-        public OptionsQuikDdeDataCollector()
+        public QuikDdeDataCollector()
         {
-            LOGGER.Info("OptionsQuikDdeDataCollector creation...");
+            LOGGER.Info("QuikDdeDataCollector creation...");
             this.server = new QuikServerDde(SERVER_NAME, TOPICS_AND_ROWS_LENGTH_MAP);
             server.OnDataUpdate += CollectAndSortServerDataByMaps;
 
@@ -50,19 +51,19 @@ namespace OptionsTradeWell.model
 
             this.callMap = new SortedDictionary<double, Option>();
             this.putMap = new SortedDictionary<double, Option>();
-            this.lastTrackingStrike = 0.0;
-            this.lastTrackingUpdate = DateTime.Now;
+            this.tickerMap = new Dictionary<string, Option>();
 
             this.futRecievedDataFlag = false;
             this.optRecievedDataFlag = false;
-            LOGGER.Info("OptionsQuikDdeDataCollector created");
+            LOGGER.Info("QuikDdeDataCollector created");
         }
 
         private static Dictionary<string, int> CreateCustomDdeTableMap()
         {
             Dictionary<string, int> resultMap = new Dictionary<string, int>();
-            resultMap.Add(FUTURES_DESK, 10);
+            resultMap.Add(FUTURES_DESK, 11);
             resultMap.Add(OPTIONS_DESK, 14);
+            resultMap.Add(POS_TABLE, 3);
 
             return resultMap;
         }
@@ -161,6 +162,12 @@ namespace OptionsTradeWell.model
             return tempOption;
         }
 
+        public Option GetOption(string ticker)
+        {
+            return tickerMap[ticker];
+        }
+
+
         public Futures GetBasicFutures()
         {
             return basicFutures;
@@ -199,11 +206,12 @@ namespace OptionsTradeWell.model
                     futuresBlotter.AskPrice = Convert.ToDouble(data[8]);
                     futuresBlotter.AskSize = Convert.ToDouble(data[9]);
 
+                    string baseContract = data[10];
+
                     basicFutures = new Futures(ticker, maturity, commission, marginRequirement, priceStep,
                         priceStepValue);
+                    basicFutures.BaseContract = baseContract;
                     basicFutures.AssignTradeBlotter(futuresBlotter);
-
-                    lastTrackingStrike = CalculateActualStrike();
 
                     LOGGER.Debug("Initializing completed. Futures instance: {0}", basicFutures);
                 }
@@ -276,6 +284,7 @@ namespace OptionsTradeWell.model
                     tempOption.AssignTradeBlotter(optionsBlotter);
 
                     suitOptionsMap.Add(strike, tempOption);
+                    tickerMap.Add(ticker, tempOption);
 
                     LOGGER.Debug("Updating completed.");
                 }
@@ -294,6 +303,27 @@ namespace OptionsTradeWell.model
                     && tempOption.Strike >= CalculateMinImportantStrike())
                 {
                     OnOptionsDeskChanged(this, new OptionEventArgs(tempOption));
+                }
+            }
+            else if (topic.Equals(POS_TABLE))
+            {
+                string account = data[0]; // ?
+                string ticker = data[1];
+                int pos = Convert.ToInt32(data[2]);
+                DerivativesClasses cls;
+
+                if (ticker.Equals(basicFutures.Ticker))
+                {
+                    cls = DerivativesClasses.FUTURES;
+                }
+                else
+                {
+                    cls = DerivativesClasses.OPTIONS;
+                }
+
+                if (OnActualPosChanged != null)
+                {
+                    OnActualPosChanged(this, new TerminalPosEventArgs(cls, ticker, pos));
                 }
             }
             else

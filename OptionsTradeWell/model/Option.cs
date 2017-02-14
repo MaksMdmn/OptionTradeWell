@@ -1,7 +1,7 @@
 ﻿using System;
 using NLog;
 using OptionsTradeWell.model.exceptions;
-using OptionsTradeWell.model.interfaces;
+using OptionsTradeWell.presenter.interfaces;
 
 namespace OptionsTradeWell.model
 {
@@ -104,8 +104,46 @@ namespace OptionsTradeWell.model
             double optionTime = this.RemainingDays / GreeksCalculator.DAYS_IN_YEAR;
             double spotPrice = this.Futures.GetTradeBlotter().AskPrice;
 
-            double vola = GreeksCalculator.GetFilteredVolatilityValue(GreeksCalculator.CalculateImpliedVolatility(this.OptionType, spotPrice, this.Strike, this.RemainingDays, GreeksCalculator.DAYS_IN_YEAR,
-                this.GetTradeBlotter().AskPrice, 0.5));
+            BuyVol = GreeksCalculator.GetFilteredVolatilityValue(
+                GreeksCalculator.CalculateImpliedVolatility(
+                    this.OptionType,
+                    spotPrice,
+                    this.Strike,
+                    this.RemainingDays,
+                    GreeksCalculator.DAYS_IN_YEAR,
+                    this.GetTradeBlotter().AskPrice,
+                    0.5));
+            SellVol = GreeksCalculator.GetFilteredVolatilityValue(
+                GreeksCalculator.CalculateImpliedVolatility(
+                    this.OptionType,
+                    spotPrice,
+                    this.Strike,
+                    this.RemainingDays,
+                    GreeksCalculator.DAYS_IN_YEAR,
+                    this.GetTradeBlotter().BidPrice,
+                    0.5));
+
+            //double vola = GreeksCalculator.GetFilteredVolatilityValue(GreeksCalculator.CalculateImpliedVolatility(this.OptionType, spotPrice, this.Strike, this.RemainingDays, GreeksCalculator.DAYS_IN_YEAR,
+            //    this.GetTradeBlotter().AskPrice, 0.5));
+
+            double vola;
+
+            if (this.Position == null)
+            {
+                vola = BuyVol;
+            }
+            else
+            {
+                if (this.Position.Quantity == 0)
+                {
+                    vola = BuyVol;
+                }
+                else
+                {
+                    vola = this.Position.Quantity > 0 ? SellVol : BuyVol;
+                }
+            }
+
 
             if (Math.Abs(vola) < 0.0001) // vola==0
             {
@@ -127,24 +165,7 @@ namespace OptionsTradeWell.model
 
 
             ImplVol = vola;
-            BuyVol = GreeksCalculator.GetFilteredVolatilityValue(
-                GreeksCalculator.CalculateImpliedVolatility(
-                    this.OptionType,
-                    spotPrice,
-                    this.Strike,
-                    this.RemainingDays,
-                    GreeksCalculator.DAYS_IN_YEAR,
-                    this.GetTradeBlotter().AskPrice,
-                    0.5));
-            SellVol = GreeksCalculator.GetFilteredVolatilityValue(
-                GreeksCalculator.CalculateImpliedVolatility(
-                    this.OptionType,
-                    spotPrice,
-                    this.Strike,
-                    this.RemainingDays,
-                    GreeksCalculator.DAYS_IN_YEAR,
-                    this.GetTradeBlotter().BidPrice,
-                    0.5));
+
 
             LOGGER.Debug("Greeks update complete, result: Delta: {0}, Gamma: {1}, Vega: {2}, Theta: {3}, ImplVol: {4}, BuyVol: {5}, SellVol: {6}",
                 Delta, Gamma, Vega, Theta, ImplVol, BuyVol, SellVol)
@@ -204,6 +225,43 @@ namespace OptionsTradeWell.model
                     return this.Position.Quantity * Theta;
                 }
             }
+        }
+
+        public int GetOptionsPossibleObligation()
+        {
+            int result = 0;
+
+            if (this.Position == null || this.Position.Quantity == 0)
+            {
+                return result;
+            }
+
+            int absPos = Math.Abs(this.Position.Quantity);
+
+            if (this.OptionType == OptionType.Call)
+            {
+                if (this.Position.Quantity > 0)
+                {
+                    result = absPos;
+                }
+                else
+                {
+                    result = absPos * -1;
+                }
+            }
+            else
+            {
+                if (this.Position.Quantity > 0)
+                {
+                    result = absPos * -1;
+                }
+                else
+                {
+                    result = absPos;
+                }
+            }
+
+            return result;
         }
 
         public override string ToString()

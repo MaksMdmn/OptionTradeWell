@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using NLog;
-using OptionsTradeWell.model.exceptions;
 using OptionsTradeWell.Properties;
 using OptionsTradeWell.view;
 using OptionsTradeWell.view.interfaces;
@@ -26,20 +21,34 @@ namespace OptionsTradeWell
         public static double maxValueY = Settings.Default.ChartsMaxYValue;
         public static double stepY = Settings.Default.ChartsStepYValue;
 
-        private static int NUMBER_OF_POSDATATABLE_ROWS_HARDCORE = 30;
+        private static int NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE = 30;
         private static string POS_SAVE_FILE_NAME = "posData.xml";
+        private static string ACT_POS_SAVE_FILE_NAME = "actPosData.xml";
         private static Logger LOGGER = LogManager.GetCurrentClassLogger();
 
-        public event EventHandler OnStartUp;
+        public event EventHandler OnStartUpClick;
         public event EventHandler OnSettingsInFormChanged;
-        public event EventHandler OnTotalResetPositionInfo;
+        public event EventHandler OnTotalResetPositionInfoClick;
         public event EventHandler<PositionTableArgs> OnPosUpdateButtonClick;
+        public event EventHandler<PositionTableArgs> OnActPosUpdateButtonClick;
+        //not implemented yet.
+        public event EventHandler OnGetPosFromQuikClick;
+        public event EventHandler<DeltaHedgeEventArgs> OnHandleHedgeClick;
+        public event EventHandler<DeltaHedgeEventArgs> OnAutoHedgeClick;
+        //not implemented yet.
+        private bool isPosUpdating;
+        private bool isLockingActPosTableEnabled;
+        private bool isAutoHedgeEnabled;
+        private bool isCheckBoxesLoaded;
+        private DeltaHedgeEventArgs actualDeltaHedgeEventArgs;
+        private PositionCloseConditionEventArgs actualPositionCloseConditionEventArgs;
 
         private SortedDictionary<double, OptionsTableRow> rowMap;
         private System.Timers.Timer statusBarReducingTimer;
 
         private DataTable optionsDataTable;
         private DataTable posDataTable;
+        private DataTable actualPosDataTable;
 
         private string[] totalInfoNames;
 
@@ -59,6 +68,10 @@ namespace OptionsTradeWell
             LOGGER.Info("Creation of MainForm...");
             statusBarReducingTimer = new System.Timers.Timer();
             rowMap = new SortedDictionary<double, OptionsTableRow>();
+            isPosUpdating = false;
+            isLockingActPosTableEnabled = false;
+            isCheckBoxesLoaded = false;
+            isAutoHedgeEnabled = false;
 
             InitializeComponent();
 
@@ -76,6 +89,10 @@ namespace OptionsTradeWell
 
             LOGGER.Info("PositionDataTable initialized");
 
+            InitializeActualPosDataTable();
+
+            LOGGER.Info("ActualPositionDataTable initialized");
+
             InitializeTotalInfoTable();
 
             LOGGER.Info("TotalInfoTable initialized");
@@ -91,6 +108,14 @@ namespace OptionsTradeWell
             dgvOptionDesk.DataError += DgvAll_DataError;
             dgvPositions.DataError += DgvAll_DataError;
             dgvTotalInfo.DataError += DgvAll_DataError;
+
+            actualDeltaHedgeEventArgs = new DeltaHedgeEventArgs();
+            actualPositionCloseConditionEventArgs = new PositionCloseConditionEventArgs();
+
+            LoadPositionsCheckAndTextBoxesStatusFromSettings();
+
+            LOGGER.Info("Check and Text Boxes values loaded");
+
             LOGGER.Info("MainForm created");
         }
 
@@ -101,19 +126,21 @@ namespace OptionsTradeWell
             }
 
             this.BeginInvoke((Action)(() =>
-            {
-                this.lblSpotPrice.Text = data[0];
-                this.toolStripStLbAsset.Text = string.Format("{0} {1}", "underlying asset:", data[1]);
-                this.lblDaysToExp.Text = data[2];
-                this.toolStripStLbLastUpd.Text = string.Format("{0} {1:dd-MM-yyyy HH:mm:ss}", "last update:", DateTime.Now);
-                this.toolStripPrBrConnection.Value = 100;
-            }));
+           {
+               this.lblSpotPrice.Text = data[0];
+               this.toolStripStLbAsset.Text = string.Format("{0} {1}", "underlying asset:", data[1]);
+               this.lblDaysToExp.Text = data[2];
+               this.toolStripStLbLastUpd.Text = string.Format("{0} {1:dd-MM-yyyy HH:mm:ss}", "last update:",
+                   DateTime.Now);
+               this.toolStripPrBrConnection.Value = 100;
+           }));
 
         }
 
         public void InitPrimarySettingsView()
         {
-            txBxCentralStrChangeTimeSec.Text = Settings.Default.MinActualStrikeUpdateTimeSec.ToString();
+            txBxAccount.Text = Settings.Default.Account;
+            txBxPosTableName.Text = Settings.Default.PositionTableName;
             txBxDaysInYear.Text = Settings.Default.DaysInYear.ToString();
             txBxFutTableName.Text = Settings.Default.FuturesTableName;
             txBxMaxVolValue.Text = Settings.Default.MaxValueOfImplVol.ToString();
@@ -143,17 +170,12 @@ namespace OptionsTradeWell
 
         public void UpdatePositionTableData(List<string[]> tableDataList)
         {
-            while (this.IsHandleCreated == false)
-            {
-            }
+            FulfilDataTable(posDataTable, tableDataList);
+        }
 
-            this.BeginInvoke((Action)(() =>
-            {
-                for (int i = 0; i < tableDataList.Count; i++)
-                {
-                    StringArrToPosTable(tableDataList[i], i);
-                }
-            }));
+        public void UpdateActualPositionTableData(List<string[]> tableDataList)
+        {
+            FulfilDataTable(actualPosDataTable, tableDataList);
         }
 
         public void UpdatePositionChartData(List<double[]> tableDataList)
@@ -163,89 +185,89 @@ namespace OptionsTradeWell
             }
 
             this.BeginInvoke((Action)(() =>
-            {
-                curPosSeries.Points.Clear();
-                expirPosSeries.Points.Clear();
+           {
+               curPosSeries.Points.Clear();
+               expirPosSeries.Points.Clear();
 
-                double expandVisibilityKoef = 1.5;
-                double numberOfStepsAtChart = 10;
+               double expandVisibilityKoef = 1.5;
+               double numberOfStepsAtChart = 10;
 
-                double tempMinValY = 9999.99;
-                double tempMaxValY = 0.0;
-                double xVal = 0.0;
-                double curPosVal = 0.0;
-                double expPosVal = 0.0;
+               double tempMinValY = 9999.99;
+               double tempMaxValY = 0.0;
+               double xVal = 0.0;
+               double curPosVal = 0.0;
+               double expPosVal = 0.0;
 
-                double chartMin;
-                double chartMax;
-                double chartStep;
+               double chartMin;
+               double chartMax;
+               double chartStep;
 
-                double tempSpotPrice = 0.0;
-                double notRoundedSpotPrice;
-                if (Double.TryParse(lblSpotPrice.Text, out notRoundedSpotPrice))
-                {
-                    tempSpotPrice = Math.Round(notRoundedSpotPrice / Settings.Default.StrikeStep, 0) *
-                                    Settings.Default.StrikeStep;
-                }
+               double tempSpotPrice = 0.0;
+               double notRoundedSpotPrice;
+               if (Double.TryParse(lblSpotPrice.Text, out notRoundedSpotPrice))
+               {
+                   tempSpotPrice = Math.Round(notRoundedSpotPrice / Settings.Default.StrikeStep, 0) *
+                                   Settings.Default.StrikeStep;
+               }
 
-                foreach (double[] dataArr in tableDataList)
-                {
-                    xVal = dataArr[0];
-                    curPosVal = dataArr[1];
-                    expPosVal = dataArr[2];
+               foreach (double[] dataArr in tableDataList)
+               {
+                   xVal = dataArr[0];
+                   curPosVal = dataArr[1];
+                   expPosVal = dataArr[2];
 
-                    if (expPosVal > tempMaxValY)
-                    {
-                        tempMaxValY = expPosVal;
-                    }
+                   if (expPosVal > tempMaxValY)
+                   {
+                       tempMaxValY = expPosVal;
+                   }
 
-                    if (curPosVal > tempMaxValY)
-                    {
-                        tempMaxValY = curPosVal;
-                    }
+                   if (curPosVal > tempMaxValY)
+                   {
+                       tempMaxValY = curPosVal;
+                   }
 
-                    if (expPosVal < tempMinValY)
-                    {
-                        tempMinValY = expPosVal;
-                    }
+                   if (expPosVal < tempMinValY)
+                   {
+                       tempMinValY = expPosVal;
+                   }
 
-                    if (curPosVal < tempMinValY)
-                    {
-                        tempMinValY = curPosVal;
-                    }
-                    curPosSeries.Points.AddXY(xVal, curPosVal);
-                    expirPosSeries.Points.AddXY(xVal, expPosVal);
-                    zeroSeries.Points.Clear();
-                    zeroSeries.Points.AddXY(xVal, 0.0);
+                   if (curPosVal < tempMinValY)
+                   {
+                       tempMinValY = curPosVal;
+                   }
+                   curPosSeries.Points.AddXY(xVal, curPosVal);
+                   expirPosSeries.Points.AddXY(xVal, expPosVal);
+                   zeroSeries.Points.Clear();
+                   zeroSeries.Points.AddXY(xVal, 0.0);
 
-                    if (tempSpotPrice > 0.0)
-                    {
-                        if (Math.Abs(tempSpotPrice - xVal) < 0.0001)
-                        {
-                            spotPriceSeries.Points.Clear();
-                            spotPriceSeries.Points.AddXY(notRoundedSpotPrice, curPosVal);
-                            spotPriceSeries.Points.AddXY(notRoundedSpotPrice, expPosVal);
-                        }
+                   if (tempSpotPrice > 0.0)
+                   {
+                       if (Math.Abs(tempSpotPrice - xVal) < 0.0001)
+                       {
+                           spotPriceSeries.Points.Clear();
+                           spotPriceSeries.Points.AddXY(notRoundedSpotPrice, curPosVal);
+                           spotPriceSeries.Points.AddXY(notRoundedSpotPrice, expPosVal);
+                       }
 
-                    }
-                }
+                   }
+               }
 
-                chartMin = tempMinValY < 0 ? tempMinValY * expandVisibilityKoef : 0;
-                chartMax = tempMaxValY < 0 ? 0 : tempMaxValY * expandVisibilityKoef;
-                chartStep = Math.Round((tempMaxValY - tempMinValY) / numberOfStepsAtChart, 0);
+               chartMin = tempMinValY < 0 ? tempMinValY * expandVisibilityKoef : 0;
+               chartMax = tempMaxValY < 0 ? 0 : tempMaxValY * expandVisibilityKoef;
+               chartStep = Math.Round((tempMaxValY - tempMinValY) / numberOfStepsAtChart, 0);
 
-                if (chartMin >= chartMax)
-                {
-                    chartMin = 0;
-                    chartMax = 10;
-                    chartStep = 1;
-                }
+               if (chartMin >= chartMax)
+               {
+                   chartMin = 0;
+                   chartMax = 10;
+                   chartStep = 1;
+               }
 
-                chrtPos.ChartAreas[0].AxisY.Minimum = chartMin;
-                chrtPos.ChartAreas[0].AxisY.Maximum = chartMax;
-                chrtPos.ChartAreas[0].AxisY.Interval = chartStep;
+               chrtPos.ChartAreas[0].AxisY.Minimum = chartMin;
+               chrtPos.ChartAreas[0].AxisY.Maximum = chartMax;
+               chrtPos.ChartAreas[0].AxisY.Interval = chartStep;
 
-            }));
+           }));
         }
 
         public void UpdateTotalInfoTable(double[] dataArr)
@@ -255,20 +277,20 @@ namespace OptionsTradeWell
             }
 
             this.BeginInvoke((Action)(() =>
-            {
-                for (int i = 0; i < dataArr.Length; i++)
-                {
-                    dgvTotalInfo[0, i + 1].Value = totalInfoNames[i] + " " + dataArr[i];
-                    if (dataArr[i] >= 0)
-                    {
-                        dgvTotalInfo[0, i + 1].Style.BackColor = Color.LightGreen;
-                    }
-                    else
-                    {
-                        dgvTotalInfo[0, i + 1].Style.BackColor = Color.LightCoral;
-                    }
-                }
-            }));
+           {
+               for (int i = 0; i < dataArr.Length; i++)
+               {
+                   dgvTotalInfo[0, i + 1].Value = totalInfoNames[i] + " " + dataArr[i];
+                   if (dataArr[i] >= 0)
+                   {
+                       dgvTotalInfo[0, i + 1].Style.BackColor = Color.LightGreen;
+                   }
+                   else
+                   {
+                       dgvTotalInfo[0, i + 1].Style.BackColor = Color.LightCoral;
+                   }
+               }
+           }));
         }
 
         public void UpdateMessageWindow(string message)
@@ -278,16 +300,31 @@ namespace OptionsTradeWell
             }
 
             this.BeginInvoke((Action)(() =>
+           {
+               StringBuilder sb = new StringBuilder();
+               string headMessage = string.Format("{0:dd-MM-yyyy HH:mm:ss}", DateTime.Now);
+               string oldMessage = txBxMsgInfo.Text;
+
+               sb.AppendLine(headMessage);
+               sb.AppendLine(message);
+               sb.AppendLine(oldMessage);
+
+               txBxMsgInfo.Text = sb.ToString();
+           }));
+        }
+
+        private void FulfilDataTable(DataTable dataTable, List<string[]> tableDataList)
+        {
+            while (this.IsHandleCreated == false)
             {
-                StringBuilder sb = new StringBuilder();
-                string headMessage = string.Format("{0:dd-MM-yyyy HH:mm:ss}", DateTime.Now);
-                string oldMessage = txBxMsgInfo.Text;
+            }
 
-                sb.AppendLine(headMessage);
-                sb.AppendLine(message);
-                sb.AppendLine(oldMessage);
-
-                txBxMsgInfo.Text = sb.ToString();
+            this.BeginInvoke((Action)(() =>
+            {
+                for (int i = 0; i < tableDataList.Count; i++)
+                {
+                    StringArrToPosTable(tableDataList[i], i, dataTable);
+                }
             }));
         }
 
@@ -385,11 +422,11 @@ namespace OptionsTradeWell
             }
         }
 
-        private void StringArrToPosTable(string[] strArr, int rowNumber)
+        private void StringArrToPosTable(string[] strArr, int rowNumber, DataTable dataTable)
         {
             for (int i = 0; i < strArr.Length; i++)
             {
-                posDataTable.Rows[rowNumber][i] = strArr[i];
+                dataTable.Rows[rowNumber][i] = strArr[i];
             }
         }
 
@@ -509,7 +546,7 @@ namespace OptionsTradeWell
             else
             {
                 //hardcore 30 row
-                for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
                 {
                     posDataTable.Rows.Add();
                 }
@@ -541,6 +578,71 @@ namespace OptionsTradeWell
             dgvPositions.Width = 590;
 
             dgvPositions.ScrollBars = ScrollBars.Both;
+        }
+
+        private void InitializeActualPosDataTable()
+        {
+            actualPosDataTable = new DataTable();
+            actualPosDataTable.TableName = "actualPosDataTable";
+
+            List<string> columnsNames = new List<string>()
+            {
+                "Type",
+                "Strike",
+                "Ent.Price",
+                "Quantity",
+                "Cur.Price",
+                "PnL usd",
+                "PnL rub",
+                "M.R.C.",
+                "M.R.N.C.",
+                "M.R.B."
+            };
+
+            for (int i = 0; i < columnsNames.Count; i++)
+            {
+                actualPosDataTable.Columns.Add(columnsNames[i]);
+            }
+
+            if (File.Exists(ACT_POS_SAVE_FILE_NAME))
+            {
+                actualPosDataTable.ReadXml(ACT_POS_SAVE_FILE_NAME);
+            }
+            else
+            {
+                //hardcore 30 row
+                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+                {
+                    actualPosDataTable.Rows.Add();
+                }
+            }
+
+
+            dgvActualPos.DataSource = actualPosDataTable;
+
+            for (int i = 0; i < columnsNames.Count; i++)
+            {
+                dgvActualPos.Columns[i].HeaderText = columnsNames[i];
+                dgvActualPos.Columns[i].Width = 60;
+                dgvActualPos.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+                dgvActualPos.Columns[i].ReadOnly = false;
+                dgvActualPos.Columns[i].Resizable = DataGridViewTriState.False;
+            }
+            dgvActualPos.MultiSelect = true;
+            dgvActualPos.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
+            dgvActualPos.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+            dgvActualPos.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+            dgvActualPos.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dgvActualPos.RowsDefaultCellStyle.SelectionBackColor = System.Drawing.Color.Aquamarine;
+            dgvActualPos.RowsDefaultCellStyle.SelectionForeColor = System.Drawing.Color.Black;
+            dgvActualPos.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.BottomCenter;
+            dgvActualPos.AllowUserToDeleteRows = false;
+            dgvActualPos.AllowUserToAddRows = false;
+
+            dgvActualPos.Height = 200;
+            dgvActualPos.Width = 660;
+
+            dgvActualPos.ScrollBars = ScrollBars.Both;
         }
 
         private void InitializeTotalInfoTable()
@@ -733,7 +835,7 @@ namespace OptionsTradeWell
         private void StartUpdateTimer()
         {
             statusBarReducingTimer.Elapsed += StatusBarReducingTimer_Elapsed;
-            statusBarReducingTimer.Interval = 500;
+            statusBarReducingTimer.Interval = 1000;
             statusBarReducingTimer.Enabled = true;
         }
 
@@ -744,30 +846,42 @@ namespace OptionsTradeWell
             }
 
             this.BeginInvoke((Action)(() =>
-            {
-                int tempVal = toolStripPrBrConnection.Value;
-                if (tempVal > 0)
-                {
-                    toolStripPrBrConnection.Value = tempVal - 2;
-                }
+           {
+               int tempVal = toolStripPrBrConnection.Value;
+               if (tempVal > 0)
+               {
+                   toolStripPrBrConnection.Value = tempVal - 2;
+               }
 
-                chrtCallVol.DataBind();
-                chrtPutVol.DataBind();
+               chrtCallVol.DataBind();
+               chrtPutVol.DataBind();
 
-            }));
+               if (isPosUpdating)
+               {
+                   posDataTable.WriteXml(POS_SAVE_FILE_NAME);
+                   PositionTableArgs args = new PositionTableArgs(GetPosTableArgs(posDataTable));
+                   CleanTableData(posDataTable);
+
+                   if (OnPosUpdateButtonClick != null)
+                   {
+                       OnPosUpdateButtonClick(sender, args);
+                   }
+               }
+
+           }));
         }
 
-        private List<string[]> GetPosTableArgs()
+        private List<string[]> GetPosTableArgs(DataTable dataTable)
         {
             List<string[]> result = new List<string[]>();
 
-            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
             {
                 string[] tempArgs = new string[4];
-                tempArgs[0] = posDataTable.Rows[i]["Type"].ToString().ToUpper();
-                tempArgs[1] = posDataTable.Rows[i]["Strike"].ToString();
-                tempArgs[2] = posDataTable.Rows[i]["Ent.Price"].ToString();
-                tempArgs[3] = posDataTable.Rows[i]["Quantity"].ToString();
+                tempArgs[0] = dataTable.Rows[i]["Type"].ToString().ToUpper();
+                tempArgs[1] = dataTable.Rows[i]["Strike"].ToString();
+                tempArgs[2] = dataTable.Rows[i]["Ent.Price"].ToString();
+                tempArgs[3] = dataTable.Rows[i]["Quantity"].ToString();
 
                 double checkIfDouble;
                 int checkIfNotZero;
@@ -791,13 +905,26 @@ namespace OptionsTradeWell
             return result;
         }
 
-        private void CleanPosTableData()
+        private void CleanTableData(DataTable dataTable)
         {
-            posDataTable.Rows.Clear();
+            dataTable.Rows.Clear();
             //hardcore 30 row
-            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
             {
-                posDataTable.Rows.Add();
+                dataTable.Rows.Add();
+            }
+        }
+
+        private void CleanRowsInTable(DataTable dataTable, DataGridView dataGridView)
+        {
+            int selectedCellsCount = dataGridView.GetCellCount(DataGridViewElementStates.Selected);
+
+            for (int i = 0; i < selectedCellsCount; i++)
+            {
+                for (int j = 0; j < dataTable.Columns.Count; j++)
+                {
+                    dataTable.Rows[dataGridView.SelectedCells[i].RowIndex][j] = "";
+                }
             }
         }
 
@@ -818,7 +945,8 @@ namespace OptionsTradeWell
         private void btnSaveSettings_Click(object sender, EventArgs e)
         {
             LOGGER.Info("btnSaveSettings_Click");
-            Settings.Default.MinActualStrikeUpdateTimeSec = Convert.ToInt32(txBxCentralStrChangeTimeSec.Text);
+            Settings.Default.Account = txBxAccount.Text;
+            Settings.Default.PositionTableName = txBxPosTableName.Text;
             Settings.Default.DaysInYear = Convert.ToDouble(txBxDaysInYear.Text);
             Settings.Default.FuturesTableName = txBxFutTableName.Text;
             Settings.Default.MaxValueOfImplVol = Convert.ToDouble(txBxMaxVolValue.Text);
@@ -847,9 +975,9 @@ namespace OptionsTradeWell
             btnStart.BackColor = Color.Gray;
             btnStart.Text = "Starting...";
 
-            if (OnStartUp != null)
+            if (OnStartUpClick != null)
             {
-                OnStartUp(sender, e);
+                OnStartUpClick(sender, e);
             }
             btnStart.ForeColor = Color.SkyBlue;
             btnStart.Text = "Started";
@@ -859,16 +987,28 @@ namespace OptionsTradeWell
 
         private void btnUpdatePos_Click(object sender, EventArgs e)
         {
-            LOGGER.Info("btnUpdatePos_Click");
+            isPosUpdating = !isPosUpdating;
 
-            posDataTable.WriteXml(POS_SAVE_FILE_NAME);
-            PositionTableArgs args = new PositionTableArgs(GetPosTableArgs());
-            CleanPosTableData();
-
-            if (OnPosUpdateButtonClick != null)
+            if (isPosUpdating)
             {
-                OnPosUpdateButtonClick(sender, args);
+                btnUpdatePos.BackColor = Color.DarkSlateGray;
+                btnUpdatePos.ForeColor = Color.WhiteSmoke;
+                btnUpdatePos.Text = "updating...";
             }
+            else
+            {
+                btnUpdatePos.BackColor = Color.Gainsboro;
+                btnUpdatePos.ForeColor = Color.Black;
+                btnUpdatePos.Text = "update";
+            }
+
+            btnCleanSelected.Enabled = !isPosUpdating;
+            btnAddFromTable.Enabled = !isPosUpdating;
+            btnPlusOneFut.Enabled = !isPosUpdating;
+            btnMinusOneFut.Enabled = !isPosUpdating;
+            btnRes.Enabled = !isPosUpdating;
+
+            LOGGER.Info("btnUpdatePos_Click, enabled: {0}", isPosUpdating);
         }
 
         private void btnAddFromTable_Click(object sender, EventArgs e)
@@ -920,7 +1060,7 @@ namespace OptionsTradeWell
                 return;
             }
 
-            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
             {
                 if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
                 {
@@ -937,23 +1077,14 @@ namespace OptionsTradeWell
         {
             LOGGER.Info("btnCleanSelected_Click");
 
-            int selectedCellsCount = dgvPositions.GetCellCount(DataGridViewElementStates.Selected);
-
-            for (int i = 0; i < selectedCellsCount; i++)
-            {
-                for (int j = 0; j < posDataTable.Columns.Count; j++)
-                {
-                    posDataTable.Rows[dgvPositions.SelectedCells[i].RowIndex][j] = "";
-                }
-            }
-
+            CleanRowsInTable(posDataTable, dgvPositions);
         }
 
         private void btnPlusOneFut_Click(object sender, EventArgs e)
         {
             LOGGER.Info("btnPlusOneFut_Click");
 
-            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
             {
                 if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
                 {
@@ -970,7 +1101,7 @@ namespace OptionsTradeWell
         {
             LOGGER.Info("btnMinusOneFut_Click");
 
-            for (int i = 0; i < NUMBER_OF_POSDATATABLE_ROWS_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
             {
                 if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
                 {
@@ -987,12 +1118,454 @@ namespace OptionsTradeWell
         {
             LOGGER.Info("btnRes_Click");
 
-            if (OnTotalResetPositionInfo != null)
+            if (OnTotalResetPositionInfoClick != null)
             {
-                CleanPosTableData();
-                OnTotalResetPositionInfo(sender, e);
+                CleanTableData(posDataTable);
+                OnTotalResetPositionInfoClick(sender, e);
             }
         }
+
+
+        private void btnGetPosFromQuik_Click(object sender, EventArgs e)
+        {
+            LOGGER.Info("btnGetPosFromQuik_Click");
+            if (OnGetPosFromQuikClick != null)
+            {
+                OnGetPosFromQuikClick(sender, e);
+            }
+        }
+
+        private void btnSendToSimul_Click(object sender, EventArgs e)
+        {
+            LOGGER.Info("btnSendToSimul_Click");
+
+            int startCl = 0;
+            int endCl = 3;
+
+            if (!isPosUpdating)
+            {
+                CleanTableData(posDataTable);
+                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+                {
+                    for (int j = startCl; j <= endCl; j++)
+                    {
+                        posDataTable.Rows[i][j] = actualPosDataTable.Rows[i][j];
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Simulation table is updating now. Please, turn off the update process and try again.");
+            }
+        }
+
+        private void btnCleanActPosRows_Click(object sender, EventArgs e)
+        {
+            LOGGER.Info("btnCleanActPosRows_Click");
+
+            CleanRowsInTable(actualPosDataTable, dgvActualPos);
+        }
+
+        private void btnOneTimUpdActPos_Click(object sender, EventArgs e)
+        {
+            LOGGER.Info("btnOneTimUpdActPos_Click");
+
+            actualPosDataTable.WriteXml(ACT_POS_SAVE_FILE_NAME);
+            PositionTableArgs args = new PositionTableArgs(GetPosTableArgs(actualPosDataTable));
+            CleanTableData(actualPosDataTable);
+
+            if (OnActPosUpdateButtonClick != null)
+            {
+                OnActPosUpdateButtonClick(sender, args);
+            }
+        }
+
+        private void btnLockPosTable_Click(object sender, EventArgs e)
+        {
+            isLockingActPosTableEnabled = !isLockingActPosTableEnabled;
+            LOGGER.Info("btnLockPosTable_Click: {0}", isLockingActPosTableEnabled);
+
+            if (isLockingActPosTableEnabled)
+            {
+                btnLockPosTable.BackColor = Color.Gray;
+                btnLockPosTable.ForeColor = Color.WhiteSmoke;
+                btnLockPosTable.Text = "LOCKED";
+
+                for (int i = 0; i < dgvActualPos.Rows.Count; i++)
+                {
+                    dgvActualPos.Rows[i].ReadOnly = true;
+                }
+
+                btnGetPosFromQuik.Enabled = false;
+                btnCleanActPosRows.Enabled = false;
+            }
+            else
+            {
+                btnLockPosTable.BackColor = Color.Transparent;
+                btnLockPosTable.ForeColor = Color.Black;
+                btnLockPosTable.Text = "UNLOCKED";
+
+                for (int i = 0; i < dgvActualPos.Rows.Count; i++)
+                {
+                    dgvActualPos.Rows[i].ReadOnly = false;
+                }
+
+                btnGetPosFromQuik.Enabled = true;
+                btnCleanActPosRows.Enabled = true;
+            }
+        }
+
+        private void btnAutoHedge_Click(object sender, EventArgs e)
+        {
+            isAutoHedgeEnabled = !isAutoHedgeEnabled;
+            LOGGER.Info("btnAutoHedge_Click: {0}", isAutoHedgeEnabled);
+
+            if (isAutoHedgeEnabled)
+            {
+                btnAutoHedge.BackColor = Color.Gray;
+                btnAutoHedge.ForeColor = Color.WhiteSmoke;
+                btnAutoHedge.Text = "Auto Hedge/Close \r\nWORKING...";
+
+                btnLockPosTable.PerformClick();
+                btnLockPosTable.Enabled = false;
+                btnHandleHedge.Enabled = false;
+
+                txBxMaxFutQ.Enabled = false;
+                txBxDeltaStep.Enabled = false;
+                txBxPriceHedgeLvls.Enabled = false;
+                txBxClosePosIfPosForClosing.Enabled = false;
+                txBxClosePosIfTrackInstr.Enabled = false;
+                txBxClosePosIfSign.Enabled = false;
+                txBxClosePosIfPrice.Enabled = false;
+                txBxClosePosIfPnL.Enabled = false;
+
+                chkBxMaxFutQ.Enabled = false;
+                chkBxDeltaStep.Enabled = false;
+                chkBxPriceHedgeLvls.Enabled = false;
+                chkBxCloseIfPrice.Enabled = false;
+                chkBxCloseIfPnL.Enabled = false;
+                chkBxClosePosIf.Enabled = false;
+
+                if (OnAutoHedgeClick != null)
+                {
+                    OnAutoHedgeClick(sender, actualDeltaHedgeEventArgs);
+                }
+            }
+            else
+            {
+                btnAutoHedge.BackColor = Color.Transparent;
+                btnAutoHedge.ForeColor = Color.Black;
+                btnAutoHedge.Text = "Auto Hedge/Close \r\nSTOPPED";
+
+                txBxMaxFutQ.Enabled = true;
+                txBxDeltaStep.Enabled = true;
+                txBxPriceHedgeLvls.Enabled = true;
+                txBxClosePosIfPosForClosing.Enabled = true;
+                txBxClosePosIfTrackInstr.Enabled = true;
+                txBxClosePosIfSign.Enabled = true;
+                txBxClosePosIfPrice.Enabled = true;
+                txBxClosePosIfPnL.Enabled = true;
+
+                chkBxMaxFutQ.Enabled = true;
+                chkBxDeltaStep.Enabled = true;
+                chkBxPriceHedgeLvls.Enabled = true;
+                chkBxCloseIfPrice.Enabled = true;
+                chkBxCloseIfPnL.Enabled = true;
+                chkBxClosePosIf.Enabled = true;
+
+                btnHandleHedge.Enabled = true;
+                btnLockPosTable.Enabled = true;
+                btnLockPosTable.PerformClick();
+            }
+        }
+
+        private void btnHandleHedge_Click(object sender, EventArgs e)
+        {
+            LOGGER.Info("btnHandleHedge_Click");
+            if (OnHandleHedgeClick != null)
+            {
+                OnHandleHedgeClick(sender, actualDeltaHedgeEventArgs);
+            }
+        }
+
+        private void chkBxMaxFutQ_CheckedChanged(object sender, EventArgs e)
+        {
+            int val;
+
+            if (chkBxMaxFutQ.Checked == true)
+            {
+                if (!Int32.TryParse(txBxMaxFutQ.Text, out val) || val <= 0)
+                {
+                    MessageBox.Show("this value must be > 0, integer type.");
+                    chkBxMaxFutQ.Checked = false;
+                    txBxMaxFutQ.Text = "";
+                }
+                else
+                {
+                    actualDeltaHedgeEventArgs.MaxFutQ = val;
+                    txBxMaxFutQ.Enabled = false;
+                }
+            }
+            else
+            {
+                txBxMaxFutQ.Enabled = true;
+            }
+
+            SavePositionsCheckAndTextBoxesStatusToSettings();
+        }
+
+        private void chkBxDeltaStep_CheckedChanged(object sender, EventArgs e)
+        {
+            double val;
+
+            if (chkBxDeltaStep.Checked == true)
+            {
+                if (!Double.TryParse(txBxDeltaStep.Text, out val) || val < 1)
+                {
+                    MessageBox.Show("this value must be >= 1, double type.");
+                    chkBxDeltaStep.Checked = false;
+                    txBxDeltaStep.Text = "";
+                }
+                else
+                {
+                    actualDeltaHedgeEventArgs.DeltaStep = val;
+                    txBxDeltaStep.Enabled = false;
+                    chkBxPriceHedgeLvls.Checked = false;
+                }
+            }
+            else
+            {
+                txBxDeltaStep.Enabled = true;
+            }
+
+            SavePositionsCheckAndTextBoxesStatusToSettings();
+        }
+
+        private void chkBxPriceHedgeLvls_CheckedChanged(object sender, EventArgs e)
+        {
+            List<double> vals = new List<double>();
+
+            if (chkBxPriceHedgeLvls.Checked == true)
+            {
+                string[] tempStrArr = txBxPriceHedgeLvls.Text.Split(new char[] { '\r', '\n' },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+                if (tempStrArr.Length == 0)
+                {
+                    MessageBox.Show("all values must be > 0, double type.");
+                    chkBxPriceHedgeLvls.Checked = false;
+                    txBxPriceHedgeLvls.Text = "";
+
+                    SavePositionsCheckAndTextBoxesStatusToSettings();
+
+                    return;
+                }
+
+                foreach (string str in tempStrArr)
+                {
+                    double val;
+                    if (!Double.TryParse(str, out val) || val <= 0)
+                    {
+                        MessageBox.Show("all values must be > 0, double type.");
+                        chkBxPriceHedgeLvls.Checked = false;
+                        txBxPriceHedgeLvls.Text = "";
+
+                        SavePositionsCheckAndTextBoxesStatusToSettings();
+
+                        return;
+                    }
+                    else
+                    {
+                        vals.Add(val);
+                    }
+                }
+                actualDeltaHedgeEventArgs.HedgeLevels = vals;
+                txBxPriceHedgeLvls.Enabled = false;
+                chkBxDeltaStep.Checked = false;
+            }
+            else
+            {
+                txBxPriceHedgeLvls.Enabled = true;
+            }
+
+            SavePositionsCheckAndTextBoxesStatusToSettings();
+        }
+
+        private void chkBxClosePosIf_CheckedChanged(object sender, EventArgs e)
+        {
+            double price;
+            bool isCorrectFiled = true;
+
+            if (chkBxClosePosIf.Checked == true)
+            {
+                if (String.IsNullOrEmpty(txBxClosePosIfPosForClosing.Text))
+                {
+                    isCorrectFiled = false;
+                    txBxClosePosIfPosForClosing.Text = "";
+                }
+
+
+                if (String.IsNullOrEmpty(txBxClosePosIfTrackInstr.Text))
+                {
+                    isCorrectFiled = false;
+                    txBxClosePosIfTrackInstr.Text = "";
+                }
+
+                if (chkBxCloseIfPrice.Checked == false
+                    && chkBxCloseIfPnL.Checked == false)
+                {
+                    isCorrectFiled = false;
+                }
+
+
+                if (isCorrectFiled == false)
+                {
+                    MessageBox.Show(
+                        "All fields must be filled, positions and instrument are string" + "\r\n"
+                        + "one of conditions (by price or pnl) must be choosen");
+                    chkBxClosePosIf.Checked = false;
+
+                    SavePositionsCheckAndTextBoxesStatusToSettings();
+
+                    return;
+                }
+
+                actualPositionCloseConditionEventArgs.ClosingPositions =
+                    new List<string>(txBxClosePosIfPosForClosing.Text.Split(new char[] { '\r', '\n' },
+                        StringSplitOptions.RemoveEmptyEntries));
+                actualPositionCloseConditionEventArgs.TrackingInstr = txBxClosePosIfTrackInstr.Text;
+                actualPositionCloseConditionEventArgs.SignCondition = txBxClosePosIfSign.Text;
+
+                txBxClosePosIfPosForClosing.Enabled = false;
+                txBxClosePosIfTrackInstr.Enabled = false;
+                txBxClosePosIfPrice.Enabled = false;
+                txBxClosePosIfPrice.Enabled = false;
+                txBxClosePosIfSign.Enabled = false;
+                txBxClosePosIfPnL.Enabled = false;
+
+            }
+            else
+            {
+                txBxClosePosIfPosForClosing.Enabled = true;
+                txBxClosePosIfTrackInstr.Enabled = true;
+                txBxClosePosIfSign.Enabled = true;
+                txBxClosePosIfPrice.Enabled = true;
+                txBxClosePosIfPrice.Enabled = true;
+                txBxClosePosIfSign.Enabled = true;
+                txBxClosePosIfPnL.Enabled = true;
+            }
+
+            SavePositionsCheckAndTextBoxesStatusToSettings();
+        }
+
+        private void chkBxCloseIfPrice_CheckedChanged(object sender, EventArgs e)
+        {
+            double val;
+
+            if (chkBxCloseIfPrice.Checked == true)
+            {
+                if (!Double.TryParse(txBxClosePosIfPrice.Text, out val) || val <= 0)
+                {
+                    MessageBox.Show("this value must be > 0, double type.");
+                    chkBxCloseIfPrice.Checked = false;
+                    txBxClosePosIfPrice.Text = "";
+
+                    SavePositionsCheckAndTextBoxesStatusToSettings();
+
+                    return;
+
+                }
+
+                if (String.IsNullOrEmpty(txBxClosePosIfSign.Text)
+                    || (!txBxClosePosIfSign.Text.Equals("<") && !txBxClosePosIfSign.Text.Equals(">")))
+                {
+                    MessageBox.Show("possible conditions: < or >");
+                    txBxClosePosIfSign.Text = "";
+
+                    SavePositionsCheckAndTextBoxesStatusToSettings();
+
+                    return;
+                }
+
+                else
+                {
+                    actualPositionCloseConditionEventArgs.PriceCondition = val;
+                    actualPositionCloseConditionEventArgs.PnLCondition = 0.0;
+                    chkBxCloseIfPnL.Checked = false;
+                }
+
+                SavePositionsCheckAndTextBoxesStatusToSettings();
+            }
+
+        }
+
+        private void chkBxCloseIfPnL_CheckedChanged(object sender, EventArgs e)
+        {
+            double val;
+
+            if (chkBxCloseIfPnL.Checked == true)
+            {
+                if (!Double.TryParse(txBxClosePosIfPnL.Text, out val) || val <= 0)
+                {
+                    MessageBox.Show("this value must be > 0, double type.");
+                    chkBxCloseIfPnL.Checked = false;
+                    txBxClosePosIfPnL.Text = "";
+                }
+                else
+                {
+                    actualPositionCloseConditionEventArgs.PriceCondition = 0.0;
+                    actualPositionCloseConditionEventArgs.PnLCondition = val;
+                    chkBxCloseIfPrice.Checked = false;
+                }
+            }
+
+            SavePositionsCheckAndTextBoxesStatusToSettings();
+        }
+
+        private void SavePositionsCheckAndTextBoxesStatusToSettings()
+        {
+            if (isCheckBoxesLoaded)
+            {
+                Settings.Default.checkBoxMaxFutQ = chkBxMaxFutQ.Checked;
+                Settings.Default.checkBoxDeltaStep = chkBxDeltaStep.Checked;
+                Settings.Default.checkBoxPriceLevels = chkBxPriceHedgeLvls.Checked;
+                Settings.Default.checkBosClosePos = chkBxClosePosIf.Checked;
+                Settings.Default.checkBoxPriceCon = chkBxCloseIfPrice.Checked;
+                Settings.Default.checkBoxPnLCon = chkBxCloseIfPnL.Checked;
+                Settings.Default.checkBoxMaxFutQValue = txBxMaxFutQ.Text;
+                Settings.Default.checkBoxDeltaStepValue = txBxDeltaStep.Text;
+                Settings.Default.checkBoxPriceLevelsValue = txBxPriceHedgeLvls.Text;
+                Settings.Default.checkBosCloseWhatPosWillBeCloseValue = txBxClosePosIfPosForClosing.Text;
+                Settings.Default.checkBosCloseTrackingInstrValue = txBxClosePosIfTrackInstr.Text;
+                Settings.Default.checkBoxPricePriceConSignValue = txBxClosePosIfSign.Text;
+                Settings.Default.checkBoxPricePriceConValue = txBxClosePosIfPrice.Text;
+                Settings.Default.checkBoxPnLValue = txBxClosePosIfPnL.Text;
+                Settings.Default.Save();
+            }
+        }
+
+        private void LoadPositionsCheckAndTextBoxesStatusFromSettings()
+        {
+            txBxMaxFutQ.Text = Settings.Default.checkBoxMaxFutQValue;
+            txBxDeltaStep.Text = Settings.Default.checkBoxDeltaStepValue;
+            txBxPriceHedgeLvls.Text = Settings.Default.checkBoxPriceLevelsValue;
+            txBxClosePosIfPosForClosing.Text = Settings.Default.checkBosCloseWhatPosWillBeCloseValue;
+            txBxClosePosIfTrackInstr.Text = Settings.Default.checkBosCloseTrackingInstrValue;
+            txBxClosePosIfSign.Text = Settings.Default.checkBoxPricePriceConSignValue;
+            txBxClosePosIfPrice.Text = Settings.Default.checkBoxPricePriceConValue;
+            txBxClosePosIfPnL.Text = Settings.Default.checkBoxPnLValue;
+
+            chkBxMaxFutQ.Checked = Settings.Default.checkBoxMaxFutQ;
+            chkBxDeltaStep.Checked = Settings.Default.checkBoxDeltaStep;
+            chkBxPriceHedgeLvls.Checked = Settings.Default.checkBoxPriceLevels;
+            chkBxCloseIfPrice.Checked = Settings.Default.checkBoxPriceCon;
+            chkBxCloseIfPnL.Checked = Settings.Default.checkBoxPnLCon;
+            chkBxClosePosIf.Checked = Settings.Default.checkBosClosePos;
+
+            isCheckBoxesLoaded = true;
+        }
+
+
 
         private class OptionsTableRow
         {
@@ -1012,10 +1585,8 @@ namespace OptionsTradeWell
 
             public int IndexInTable { get; set; }
 
-            public int UniqueValueInDataArrIndex
-            {
-                get; private set;
-            }
+            public int UniqueValueInDataArrIndex { get; private set; }
+
             public double[] DataArr
             {
                 get { return dataArr; }
@@ -1028,10 +1599,7 @@ namespace OptionsTradeWell
 
             public double UniqueValue
             {
-                get
-                {
-                    return DataArr[UniqueValueInDataArrIndex];
-                }
+                get { return DataArr[UniqueValueInDataArrIndex]; }
             }
 
             public double Strike { get; set; }

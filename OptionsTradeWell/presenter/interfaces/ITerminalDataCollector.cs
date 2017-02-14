@@ -1,4 +1,4 @@
-﻿namespace OptionsTradeWell.model.interfaces
+﻿namespace OptionsTradeWell.presenter.interfaces
 {
     public interface ITerminalDataCollector
     {

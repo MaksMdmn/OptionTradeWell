@@ -1,23 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using OptionsTradeWell.model.interfaces;
-using OptionsTradeWell.Properties;
+using OptionsTradeWell.model;
 
-namespace OptionsTradeWell.model
+namespace OptionsTradeWell.presenter
 {
     public class PositionManager
     {
-
-        private double[] myLogArr = new double[]
-        {
-            0.9,
-            0.8,
-            0.6,
-            0.25,
-            0.05,
-            0.01,
-        };
-
         public PositionManager()
         {
             Options = new List<Option>();
@@ -73,6 +61,21 @@ namespace OptionsTradeWell.model
                 {
                     Futures.Position.AddToExistingPos(futures.Position.EnterPrice, futures.Position.Quantity);
                 }
+            }
+        }
+
+        public void AddOrChangeExistingOptionsPosition(Option opt)
+        {
+            Option tempOption = GetIfSuchOptionHasAlreadyExist(opt);
+
+            if (tempOption == null)
+            {
+                Options.Add(opt);
+            }
+            else
+            {
+                tempOption.Position.Quantity = opt.Position.Quantity;
+                tempOption.Position.EnterPrice = opt.Position.EnterPrice;
             }
         }
 
@@ -174,6 +177,51 @@ namespace OptionsTradeWell.model
             FixedPnL = 0.0;
         }
 
+        public bool IsOptionsPositionExists()
+        {
+            return Options.Count > 0;
+        }
+
+        public bool IsAnyPositionsExists()
+        {
+            return IsOptionsPositionExists() || Futures != null;
+        }
+
+        public bool GetCurrentPriceIfPossible(out double price)
+        {
+            price = 0.0;
+            bool result = false;
+
+            if (Options.Count > 0)
+            {
+                price = Options[0].Futures.GetTradeBlotter().AskPrice;
+                result = true;
+            }
+            else if (Futures != null)
+            {
+                price = Futures.GetTradeBlotter().AskPrice;
+                result = true;
+            }
+
+            return result;
+        }
+
+        public double GetCurrentPrice()
+        {
+            double price = 0.0;
+
+            if (Options.Count > 0)
+            {
+                price = Options[0].Futures.GetTradeBlotter().AskPrice;
+            }
+            else if (Futures != null)
+            {
+                price = Futures.GetTradeBlotter().AskPrice;
+            }
+
+            return price;
+        }
+
         private Option GetIfSuchOptionHasAlreadyExist(Option option)
         {
             Option answer = null;
@@ -193,18 +241,6 @@ namespace OptionsTradeWell.model
             }
 
             return answer;
-        }
-
-        private double CalcMyKoef(double distance, double calcStep)
-        {
-            int tempIndex = (int)(distance / calcStep);
-
-            if (tempIndex >= myLogArr.Length)
-            {
-                tempIndex = myLogArr.Length - 1;
-            }
-
-            return myLogArr[tempIndex];
         }
     }
 }

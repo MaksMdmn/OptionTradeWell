@@ -1,6 +1,6 @@
 ﻿using System;
 using OptionsTradeWell.model.exceptions;
-using OptionsTradeWell.model.interfaces;
+using OptionsTradeWell.presenter.interfaces;
 
 namespace OptionsTradeWell.model
 {
@@ -33,6 +33,8 @@ namespace OptionsTradeWell.model
 
         public Position Position { get; }
 
+        public string BaseContract { get; set; }
+
         public static Futures GetFakeFutures(double enterFutPrice, int futPosition, TradeBlotter blotter, double priceStep, double priceVal)
         {
             Futures fut = new Futures("", DateTime.Now, 0.0, 0.0, priceStep, priceVal);
@@ -44,7 +46,7 @@ namespace OptionsTradeWell.model
 
         public override string ToString()
         {
-            return $"{nameof(blotter)}: {blotter}, {nameof(Ticker)}: {Ticker}, {nameof(Maturity)}: {Maturity}, {nameof(Commission)}: {Commission}, {nameof(MarginRequirement)}: {MarginRequirement}, {nameof(PriceStep)}: {PriceStep}, {nameof(PriceStepValue)}: {PriceStepValue}, {nameof(Position)}: {Position}";
+            return $"{nameof(blotter)}: {blotter}, {nameof(Ticker)}: {Ticker}, {nameof(Maturity)}: {Maturity}, {nameof(Commission)}: {Commission}, {nameof(MarginRequirement)}: {MarginRequirement}, {nameof(PriceStep)}: {PriceStep}, {nameof(PriceStepValue)}: {PriceStepValue}, {nameof(Position)}: {Position}, {nameof(BaseContract)}: {BaseContract}";
         }
 
         public void AssignTradeBlotter(TradeBlotter blotter)

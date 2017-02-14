@@ -35,7 +35,7 @@
             this.tabSettings = new System.Windows.Forms.TabPage();
             this.chrtPutVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chrtCallVol = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.tabMain = new System.Windows.Forms.TabPage();
+            this.tabOptDesk = new System.Windows.Forms.TabPage();
             this.btnRes = new System.Windows.Forms.Button();
             this.btnMinusOneFut = new System.Windows.Forms.Button();
             this.btnPlusOneFut = new System.Windows.Forms.Button();
@@ -54,7 +54,36 @@
             this.btnStart = new System.Windows.Forms.Button();
             this.dgvOptionDesk = new System.Windows.Forms.DataGridView();
             this.tabs = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabActualPos = new System.Windows.Forms.TabPage();
+            this.txBxClosePosIfPnL = new System.Windows.Forms.TextBox();
+            this.chkBxCloseIfPnL = new System.Windows.Forms.CheckBox();
+            this.chkBxCloseIfPrice = new System.Windows.Forms.CheckBox();
+            this.btnOneTimUpdActPos = new System.Windows.Forms.Button();
+            this.btnCleanActPosRows = new System.Windows.Forms.Button();
+            this.txBxClosePosIfPrice = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.txBxClosePosIfTrackInstr = new System.Windows.Forms.TextBox();
+            this.txBxClosePosIfSign = new System.Windows.Forms.TextBox();
+            this.chkBxClosePosIf = new System.Windows.Forms.CheckBox();
+            this.txBxClosePosIfPosForClosing = new System.Windows.Forms.TextBox();
+            this.btnAutoHedge = new System.Windows.Forms.Button();
+            this.btnSendToSimul = new System.Windows.Forms.Button();
+            this.chkBxPriceHedgeLvls = new System.Windows.Forms.CheckBox();
+            this.txBxPriceHedgeLvls = new System.Windows.Forms.TextBox();
+            this.chkBxMaxFutQ = new System.Windows.Forms.CheckBox();
+            this.txBxMaxFutQ = new System.Windows.Forms.TextBox();
+            this.chkBxDeltaStep = new System.Windows.Forms.CheckBox();
+            this.txBxDeltaStep = new System.Windows.Forms.TextBox();
+            this.btnLockPosTable = new System.Windows.Forms.Button();
+            this.btnGetPosFromQuik = new System.Windows.Forms.Button();
+            this.btnHandleHedge = new System.Windows.Forms.Button();
+            this.dgvActualPos = new System.Windows.Forms.DataGridView();
+            this.tabVols = new System.Windows.Forms.TabPage();
+            this.txBxAccount = new System.Windows.Forms.TextBox();
+            this.label24 = new System.Windows.Forms.Label();
+            this.txBxPosTableName = new System.Windows.Forms.TextBox();
+            this.label23 = new System.Windows.Forms.Label();
             this.txBxStrStep = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.txBxStrikesNumber = new System.Windows.Forms.TextBox();
@@ -64,7 +93,6 @@
             this.txBxStepYValue = new System.Windows.Forms.TextBox();
             this.txBxMaxYValue = new System.Windows.Forms.TextBox();
             this.txBxMinYValue = new System.Windows.Forms.TextBox();
-            this.txBxCentralStrChangeTimeSec = new System.Windows.Forms.TextBox();
             this.txBxMaxVolValue = new System.Windows.Forms.TextBox();
             this.txBxRounding = new System.Windows.Forms.TextBox();
             this.txBxDaysInYear = new System.Windows.Forms.TextBox();
@@ -81,7 +109,6 @@
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -96,13 +123,15 @@
             this.tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPutVol)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtCallVol)).BeginInit();
-            this.tabMain.SuspendLayout();
+            this.tabOptDesk.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTotalInfo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPos)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPositions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOptionDesk)).BeginInit();
             this.tabs.SuspendLayout();
-            this.tabPage1.SuspendLayout();
+            this.tabActualPos.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvActualPos)).BeginInit();
+            this.tabVols.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -115,7 +144,7 @@
             this.tabSettings.Padding = new System.Windows.Forms.Padding(3);
             this.tabSettings.Size = new System.Drawing.Size(1318, 679);
             this.tabSettings.TabIndex = 1;
-            this.tabSettings.Text = "ChartAnalyse";
+            this.tabSettings.Text = "Volatility";
             this.tabSettings.UseVisualStyleBackColor = true;
             // 
             // chrtPutVol
@@ -156,33 +185,33 @@
             this.chrtCallVol.TabIndex = 4;
             this.chrtCallVol.Text = "chart2";
             // 
-            // tabMain
+            // tabOptDesk
             // 
-            this.tabMain.AutoScroll = true;
-            this.tabMain.BackColor = System.Drawing.Color.Gainsboro;
-            this.tabMain.Controls.Add(this.btnRes);
-            this.tabMain.Controls.Add(this.btnMinusOneFut);
-            this.tabMain.Controls.Add(this.btnPlusOneFut);
-            this.tabMain.Controls.Add(this.dgvTotalInfo);
-            this.tabMain.Controls.Add(this.btnCleanSelected);
-            this.tabMain.Controls.Add(this.btnAddFromTable);
-            this.tabMain.Controls.Add(this.txBxMsgInfo);
-            this.tabMain.Controls.Add(this.chrtPos);
-            this.tabMain.Controls.Add(this.btnUpdatePos);
-            this.tabMain.Controls.Add(this.dgvPositions);
-            this.tabMain.Controls.Add(this.label21);
-            this.tabMain.Controls.Add(this.label20);
-            this.tabMain.Controls.Add(this.lblDaysToExp);
-            this.tabMain.Controls.Add(this.lblSpotPrice);
-            this.tabMain.Controls.Add(this.statusStrip2);
-            this.tabMain.Controls.Add(this.btnStart);
-            this.tabMain.Controls.Add(this.dgvOptionDesk);
-            this.tabMain.Location = new System.Drawing.Point(4, 22);
-            this.tabMain.Name = "tabMain";
-            this.tabMain.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMain.Size = new System.Drawing.Size(1318, 679);
-            this.tabMain.TabIndex = 0;
-            this.tabMain.Text = "MainPage";
+            this.tabOptDesk.AutoScroll = true;
+            this.tabOptDesk.BackColor = System.Drawing.Color.Gainsboro;
+            this.tabOptDesk.Controls.Add(this.btnRes);
+            this.tabOptDesk.Controls.Add(this.btnMinusOneFut);
+            this.tabOptDesk.Controls.Add(this.btnPlusOneFut);
+            this.tabOptDesk.Controls.Add(this.dgvTotalInfo);
+            this.tabOptDesk.Controls.Add(this.btnCleanSelected);
+            this.tabOptDesk.Controls.Add(this.btnAddFromTable);
+            this.tabOptDesk.Controls.Add(this.txBxMsgInfo);
+            this.tabOptDesk.Controls.Add(this.chrtPos);
+            this.tabOptDesk.Controls.Add(this.btnUpdatePos);
+            this.tabOptDesk.Controls.Add(this.dgvPositions);
+            this.tabOptDesk.Controls.Add(this.label21);
+            this.tabOptDesk.Controls.Add(this.label20);
+            this.tabOptDesk.Controls.Add(this.lblDaysToExp);
+            this.tabOptDesk.Controls.Add(this.lblSpotPrice);
+            this.tabOptDesk.Controls.Add(this.statusStrip2);
+            this.tabOptDesk.Controls.Add(this.btnStart);
+            this.tabOptDesk.Controls.Add(this.dgvOptionDesk);
+            this.tabOptDesk.Location = new System.Drawing.Point(4, 22);
+            this.tabOptDesk.Name = "tabOptDesk";
+            this.tabOptDesk.Padding = new System.Windows.Forms.Padding(3);
+            this.tabOptDesk.Size = new System.Drawing.Size(1318, 679);
+            this.tabOptDesk.TabIndex = 0;
+            this.tabOptDesk.Text = "OptionDesk&Simulation";
             // 
             // btnRes
             // 
@@ -364,69 +393,362 @@
             this.tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabs.Controls.Add(this.tabMain);
+            this.tabs.Controls.Add(this.tabOptDesk);
             this.tabs.Controls.Add(this.tabSettings);
-            this.tabs.Controls.Add(this.tabPage1);
+            this.tabs.Controls.Add(this.tabActualPos);
+            this.tabs.Controls.Add(this.tabVols);
             this.tabs.Location = new System.Drawing.Point(12, 12);
             this.tabs.Name = "tabs";
             this.tabs.SelectedIndex = 0;
             this.tabs.Size = new System.Drawing.Size(1326, 705);
             this.tabs.TabIndex = 5;
             // 
-            // tabPage1
+            // tabActualPos
             // 
-            this.tabPage1.Controls.Add(this.txBxStrStep);
-            this.tabPage1.Controls.Add(this.label8);
-            this.tabPage1.Controls.Add(this.txBxStrikesNumber);
-            this.tabPage1.Controls.Add(this.label7);
-            this.tabPage1.Controls.Add(this.btnSetDefaultSettings);
-            this.tabPage1.Controls.Add(this.btnSaveSettings);
-            this.tabPage1.Controls.Add(this.txBxStepYValue);
-            this.tabPage1.Controls.Add(this.txBxMaxYValue);
-            this.tabPage1.Controls.Add(this.txBxMinYValue);
-            this.tabPage1.Controls.Add(this.txBxCentralStrChangeTimeSec);
-            this.tabPage1.Controls.Add(this.txBxMaxVolValue);
-            this.tabPage1.Controls.Add(this.txBxRounding);
-            this.tabPage1.Controls.Add(this.txBxDaysInYear);
-            this.tabPage1.Controls.Add(this.txBxNumberOfTrackOpt);
-            this.tabPage1.Controls.Add(this.txBxUniqueIndx);
-            this.tabPage1.Controls.Add(this.txBxOptTableName);
-            this.tabPage1.Controls.Add(this.txBxServName);
-            this.tabPage1.Controls.Add(this.txBxFutTableName);
-            this.tabPage1.Controls.Add(this.label18);
-            this.tabPage1.Controls.Add(this.label17);
-            this.tabPage1.Controls.Add(this.label16);
-            this.tabPage1.Controls.Add(this.label15);
-            this.tabPage1.Controls.Add(this.label13);
-            this.tabPage1.Controls.Add(this.label12);
-            this.tabPage1.Controls.Add(this.label11);
-            this.tabPage1.Controls.Add(this.label10);
-            this.tabPage1.Controls.Add(this.label9);
-            this.tabPage1.Controls.Add(this.label6);
-            this.tabPage1.Controls.Add(this.label5);
-            this.tabPage1.Controls.Add(this.label4);
-            this.tabPage1.Controls.Add(this.label3);
-            this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Controls.Add(this.label1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1318, 679);
-            this.tabPage1.TabIndex = 2;
-            this.tabPage1.Text = "Settings";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabActualPos.Controls.Add(this.txBxClosePosIfPnL);
+            this.tabActualPos.Controls.Add(this.chkBxCloseIfPnL);
+            this.tabActualPos.Controls.Add(this.chkBxCloseIfPrice);
+            this.tabActualPos.Controls.Add(this.btnOneTimUpdActPos);
+            this.tabActualPos.Controls.Add(this.btnCleanActPosRows);
+            this.tabActualPos.Controls.Add(this.txBxClosePosIfPrice);
+            this.tabActualPos.Controls.Add(this.label19);
+            this.tabActualPos.Controls.Add(this.label14);
+            this.tabActualPos.Controls.Add(this.txBxClosePosIfTrackInstr);
+            this.tabActualPos.Controls.Add(this.txBxClosePosIfSign);
+            this.tabActualPos.Controls.Add(this.chkBxClosePosIf);
+            this.tabActualPos.Controls.Add(this.txBxClosePosIfPosForClosing);
+            this.tabActualPos.Controls.Add(this.btnAutoHedge);
+            this.tabActualPos.Controls.Add(this.btnSendToSimul);
+            this.tabActualPos.Controls.Add(this.chkBxPriceHedgeLvls);
+            this.tabActualPos.Controls.Add(this.txBxPriceHedgeLvls);
+            this.tabActualPos.Controls.Add(this.chkBxMaxFutQ);
+            this.tabActualPos.Controls.Add(this.txBxMaxFutQ);
+            this.tabActualPos.Controls.Add(this.chkBxDeltaStep);
+            this.tabActualPos.Controls.Add(this.txBxDeltaStep);
+            this.tabActualPos.Controls.Add(this.btnLockPosTable);
+            this.tabActualPos.Controls.Add(this.btnGetPosFromQuik);
+            this.tabActualPos.Controls.Add(this.btnHandleHedge);
+            this.tabActualPos.Controls.Add(this.dgvActualPos);
+            this.tabActualPos.Location = new System.Drawing.Point(4, 22);
+            this.tabActualPos.Name = "tabActualPos";
+            this.tabActualPos.Padding = new System.Windows.Forms.Padding(3);
+            this.tabActualPos.Size = new System.Drawing.Size(1318, 679);
+            this.tabActualPos.TabIndex = 3;
+            this.tabActualPos.Text = "Position";
+            this.tabActualPos.UseVisualStyleBackColor = true;
+            // 
+            // txBxClosePosIfPnL
+            // 
+            this.txBxClosePosIfPnL.Location = new System.Drawing.Point(771, 364);
+            this.txBxClosePosIfPnL.Name = "txBxClosePosIfPnL";
+            this.txBxClosePosIfPnL.Size = new System.Drawing.Size(95, 20);
+            this.txBxClosePosIfPnL.TabIndex = 26;
+            // 
+            // chkBxCloseIfPnL
+            // 
+            this.chkBxCloseIfPnL.AutoSize = true;
+            this.chkBxCloseIfPnL.Location = new System.Drawing.Point(682, 359);
+            this.chkBxCloseIfPnL.Name = "chkBxCloseIfPnL";
+            this.chkBxCloseIfPnL.Size = new System.Drawing.Size(72, 30);
+            this.chkBxCloseIfPnL.TabIndex = 25;
+            this.chkBxCloseIfPnL.Text = "PnL \r\ncondition:";
+            this.chkBxCloseIfPnL.UseVisualStyleBackColor = true;
+            this.chkBxCloseIfPnL.CheckedChanged += new System.EventHandler(this.chkBxCloseIfPnL_CheckedChanged);
+            // 
+            // chkBxCloseIfPrice
+            // 
+            this.chkBxCloseIfPrice.AutoSize = true;
+            this.chkBxCloseIfPrice.Location = new System.Drawing.Point(682, 323);
+            this.chkBxCloseIfPrice.Name = "chkBxCloseIfPrice";
+            this.chkBxCloseIfPrice.Size = new System.Drawing.Size(75, 30);
+            this.chkBxCloseIfPrice.TabIndex = 24;
+            this.chkBxCloseIfPrice.Text = "price \r\ncondition: ";
+            this.chkBxCloseIfPrice.UseVisualStyleBackColor = true;
+            this.chkBxCloseIfPrice.CheckedChanged += new System.EventHandler(this.chkBxCloseIfPrice_CheckedChanged);
+            // 
+            // btnOneTimUpdActPos
+            // 
+            this.btnOneTimUpdActPos.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnOneTimUpdActPos.Location = new System.Drawing.Point(257, 28);
+            this.btnOneTimUpdActPos.Name = "btnOneTimUpdActPos";
+            this.btnOneTimUpdActPos.Size = new System.Drawing.Size(115, 22);
+            this.btnOneTimUpdActPos.TabIndex = 23;
+            this.btnOneTimUpdActPos.Text = "ONE-TIME UPD.";
+            this.btnOneTimUpdActPos.UseVisualStyleBackColor = true;
+            this.btnOneTimUpdActPos.Click += new System.EventHandler(this.btnOneTimUpdActPos_Click);
+            // 
+            // btnCleanActPosRows
+            // 
+            this.btnCleanActPosRows.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnCleanActPosRows.Location = new System.Drawing.Point(387, 28);
+            this.btnCleanActPosRows.Name = "btnCleanActPosRows";
+            this.btnCleanActPosRows.Size = new System.Drawing.Size(115, 22);
+            this.btnCleanActPosRows.TabIndex = 22;
+            this.btnCleanActPosRows.Text = "CLEAN ROWS";
+            this.btnCleanActPosRows.UseVisualStyleBackColor = true;
+            this.btnCleanActPosRows.Click += new System.EventHandler(this.btnCleanActPosRows_Click);
+            // 
+            // txBxClosePosIfPrice
+            // 
+            this.txBxClosePosIfPrice.Location = new System.Drawing.Point(795, 333);
+            this.txBxClosePosIfPrice.Name = "txBxClosePosIfPrice";
+            this.txBxClosePosIfPrice.Size = new System.Drawing.Size(71, 20);
+            this.txBxClosePosIfPrice.TabIndex = 7;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(681, 303);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(87, 13);
+            this.label19.TabIndex = 19;
+            this.label19.Text = "tracking instrum.:";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(682, 226);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(77, 26);
+            this.label14.TabIndex = 18;
+            this.label14.Text = "what positions \r\nwill be closed:";
+            // 
+            // txBxClosePosIfTrackInstr
+            // 
+            this.txBxClosePosIfTrackInstr.Location = new System.Drawing.Point(771, 300);
+            this.txBxClosePosIfTrackInstr.Name = "txBxClosePosIfTrackInstr";
+            this.txBxClosePosIfTrackInstr.Size = new System.Drawing.Size(95, 20);
+            this.txBxClosePosIfTrackInstr.TabIndex = 5;
+            // 
+            // txBxClosePosIfSign
+            // 
+            this.txBxClosePosIfSign.Location = new System.Drawing.Point(771, 333);
+            this.txBxClosePosIfSign.Name = "txBxClosePosIfSign";
+            this.txBxClosePosIfSign.Size = new System.Drawing.Size(20, 20);
+            this.txBxClosePosIfSign.TabIndex = 6;
+            // 
+            // chkBxClosePosIf
+            // 
+            this.chkBxClosePosIf.AutoSize = true;
+            this.chkBxClosePosIf.Location = new System.Drawing.Point(685, 200);
+            this.chkBxClosePosIf.Name = "chkBxClosePosIf";
+            this.chkBxClosePosIf.Size = new System.Drawing.Size(101, 17);
+            this.chkBxClosePosIf.TabIndex = 15;
+            this.chkBxClosePosIf.Text = "close position if:";
+            this.chkBxClosePosIf.UseVisualStyleBackColor = true;
+            this.chkBxClosePosIf.CheckedChanged += new System.EventHandler(this.chkBxClosePosIf_CheckedChanged);
+            // 
+            // txBxClosePosIfPosForClosing
+            // 
+            this.txBxClosePosIfPosForClosing.Location = new System.Drawing.Point(771, 226);
+            this.txBxClosePosIfPosForClosing.Multiline = true;
+            this.txBxClosePosIfPosForClosing.Name = "txBxClosePosIfPosForClosing";
+            this.txBxClosePosIfPosForClosing.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txBxClosePosIfPosForClosing.Size = new System.Drawing.Size(95, 68);
+            this.txBxClosePosIfPosForClosing.TabIndex = 4;
+            // 
+            // btnAutoHedge
+            // 
+            this.btnAutoHedge.Location = new System.Drawing.Point(756, 7);
+            this.btnAutoHedge.Name = "btnAutoHedge";
+            this.btnAutoHedge.Size = new System.Drawing.Size(110, 45);
+            this.btnAutoHedge.TabIndex = 13;
+            this.btnAutoHedge.Text = "Auto Hedge/Close";
+            this.btnAutoHedge.UseVisualStyleBackColor = true;
+            this.btnAutoHedge.Click += new System.EventHandler(this.btnAutoHedge_Click);
+            // 
+            // btnSendToSimul
+            // 
+            this.btnSendToSimul.Location = new System.Drawing.Point(122, 8);
+            this.btnSendToSimul.Name = "btnSendToSimul";
+            this.btnSendToSimul.Size = new System.Drawing.Size(110, 44);
+            this.btnSendToSimul.TabIndex = 12;
+            this.btnSendToSimul.Text = "Send to\r\nsimulation";
+            this.btnSendToSimul.UseVisualStyleBackColor = true;
+            this.btnSendToSimul.Click += new System.EventHandler(this.btnSendToSimul_Click);
+            // 
+            // chkBxPriceHedgeLvls
+            // 
+            this.chkBxPriceHedgeLvls.AutoSize = true;
+            this.chkBxPriceHedgeLvls.Location = new System.Drawing.Point(684, 112);
+            this.chkBxPriceHedgeLvls.Name = "chkBxPriceHedgeLvls";
+            this.chkBxPriceHedgeLvls.Size = new System.Drawing.Size(85, 30);
+            this.chkBxPriceHedgeLvls.TabIndex = 11;
+            this.chkBxPriceHedgeLvls.Text = "price hedge \r\nlevels";
+            this.chkBxPriceHedgeLvls.UseVisualStyleBackColor = true;
+            this.chkBxPriceHedgeLvls.CheckedChanged += new System.EventHandler(this.chkBxPriceHedgeLvls_CheckedChanged);
+            // 
+            // txBxPriceHedgeLvls
+            // 
+            this.txBxPriceHedgeLvls.Location = new System.Drawing.Point(771, 112);
+            this.txBxPriceHedgeLvls.Multiline = true;
+            this.txBxPriceHedgeLvls.Name = "txBxPriceHedgeLvls";
+            this.txBxPriceHedgeLvls.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txBxPriceHedgeLvls.Size = new System.Drawing.Size(95, 68);
+            this.txBxPriceHedgeLvls.TabIndex = 3;
+            // 
+            // chkBxMaxFutQ
+            // 
+            this.chkBxMaxFutQ.AutoSize = true;
+            this.chkBxMaxFutQ.Location = new System.Drawing.Point(685, 55);
+            this.chkBxMaxFutQ.Name = "chkBxMaxFutQ";
+            this.chkBxMaxFutQ.Size = new System.Drawing.Size(80, 30);
+            this.chkBxMaxFutQ.TabIndex = 9;
+            this.chkBxMaxFutQ.Text = "max futures\r\nquantity";
+            this.chkBxMaxFutQ.UseVisualStyleBackColor = true;
+            this.chkBxMaxFutQ.CheckedChanged += new System.EventHandler(this.chkBxMaxFutQ_CheckedChanged);
+            // 
+            // txBxMaxFutQ
+            // 
+            this.txBxMaxFutQ.Location = new System.Drawing.Point(771, 60);
+            this.txBxMaxFutQ.Name = "txBxMaxFutQ";
+            this.txBxMaxFutQ.Size = new System.Drawing.Size(95, 20);
+            this.txBxMaxFutQ.TabIndex = 1;
+            // 
+            // chkBxDeltaStep
+            // 
+            this.chkBxDeltaStep.AutoSize = true;
+            this.chkBxDeltaStep.Location = new System.Drawing.Point(685, 86);
+            this.chkBxDeltaStep.Name = "chkBxDeltaStep";
+            this.chkBxDeltaStep.Size = new System.Drawing.Size(72, 17);
+            this.chkBxDeltaStep.TabIndex = 7;
+            this.chkBxDeltaStep.Text = "delta step";
+            this.chkBxDeltaStep.UseVisualStyleBackColor = true;
+            this.chkBxDeltaStep.CheckedChanged += new System.EventHandler(this.chkBxDeltaStep_CheckedChanged);
+            // 
+            // txBxDeltaStep
+            // 
+            this.txBxDeltaStep.Location = new System.Drawing.Point(771, 86);
+            this.txBxDeltaStep.Name = "txBxDeltaStep";
+            this.txBxDeltaStep.Size = new System.Drawing.Size(95, 20);
+            this.txBxDeltaStep.TabIndex = 2;
+            // 
+            // btnLockPosTable
+            // 
+            this.btnLockPosTable.Location = new System.Drawing.Point(556, 8);
+            this.btnLockPosTable.Name = "btnLockPosTable";
+            this.btnLockPosTable.Size = new System.Drawing.Size(110, 44);
+            this.btnLockPosTable.TabIndex = 3;
+            this.btnLockPosTable.Text = "Lock\\Unlock\r\nposition table";
+            this.btnLockPosTable.UseVisualStyleBackColor = true;
+            this.btnLockPosTable.Click += new System.EventHandler(this.btnLockPosTable_Click);
+            // 
+            // btnGetPosFromQuik
+            // 
+            this.btnGetPosFromQuik.Location = new System.Drawing.Point(6, 8);
+            this.btnGetPosFromQuik.Name = "btnGetPosFromQuik";
+            this.btnGetPosFromQuik.Size = new System.Drawing.Size(110, 44);
+            this.btnGetPosFromQuik.TabIndex = 2;
+            this.btnGetPosFromQuik.Text = "Get position\rfrom quik";
+            this.btnGetPosFromQuik.UseVisualStyleBackColor = true;
+            this.btnGetPosFromQuik.Click += new System.EventHandler(this.btnGetPosFromQuik_Click);
+            // 
+            // btnHandleHedge
+            // 
+            this.btnHandleHedge.Location = new System.Drawing.Point(964, 8);
+            this.btnHandleHedge.Name = "btnHandleHedge";
+            this.btnHandleHedge.Size = new System.Drawing.Size(110, 44);
+            this.btnHandleHedge.TabIndex = 1;
+            this.btnHandleHedge.Text = "Handle\r\nHedge";
+            this.btnHandleHedge.UseVisualStyleBackColor = true;
+            this.btnHandleHedge.Click += new System.EventHandler(this.btnHandleHedge_Click);
+            // 
+            // dgvActualPos
+            // 
+            this.dgvActualPos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvActualPos.Location = new System.Drawing.Point(6, 56);
+            this.dgvActualPos.Name = "dgvActualPos";
+            this.dgvActualPos.Size = new System.Drawing.Size(660, 200);
+            this.dgvActualPos.TabIndex = 0;
+            // 
+            // tabVols
+            // 
+            this.tabVols.Controls.Add(this.txBxAccount);
+            this.tabVols.Controls.Add(this.label24);
+            this.tabVols.Controls.Add(this.txBxPosTableName);
+            this.tabVols.Controls.Add(this.label23);
+            this.tabVols.Controls.Add(this.txBxStrStep);
+            this.tabVols.Controls.Add(this.label8);
+            this.tabVols.Controls.Add(this.txBxStrikesNumber);
+            this.tabVols.Controls.Add(this.label7);
+            this.tabVols.Controls.Add(this.btnSetDefaultSettings);
+            this.tabVols.Controls.Add(this.btnSaveSettings);
+            this.tabVols.Controls.Add(this.txBxStepYValue);
+            this.tabVols.Controls.Add(this.txBxMaxYValue);
+            this.tabVols.Controls.Add(this.txBxMinYValue);
+            this.tabVols.Controls.Add(this.txBxMaxVolValue);
+            this.tabVols.Controls.Add(this.txBxRounding);
+            this.tabVols.Controls.Add(this.txBxDaysInYear);
+            this.tabVols.Controls.Add(this.txBxNumberOfTrackOpt);
+            this.tabVols.Controls.Add(this.txBxUniqueIndx);
+            this.tabVols.Controls.Add(this.txBxOptTableName);
+            this.tabVols.Controls.Add(this.txBxServName);
+            this.tabVols.Controls.Add(this.txBxFutTableName);
+            this.tabVols.Controls.Add(this.label18);
+            this.tabVols.Controls.Add(this.label17);
+            this.tabVols.Controls.Add(this.label16);
+            this.tabVols.Controls.Add(this.label15);
+            this.tabVols.Controls.Add(this.label13);
+            this.tabVols.Controls.Add(this.label12);
+            this.tabVols.Controls.Add(this.label11);
+            this.tabVols.Controls.Add(this.label10);
+            this.tabVols.Controls.Add(this.label6);
+            this.tabVols.Controls.Add(this.label5);
+            this.tabVols.Controls.Add(this.label4);
+            this.tabVols.Controls.Add(this.label3);
+            this.tabVols.Controls.Add(this.label2);
+            this.tabVols.Controls.Add(this.label1);
+            this.tabVols.Location = new System.Drawing.Point(4, 22);
+            this.tabVols.Name = "tabVols";
+            this.tabVols.Padding = new System.Windows.Forms.Padding(3);
+            this.tabVols.Size = new System.Drawing.Size(1318, 679);
+            this.tabVols.TabIndex = 2;
+            this.tabVols.Text = "Settings";
+            this.tabVols.UseVisualStyleBackColor = true;
+            // 
+            // txBxAccount
+            // 
+            this.txBxAccount.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.txBxAccount.Location = new System.Drawing.Point(162, 152);
+            this.txBxAccount.Name = "txBxAccount";
+            this.txBxAccount.Size = new System.Drawing.Size(100, 20);
+            this.txBxAccount.TabIndex = 12;
+            // 
+            // label24
+            // 
+            this.label24.Location = new System.Drawing.Point(6, 152);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(150, 15);
+            this.label24.TabIndex = 41;
+            this.label24.Text = "Account";
+            // 
+            // txBxPosTableName
+            // 
+            this.txBxPosTableName.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.txBxPosTableName.Location = new System.Drawing.Point(162, 124);
+            this.txBxPosTableName.Name = "txBxPosTableName";
+            this.txBxPosTableName.Size = new System.Drawing.Size(100, 20);
+            this.txBxPosTableName.TabIndex = 11;
+            // 
+            // label23
+            // 
+            this.label23.Location = new System.Drawing.Point(6, 124);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(150, 15);
+            this.label23.TabIndex = 39;
+            this.label23.Text = "PositionTableName";
             // 
             // txBxStrStep
             // 
             this.txBxStrStep.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxStrStep.Location = new System.Drawing.Point(162, 155);
+            this.txBxStrStep.Location = new System.Drawing.Point(162, 206);
             this.txBxStrStep.Name = "txBxStrStep";
             this.txBxStrStep.Size = new System.Drawing.Size(100, 20);
-            this.txBxStrStep.TabIndex = 38;
+            this.txBxStrStep.TabIndex = 14;
             // 
             // label8
             // 
-            this.label8.Location = new System.Drawing.Point(6, 155);
+            this.label8.Location = new System.Drawing.Point(6, 206);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(150, 15);
             this.label8.TabIndex = 37;
@@ -435,14 +757,14 @@
             // txBxStrikesNumber
             // 
             this.txBxStrikesNumber.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxStrikesNumber.Location = new System.Drawing.Point(162, 182);
+            this.txBxStrikesNumber.Location = new System.Drawing.Point(162, 233);
             this.txBxStrikesNumber.Name = "txBxStrikesNumber";
             this.txBxStrikesNumber.Size = new System.Drawing.Size(100, 20);
-            this.txBxStrikesNumber.TabIndex = 36;
+            this.txBxStrikesNumber.TabIndex = 15;
             // 
             // label7
             // 
-            this.label7.Location = new System.Drawing.Point(6, 182);
+            this.label7.Location = new System.Drawing.Point(6, 233);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(150, 15);
             this.label7.TabIndex = 35;
@@ -473,74 +795,66 @@
             // txBxStepYValue
             // 
             this.txBxStepYValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxStepYValue.Location = new System.Drawing.Point(831, 124);
+            this.txBxStepYValue.Location = new System.Drawing.Point(847, 93);
             this.txBxStepYValue.Name = "txBxStepYValue";
             this.txBxStepYValue.Size = new System.Drawing.Size(100, 20);
-            this.txBxStepYValue.TabIndex = 32;
+            this.txBxStepYValue.TabIndex = 22;
             // 
             // txBxMaxYValue
             // 
             this.txBxMaxYValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxMaxYValue.Location = new System.Drawing.Point(831, 99);
+            this.txBxMaxYValue.Location = new System.Drawing.Point(847, 66);
             this.txBxMaxYValue.Name = "txBxMaxYValue";
             this.txBxMaxYValue.Size = new System.Drawing.Size(100, 20);
-            this.txBxMaxYValue.TabIndex = 31;
+            this.txBxMaxYValue.TabIndex = 21;
             // 
             // txBxMinYValue
             // 
             this.txBxMinYValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxMinYValue.Location = new System.Drawing.Point(831, 68);
+            this.txBxMinYValue.Location = new System.Drawing.Point(847, 38);
             this.txBxMinYValue.Name = "txBxMinYValue";
             this.txBxMinYValue.Size = new System.Drawing.Size(100, 20);
-            this.txBxMinYValue.TabIndex = 30;
-            // 
-            // txBxCentralStrChangeTimeSec
-            // 
-            this.txBxCentralStrChangeTimeSec.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxCentralStrChangeTimeSec.Location = new System.Drawing.Point(831, 39);
-            this.txBxCentralStrChangeTimeSec.Name = "txBxCentralStrChangeTimeSec";
-            this.txBxCentralStrChangeTimeSec.Size = new System.Drawing.Size(100, 20);
-            this.txBxCentralStrChangeTimeSec.TabIndex = 28;
+            this.txBxMinYValue.TabIndex = 20;
             // 
             // txBxMaxVolValue
             // 
             this.txBxMaxVolValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxMaxVolValue.Location = new System.Drawing.Point(493, 129);
+            this.txBxMaxVolValue.Location = new System.Drawing.Point(524, 127);
             this.txBxMaxVolValue.Name = "txBxMaxVolValue";
             this.txBxMaxVolValue.Size = new System.Drawing.Size(100, 20);
-            this.txBxMaxVolValue.TabIndex = 27;
+            this.txBxMaxVolValue.TabIndex = 19;
             // 
             // txBxRounding
             // 
             this.txBxRounding.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxRounding.Location = new System.Drawing.Point(493, 98);
+            this.txBxRounding.Location = new System.Drawing.Point(524, 96);
             this.txBxRounding.Name = "txBxRounding";
             this.txBxRounding.Size = new System.Drawing.Size(100, 20);
-            this.txBxRounding.TabIndex = 26;
+            this.txBxRounding.TabIndex = 18;
             // 
             // txBxDaysInYear
             // 
             this.txBxDaysInYear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxDaysInYear.Location = new System.Drawing.Point(493, 68);
+            this.txBxDaysInYear.Location = new System.Drawing.Point(524, 66);
             this.txBxDaysInYear.Name = "txBxDaysInYear";
             this.txBxDaysInYear.Size = new System.Drawing.Size(100, 20);
-            this.txBxDaysInYear.TabIndex = 25;
+            this.txBxDaysInYear.TabIndex = 17;
             // 
             // txBxNumberOfTrackOpt
             // 
             this.txBxNumberOfTrackOpt.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxNumberOfTrackOpt.Location = new System.Drawing.Point(493, 41);
+            this.txBxNumberOfTrackOpt.Location = new System.Drawing.Point(524, 39);
             this.txBxNumberOfTrackOpt.Name = "txBxNumberOfTrackOpt";
             this.txBxNumberOfTrackOpt.Size = new System.Drawing.Size(100, 20);
-            this.txBxNumberOfTrackOpt.TabIndex = 24;
+            this.txBxNumberOfTrackOpt.TabIndex = 16;
             // 
             // txBxUniqueIndx
             // 
             this.txBxUniqueIndx.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxUniqueIndx.Location = new System.Drawing.Point(162, 129);
+            this.txBxUniqueIndx.Location = new System.Drawing.Point(162, 180);
             this.txBxUniqueIndx.Name = "txBxUniqueIndx";
             this.txBxUniqueIndx.Size = new System.Drawing.Size(100, 20);
-            this.txBxUniqueIndx.TabIndex = 21;
+            this.txBxUniqueIndx.TabIndex = 13;
             // 
             // txBxOptTableName
             // 
@@ -548,7 +862,7 @@
             this.txBxOptTableName.Location = new System.Drawing.Point(162, 98);
             this.txBxOptTableName.Name = "txBxOptTableName";
             this.txBxOptTableName.Size = new System.Drawing.Size(100, 20);
-            this.txBxOptTableName.TabIndex = 20;
+            this.txBxOptTableName.TabIndex = 10;
             // 
             // txBxServName
             // 
@@ -556,7 +870,7 @@
             this.txBxServName.Location = new System.Drawing.Point(162, 44);
             this.txBxServName.Name = "txBxServName";
             this.txBxServName.Size = new System.Drawing.Size(100, 20);
-            this.txBxServName.TabIndex = 19;
+            this.txBxServName.TabIndex = 8;
             // 
             // txBxFutTableName
             // 
@@ -564,11 +878,11 @@
             this.txBxFutTableName.Location = new System.Drawing.Point(162, 71);
             this.txBxFutTableName.Name = "txBxFutTableName";
             this.txBxFutTableName.Size = new System.Drawing.Size(100, 20);
-            this.txBxFutTableName.TabIndex = 18;
+            this.txBxFutTableName.TabIndex = 9;
             // 
             // label18
             // 
-            this.label18.Location = new System.Drawing.Point(675, 68);
+            this.label18.Location = new System.Drawing.Point(691, 44);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(150, 15);
             this.label18.TabIndex = 17;
@@ -576,7 +890,7 @@
             // 
             // label17
             // 
-            this.label17.Location = new System.Drawing.Point(675, 99);
+            this.label17.Location = new System.Drawing.Point(691, 71);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(150, 15);
             this.label17.TabIndex = 16;
@@ -584,7 +898,7 @@
             // 
             // label16
             // 
-            this.label16.Location = new System.Drawing.Point(675, 129);
+            this.label16.Location = new System.Drawing.Point(691, 98);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(150, 15);
             this.label16.TabIndex = 15;
@@ -600,7 +914,7 @@
             // 
             // label13
             // 
-            this.label13.Location = new System.Drawing.Point(337, 98);
+            this.label13.Location = new System.Drawing.Point(368, 98);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(150, 15);
             this.label13.TabIndex = 12;
@@ -608,7 +922,7 @@
             // 
             // label12
             // 
-            this.label12.Location = new System.Drawing.Point(337, 129);
+            this.label12.Location = new System.Drawing.Point(368, 129);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(150, 15);
             this.label12.TabIndex = 11;
@@ -616,7 +930,7 @@
             // 
             // label11
             // 
-            this.label11.Location = new System.Drawing.Point(337, 71);
+            this.label11.Location = new System.Drawing.Point(368, 71);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(150, 15);
             this.label11.TabIndex = 10;
@@ -630,14 +944,6 @@
             this.label10.TabIndex = 9;
             this.label10.Text = "OPTIONS FEATURES";
             // 
-            // label9
-            // 
-            this.label9.Location = new System.Drawing.Point(675, 44);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(150, 15);
-            this.label9.TabIndex = 8;
-            this.label9.Text = "CentralStrikeChange(min sec.)";
-            // 
             // label6
             // 
             this.label6.Location = new System.Drawing.Point(706, 20);
@@ -648,7 +954,7 @@
             // 
             // label5
             // 
-            this.label5.Location = new System.Drawing.Point(6, 129);
+            this.label5.Location = new System.Drawing.Point(6, 180);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(150, 15);
             this.label5.TabIndex = 4;
@@ -656,7 +962,7 @@
             // 
             // label4
             // 
-            this.label4.Location = new System.Drawing.Point(337, 44);
+            this.label4.Location = new System.Drawing.Point(368, 44);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(150, 15);
             this.label4.TabIndex = 3;
@@ -733,15 +1039,18 @@
             this.tabSettings.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chrtPutVol)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtCallVol)).EndInit();
-            this.tabMain.ResumeLayout(false);
-            this.tabMain.PerformLayout();
+            this.tabOptDesk.ResumeLayout(false);
+            this.tabOptDesk.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTotalInfo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPos)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPositions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOptionDesk)).EndInit();
             this.tabs.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
+            this.tabActualPos.ResumeLayout(false);
+            this.tabActualPos.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvActualPos)).EndInit();
+            this.tabVols.ResumeLayout(false);
+            this.tabVols.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -752,13 +1061,13 @@
         #endregion
 
         private System.Windows.Forms.TabPage tabSettings;
-        private System.Windows.Forms.TabPage tabMain;
+        private System.Windows.Forms.TabPage tabOptDesk;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.DataGridView dgvOptionDesk;
         private System.Windows.Forms.TabControl tabs;
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtPutVol;
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtCallVol;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabVols;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStLbAsset;
         private System.Windows.Forms.ToolStripProgressBar toolStripPrBrConnection;
@@ -768,7 +1077,6 @@
         private System.Windows.Forms.TextBox txBxStepYValue;
         private System.Windows.Forms.TextBox txBxMaxYValue;
         private System.Windows.Forms.TextBox txBxMinYValue;
-        private System.Windows.Forms.TextBox txBxCentralStrChangeTimeSec;
         private System.Windows.Forms.TextBox txBxMaxVolValue;
         private System.Windows.Forms.TextBox txBxRounding;
         private System.Windows.Forms.TextBox txBxDaysInYear;
@@ -785,7 +1093,6 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
@@ -812,6 +1119,35 @@
         private System.Windows.Forms.Button btnRes;
         private System.Windows.Forms.TextBox txBxStrStep;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TabPage tabActualPos;
+        private System.Windows.Forms.CheckBox chkBxPriceHedgeLvls;
+        private System.Windows.Forms.TextBox txBxPriceHedgeLvls;
+        private System.Windows.Forms.CheckBox chkBxMaxFutQ;
+        private System.Windows.Forms.TextBox txBxMaxFutQ;
+        private System.Windows.Forms.CheckBox chkBxDeltaStep;
+        private System.Windows.Forms.TextBox txBxDeltaStep;
+        private System.Windows.Forms.Button btnLockPosTable;
+        private System.Windows.Forms.Button btnGetPosFromQuik;
+        private System.Windows.Forms.Button btnHandleHedge;
+        private System.Windows.Forms.DataGridView dgvActualPos;
+        private System.Windows.Forms.Button btnAutoHedge;
+        private System.Windows.Forms.Button btnSendToSimul;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox txBxClosePosIfTrackInstr;
+        private System.Windows.Forms.TextBox txBxClosePosIfSign;
+        private System.Windows.Forms.CheckBox chkBxClosePosIf;
+        private System.Windows.Forms.TextBox txBxClosePosIfPosForClosing;
+        private System.Windows.Forms.TextBox txBxClosePosIfPrice;
+        private System.Windows.Forms.Button btnCleanActPosRows;
+        private System.Windows.Forms.TextBox txBxAccount;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.TextBox txBxPosTableName;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Button btnOneTimUpdActPos;
+        private System.Windows.Forms.TextBox txBxClosePosIfPnL;
+        private System.Windows.Forms.CheckBox chkBxCloseIfPnL;
+        private System.Windows.Forms.CheckBox chkBxCloseIfPrice;
     }
 }
 

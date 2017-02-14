@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ServerName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">OTWserver</Value>
+      <Value Profile="(Default)">OTW</Value>
     </Setting>
     <Setting Name="FuturesTableName" Type="System.String" Scope="User">
       <Value Profile="(Default)">FUT</Value>
@@ -26,14 +26,11 @@
     <Setting Name="MaxValueOfImplVol" Type="System.Double" Scope="User">
       <Value Profile="(Default)">3</Value>
     </Setting>
-    <Setting Name="MinActualStrikeUpdateTimeSec" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10</Value>
-    </Setting>
     <Setting Name="ChartsMinYValue" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">-10</Value>
     </Setting>
     <Setting Name="ChartsMaxYValue" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">120</Value>
+      <Value Profile="(Default)">70</Value>
     </Setting>
     <Setting Name="ChartsStepYValue" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5</Value>
@@ -42,7 +39,55 @@
       <Value Profile="(Default)">70000</Value>
     </Setting>
     <Setting Name="StrikeStep" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1</Value>
+      <Value Profile="(Default)">250</Value>
+    </Setting>
+    <Setting Name="PositionTableName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">POS</Value>
+    </Setting>
+    <Setting Name="Account" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SPBFUT26WILL</Value>
+    </Setting>
+    <Setting Name="checkBoxMaxFutQ" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="checkBoxDeltaStep" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="checkBoxPriceLevels" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="checkBosClosePos" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="checkBoxPriceCon" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="checkBoxPnLCon" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="checkBoxMaxFutQValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="checkBoxDeltaStepValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="checkBoxPriceLevelsValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="checkBosCloseWhatPosWillBeCloseValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="checkBosCloseTrackingInstrValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="checkBoxPricePriceConSignValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="checkBoxPricePriceConValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="checkBoxPnLValue" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>
