@@ -4,16 +4,15 @@ using System.Text;
 using OptionsTradeWell.assistants;
 using OptionsTradeWell.model;
 using OptionsTradeWell.presenter.interfaces;
+using OptionsTradeWell.Properties;
 
 namespace OptionsTradeWell.presenter
 {
     public class QuikTransactionsImporter : ITerminalTransactionsImporter
     {
-        //make private in future!!!!!!!
-        public static string ACCOUNT = "";
-        public static string BASE_CONTRACT = "";
-        public static string TERMINAL_PATH = "";
         private static int transactionId = 0;
+        private string ACCOUNT = Settings.Default.Account;
+        private string TERMINAL_PATH = Settings.Default.PathToQuik;
 
         public QuikTransactionsImporter()
         {
@@ -213,7 +212,7 @@ namespace OptionsTradeWell.presenter
             return false;
         }
 
-        public bool CancelAllOrders(DerivativesClasses cls)
+        public bool CancelAllOrders(DerivativesClasses cls, string baseContract)
         {
             string derivativeClass = cls == DerivativesClasses.FUTURES
                 ? T2QParametres.CLASS_CODE_FUT
@@ -225,7 +224,7 @@ namespace OptionsTradeWell.presenter
                 "TRANS_ID=" + GetNewTransactionId(),
                 "CLASSCODE=" + derivativeClass,
                 "ACTION=" + T2QParametres.ACTION_CANCEL_ALL_ORDERS,
-                "BASE_CONTRACT=" + BASE_CONTRACT
+                "BASE_CONTRACT=" + baseContract
              });
 
             double result = -1;
@@ -314,6 +313,5 @@ namespace OptionsTradeWell.presenter
         {
             return ++transactionId;
         }
-
     }
 }

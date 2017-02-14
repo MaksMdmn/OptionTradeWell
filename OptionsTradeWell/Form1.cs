@@ -31,11 +31,10 @@ namespace OptionsTradeWell
         public event EventHandler OnTotalResetPositionInfoClick;
         public event EventHandler<PositionTableArgs> OnPosUpdateButtonClick;
         public event EventHandler<PositionTableArgs> OnActPosUpdateButtonClick;
-        //not implemented yet.
         public event EventHandler OnGetPosFromQuikClick;
         public event EventHandler<DeltaHedgeEventArgs> OnHandleHedgeClick;
         public event EventHandler<DeltaHedgeEventArgs> OnAutoHedgeClick;
-        //not implemented yet.
+
         private bool isPosUpdating;
         private bool isLockingActPosTableEnabled;
         private bool isAutoHedgeEnabled;
@@ -44,6 +43,7 @@ namespace OptionsTradeWell
         private PositionCloseConditionEventArgs actualPositionCloseConditionEventArgs;
 
         private SortedDictionary<double, OptionsTableRow> rowMap;
+
         private System.Timers.Timer statusBarReducingTimer;
 
         private DataTable optionsDataTable;
@@ -77,7 +77,7 @@ namespace OptionsTradeWell
 
             LOGGER.Info("Components initialized");
 
-            InitPrimarySettingsView();
+            LoadPrimarySettings();
 
             LOGGER.Info("Primary settings initialized");
 
@@ -101,7 +101,7 @@ namespace OptionsTradeWell
 
             LOGGER.Info("Charts initialized");
 
-            StartUpdateTimer();
+            StartUpdateTimersEvents();
 
             toolStripPrBrConnection.Value = 100;
 
@@ -135,25 +135,6 @@ namespace OptionsTradeWell
                this.toolStripPrBrConnection.Value = 100;
            }));
 
-        }
-
-        public void InitPrimarySettingsView()
-        {
-            txBxAccount.Text = Settings.Default.Account;
-            txBxPosTableName.Text = Settings.Default.PositionTableName;
-            txBxDaysInYear.Text = Settings.Default.DaysInYear.ToString();
-            txBxFutTableName.Text = Settings.Default.FuturesTableName;
-            txBxMaxVolValue.Text = Settings.Default.MaxValueOfImplVol.ToString();
-            txBxMaxYValue.Text = Settings.Default.ChartsMaxYValue.ToString();
-            txBxMinYValue.Text = Settings.Default.ChartsMinYValue.ToString();
-            txBxNumberOfTrackOpt.Text = Settings.Default.NumberOfTrackingOptions.ToString();
-            txBxOptTableName.Text = Settings.Default.OptionsTableName;
-            txBxStepYValue.Text = Settings.Default.ChartsStepYValue.ToString();
-            txBxServName.Text = Settings.Default.ServerName;
-            txBxUniqueIndx.Text = Settings.Default.UniqueIndexInDdeDataArray.ToString();
-            txBxRounding.Text = Settings.Default.RoundTo.ToString();
-            txBxStrikesNumber.Text = Settings.Default.MaxOptionStrikeInQuikDesk.ToString();
-            txBxStrStep.Text = Settings.Default.StrikeStep.ToString();
         }
 
         public void UpdateViewData(List<double[]> tableDataList)
@@ -832,7 +813,7 @@ namespace OptionsTradeWell
             chrtPos.Series.Add(zeroSeries);
         }
 
-        private void StartUpdateTimer()
+        private void StartUpdateTimersEvents()
         {
             statusBarReducingTimer.Elapsed += StatusBarReducingTimer_Elapsed;
             statusBarReducingTimer.Interval = 1000;
@@ -860,7 +841,7 @@ namespace OptionsTradeWell
                {
                    posDataTable.WriteXml(POS_SAVE_FILE_NAME);
                    PositionTableArgs args = new PositionTableArgs(GetPosTableArgs(posDataTable));
-                   CleanTableData(posDataTable);
+                   CleanDataTable(posDataTable);
 
                    if (OnPosUpdateButtonClick != null)
                    {
@@ -905,7 +886,7 @@ namespace OptionsTradeWell
             return result;
         }
 
-        private void CleanTableData(DataTable dataTable)
+        private void CleanDataTable(DataTable dataTable)
         {
             dataTable.Rows.Clear();
             //hardcore 30 row
@@ -928,23 +909,28 @@ namespace OptionsTradeWell
             }
         }
 
-        private void DgvAll_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        private void LoadPrimarySettings()
         {
-            UpdateMessageWindow(e.Exception.StackTrace);
-            UpdateMessageWindow(e.Exception.Message);
-
-            LOGGER.Error("Table: {0}, dataGridError event was activated: {1}", sender, e.Exception.ToString());
+            txBxAccount.Text = Settings.Default.Account;
+            txBxPosTableName.Text = Settings.Default.PositionTableName;
+            txBxDaysInYear.Text = Settings.Default.DaysInYear.ToString();
+            txBxFutTableName.Text = Settings.Default.FuturesTableName;
+            txBxMaxVolValue.Text = Settings.Default.MaxValueOfImplVol.ToString();
+            txBxMaxYValue.Text = Settings.Default.ChartsMaxYValue.ToString();
+            txBxMinYValue.Text = Settings.Default.ChartsMinYValue.ToString();
+            txBxNumberOfTrackOpt.Text = Settings.Default.NumberOfTrackingOptions.ToString();
+            txBxOptTableName.Text = Settings.Default.OptionsTableName;
+            txBxStepYValue.Text = Settings.Default.ChartsStepYValue.ToString();
+            txBxServName.Text = Settings.Default.ServerName;
+            txBxUniqueIndx.Text = Settings.Default.UniqueIndexInDdeDataArray.ToString();
+            txBxRounding.Text = Settings.Default.RoundTo.ToString();
+            txBxStrikesNumber.Text = Settings.Default.MaxOptionStrikeInQuikDesk.ToString();
+            txBxStrStep.Text = Settings.Default.StrikeStep.ToString();
+            txBxPathToQuik.Text = Settings.Default.PathToQuik.ToString();
         }
 
-        private void btnSetDefaultSettings_Click(object sender, EventArgs e)
+        private void SavePrimarySettings()
         {
-            LOGGER.Info("btnSetDefaultSettings_Click");
-            InitPrimarySettingsView();
-        }
-
-        private void btnSaveSettings_Click(object sender, EventArgs e)
-        {
-            LOGGER.Info("btnSaveSettings_Click");
             Settings.Default.Account = txBxAccount.Text;
             Settings.Default.PositionTableName = txBxPosTableName.Text;
             Settings.Default.DaysInYear = Convert.ToDouble(txBxDaysInYear.Text);
@@ -960,7 +946,28 @@ namespace OptionsTradeWell
             Settings.Default.RoundTo = Convert.ToInt32(txBxRounding.Text);
             Settings.Default.MaxOptionStrikeInQuikDesk = Convert.ToInt32(txBxStrikesNumber.Text);
             Settings.Default.StrikeStep = Convert.ToDouble(txBxStrStep.Text);
+            Settings.Default.PathToQuik = txBxPathToQuik.Text;
             Settings.Default.Save();
+        }
+
+        private void DgvAll_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            UpdateMessageWindow(e.Exception.StackTrace);
+            UpdateMessageWindow(e.Exception.Message);
+
+            LOGGER.Error("Table: {0}, dataGridError event was activated: {1}", sender, e.Exception.ToString());
+        }
+
+        private void btnSetDefaultSettings_Click(object sender, EventArgs e)
+        {
+            LOGGER.Info("btnSetDefaultSettings_Click");
+            LoadPrimarySettings();
+        }
+
+        private void btnSaveSettings_Click(object sender, EventArgs e)
+        {
+            LOGGER.Info("btnSaveSettings_Click");
+            SavePrimarySettings();
 
             if (OnSettingsInFormChanged != null)
             {
@@ -1120,7 +1127,7 @@ namespace OptionsTradeWell
 
             if (OnTotalResetPositionInfoClick != null)
             {
-                CleanTableData(posDataTable);
+                CleanDataTable(posDataTable);
                 OnTotalResetPositionInfoClick(sender, e);
             }
         }
@@ -1129,6 +1136,8 @@ namespace OptionsTradeWell
         private void btnGetPosFromQuik_Click(object sender, EventArgs e)
         {
             LOGGER.Info("btnGetPosFromQuik_Click");
+            CleanDataTable(actualPosDataTable);
+
             if (OnGetPosFromQuikClick != null)
             {
                 OnGetPosFromQuikClick(sender, e);
@@ -1144,7 +1153,7 @@ namespace OptionsTradeWell
 
             if (!isPosUpdating)
             {
-                CleanTableData(posDataTable);
+                CleanDataTable(posDataTable);
                 for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
                 {
                     for (int j = startCl; j <= endCl; j++)
@@ -1172,7 +1181,7 @@ namespace OptionsTradeWell
 
             actualPosDataTable.WriteXml(ACT_POS_SAVE_FILE_NAME);
             PositionTableArgs args = new PositionTableArgs(GetPosTableArgs(actualPosDataTable));
-            CleanTableData(actualPosDataTable);
+            CleanDataTable(actualPosDataTable);
 
             if (OnActPosUpdateButtonClick != null)
             {

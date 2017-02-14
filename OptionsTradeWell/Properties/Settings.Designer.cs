@@ -370,5 +370,17 @@ namespace OptionsTradeWell.Properties {
                 this["checkBoxPnLValue"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PathToQuik {
+            get {
+                return ((string)(this["PathToQuik"]));
+            }
+            set {
+                this["PathToQuik"] = value;
+            }
+        }
     }
 }

@@ -120,6 +120,8 @@
             this.toolStripStLbAsset = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStLbLastUpd = new System.Windows.Forms.ToolStripStatusLabel();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.txBxPathToQuik = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPutVol)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtCallVol)).BeginInit();
@@ -663,6 +665,8 @@
             // 
             // tabVols
             // 
+            this.tabVols.Controls.Add(this.txBxPathToQuik);
+            this.tabVols.Controls.Add(this.label9);
             this.tabVols.Controls.Add(this.txBxAccount);
             this.tabVols.Controls.Add(this.label24);
             this.tabVols.Controls.Add(this.txBxPosTableName);
@@ -1027,6 +1031,22 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
+            // txBxPathToQuik
+            // 
+            this.txBxPathToQuik.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.txBxPathToQuik.Location = new System.Drawing.Point(162, 259);
+            this.txBxPathToQuik.Name = "txBxPathToQuik";
+            this.txBxPathToQuik.Size = new System.Drawing.Size(100, 20);
+            this.txBxPathToQuik.TabIndex = 16;
+            // 
+            // label9
+            // 
+            this.label9.Location = new System.Drawing.Point(6, 259);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(150, 15);
+            this.label9.TabIndex = 43;
+            this.label9.Text = "PathToQuikFolder";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1148,6 +1168,8 @@
         private System.Windows.Forms.TextBox txBxClosePosIfPnL;
         private System.Windows.Forms.CheckBox chkBxCloseIfPnL;
         private System.Windows.Forms.CheckBox chkBxCloseIfPrice;
+        private System.Windows.Forms.TextBox txBxPathToQuik;
+        private System.Windows.Forms.Label label9;
     }
 }
 
