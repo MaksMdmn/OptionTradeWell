@@ -14,7 +14,7 @@ namespace OptionsTradeWell.model
 
         public static double CalculateDelta(OptionType type, double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
-            LOGGER.Debug("requested delta calculation with following args: type={0}, spotPrice={1}, strike={2}, daysLeft={3}, daysInYear={4}, vola={5}",
+            LOGGER.Trace("requested delta calculation with following args: type={0}, spotPrice={1}, strike={2}, daysLeft={3}, daysInYear={4}, vola={5}",
                 type, spotPrice, strike, daysLeft, daysInYear, vola);
             double result = 0d;
 
@@ -35,7 +35,7 @@ namespace OptionsTradeWell.model
 
         public static double CalculateDelta(OptionType type, double distr_d1)
         {
-            LOGGER.Debug("requested delta calculation with following args: type={0}, distr_d1={1}",
+            LOGGER.Trace("requested delta calculation with following args: type={0}, distr_d1={1}",
                 type, distr_d1);
             double result = 0d;
 
@@ -55,7 +55,7 @@ namespace OptionsTradeWell.model
 
         public static double CalculateGamma(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
-            LOGGER.Debug("requested gamma calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
+            LOGGER.Trace("requested gamma calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
                 spotPrice, strike, daysLeft, daysInYear, vola);
             double optionTime = daysLeft / daysInYear;
             double d1 = Calculate_d1(spotPrice, strike, daysLeft, daysInYear, vola);
@@ -65,14 +65,14 @@ namespace OptionsTradeWell.model
 
         public static double CalculateGamma(double spotPrice, double distr_d1, double optionTime, double vola)
         {
-            LOGGER.Debug("requested gamma calculation with following args: spotPrice={0}, distr_d1={1}, optionTime={2}, vola={3}",
+            LOGGER.Trace("requested gamma calculation with following args: spotPrice={0}, distr_d1={1}, optionTime={2}, vola={3}",
                 spotPrice, distr_d1, optionTime, vola);
             return GetRoundValue(distr_d1 / (spotPrice * vola * Math.Sqrt(optionTime)));
         }
 
         public static double CalculateVega(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
-            LOGGER.Debug("requested vega calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
+            LOGGER.Trace("requested vega calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
                 spotPrice, strike, daysLeft, daysInYear, vola);
             double optionTime = daysLeft / daysInYear;
             double d1 = Calculate_d1(spotPrice, strike, daysLeft, daysInYear, vola);
@@ -82,14 +82,14 @@ namespace OptionsTradeWell.model
 
         public static double CalculateVega(double spotPrice, double distr_d1, double optionTime)
         {
-            LOGGER.Debug("requested gamma calculation with following args: spotPrice={0}, distr_d1={1}, optionTime={2}",
+            LOGGER.Trace("requested gamma calculation with following args: spotPrice={0}, distr_d1={1}, optionTime={2}",
                 spotPrice, distr_d1, optionTime);
             return GetRoundValue((spotPrice * Math.Sqrt(optionTime) * distr_d1) / 100);
         }
 
         public static double CalculateTheta(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
-            LOGGER.Debug("requested theta calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
+            LOGGER.Trace("requested theta calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
                 spotPrice, strike, daysLeft, daysInYear, vola);
             double optionTime = daysLeft / daysInYear;
             double d1 = Calculate_d1(spotPrice, strike, daysLeft, daysInYear, vola);
@@ -99,14 +99,14 @@ namespace OptionsTradeWell.model
 
         public static double CalculateTheta(double spotPrice, double ditsr_d1, double daysInYear, double optionTime, double vola, bool overloadProblem_nvm)
         {
-            LOGGER.Debug("requested theta calculation (method with overload hardcore bool param) with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
+            LOGGER.Trace("requested theta calculation (method with overload hardcore bool param) with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
                 spotPrice, ditsr_d1, daysInYear, optionTime, vola);
             return GetRoundValue(-(spotPrice * vola * ditsr_d1) / (2 * Math.Sqrt(optionTime)) / daysInYear);
         }
 
         public static double CalculateOptionPrice_BS(OptionType type, double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
-            LOGGER.Debug("requested option price calculation with following args: type={0}, spotPrice={1}, strike={2}, daysLeft={3}, daysInYear={4}, vola={5}",
+            LOGGER.Trace("requested option price calculation with following args: type={0}, spotPrice={1}, strike={2}, daysLeft={3}, daysInYear={4}, vola={5}",
                 type, spotPrice, strike, daysLeft, daysInYear, vola);
             double d1 = 0.0;
             double d2 = 0.0;
@@ -132,7 +132,7 @@ namespace OptionsTradeWell.model
         }
         public static double Calculate_d1(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
-            LOGGER.Debug("requested d1 calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
+            LOGGER.Trace("requested d1 calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
                 spotPrice, strike, daysLeft, daysInYear, vola);
             double interestRate = 0.0;
             double optionTime = daysLeft / daysInYear;
@@ -143,7 +143,7 @@ namespace OptionsTradeWell.model
         }
         public static double Calculate_d2(double spotPrice, double strike, double daysLeft, double daysInYear, double vola)
         {
-            LOGGER.Debug("requested d1 calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
+            LOGGER.Trace("requested d1 calculation with following args: spotPrice={0}, strike={1}, daysLeft={2}, daysInYear={3}, vola={4}",
                 spotPrice, strike, daysLeft, daysInYear, vola);
             double optionTime = daysLeft / daysInYear;
 
@@ -151,7 +151,7 @@ namespace OptionsTradeWell.model
         }
         public static double CalculateDistributionOfStNrmDstr(double value)
         {
-            LOGGER.Debug("requested calculation of distribution of following value: {0}", value);
+            LOGGER.Trace("requested calculation of distribution of following value: {0}", value);
             double result;
 
             double L = 0.0;
@@ -181,14 +181,14 @@ namespace OptionsTradeWell.model
 
         public static double GreeksDistribution(double value)
         {
-            LOGGER.Debug("requested 'greeks' distribution of following value: {0}", value);
+            LOGGER.Trace("requested 'greeks' distribution of following value: {0}", value);
             double result = Math.Exp(value * value * 0.5 * -1) / (Math.Sqrt(2 * Math.PI));
             return result;
         }
 
         public static double CalculateImpliedVolatility(OptionType type, double spotPrice, double strike, double daysLeft, double daysInYear, double optionPrice, double volaGuess)
         {
-            LOGGER.Debug("requested implVolatility calculation with following args: type={0}, spotPrice={1}, strike={2}, daysLeft={3}, daysInYear={4}, optionPrice={5}, guess={6}",
+            LOGGER.Trace("requested implVolatility calculation with following args: type={0}, spotPrice={1}, strike={2}, daysLeft={3}, daysInYear={4}, optionPrice={5}, guess={6}",
                 type, spotPrice, strike, daysLeft, daysInYear, optionPrice, volaGuess);
             double dVol = 0.00001;
             double epsilon = 0.00001;
@@ -308,7 +308,7 @@ namespace OptionsTradeWell.model
 
         private static double GetRoundValue(double value)
         {
-            LOGGER.Debug("requested rounding of value: {0}, decimal places: {1}", value, NUMBER_OF_DECIMAL_PLACES);
+            LOGGER.Trace("requested rounding of value: {0}, decimal places: {1}", value, NUMBER_OF_DECIMAL_PLACES);
             return Math.Round(value, NUMBER_OF_DECIMAL_PLACES);
         }
 

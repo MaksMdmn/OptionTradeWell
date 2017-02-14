@@ -22,6 +22,7 @@ namespace OptionsTradeWell
         [STAThread]
         static void Main()
         {
+            LOGGER.Info("Program started.");
             try
             {
                 Application.EnableVisualStyles();
@@ -37,9 +38,10 @@ namespace OptionsTradeWell
             }
             catch (Exception e)
             {
-                LOGGER.Fatal("Main method exception, we are in a serious trouble: {0}", e.ToString());
+                LOGGER.Fatal("Program stopped. Main method exception, we are in a serious trouble, bud: {0}", e.ToString());
                 throw;
             }
+            LOGGER.Info("Program stopped (successfully).");
         }
 
     }

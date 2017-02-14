@@ -105,9 +105,10 @@ namespace OptionsTradeWell
 
             toolStripPrBrConnection.Value = 100;
 
-            dgvOptionDesk.DataError += DgvAll_DataError;
-            dgvPositions.DataError += DgvAll_DataError;
-            dgvTotalInfo.DataError += DgvAll_DataError;
+            dgvOptionDesk.DataError += DgvOptionDesk_DataError;
+            dgvPositions.DataError += DgvPositions_DataError;
+            dgvTotalInfo.DataError += DgvTotalInfo_DataError;
+            dgvActualPos.DataError += DgvActualPos_DataError;
 
             actualDeltaHedgeEventArgs = new DeltaHedgeEventArgs();
             actualPositionCloseConditionEventArgs = new PositionCloseConditionEventArgs();
@@ -141,7 +142,10 @@ namespace OptionsTradeWell
         {
             if (rowMap.Count == 0)
             {
-                FirstCreationOfDataMap(tableDataList);
+                lock (rowMap)
+                {
+                    FirstCreationOfDataMap(tableDataList);
+                }
             }
             else
             {
@@ -950,12 +954,59 @@ namespace OptionsTradeWell
             Settings.Default.Save();
         }
 
-        private void DgvAll_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        private void DgvOptionDesk_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            DgvGeneralActionsIfDataErrorHappened(dgvOptionDesk, e, "Option Desk");
+        }
+
+        private void DgvActualPos_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            DgvGeneralActionsIfDataErrorHappened(dgvActualPos, e, "Actual Position");
+
+        }
+
+        private void DgvTotalInfo_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            DgvGeneralActionsIfDataErrorHappened(dgvTotalInfo, e, "Total Info");
+
+        }
+
+        private void DgvPositions_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            DgvGeneralActionsIfDataErrorHappened(dgvPositions, e, "Positions in simulation");
+
+        }
+
+        private void DgvGeneralActionsIfDataErrorHappened(DataGridView dgv, DataGridViewDataErrorEventArgs e,
+            string dgvName)
         {
             UpdateMessageWindow(e.Exception.StackTrace);
             UpdateMessageWindow(e.Exception.Message);
 
-            LOGGER.Error("Table: {0}, dataGridError event was activated: {1}", sender, e.Exception.ToString());
+            LOGGER.Error("{0}: dataGridError event was activated: {1}, \n\r" +
+                         "Could be helpful that data: \n\r rowMap: {2}" +
+                         "\n\r dgv: {3}",
+                         dgvName,
+                         e.Exception.ToString(),
+                         string.Join(";", rowMap),
+                         DataGrivViewToStringRepresentation(dgv));
+        }
+
+        private string DataGrivViewToStringRepresentation(DataGridView dgv)
+        {
+            char delimiter = ';';
+            StringBuilder sb = new StringBuilder();
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    sb.Append(cell.Value);
+                    sb.Append(delimiter);
+                }
+                sb.Remove(sb.Length - 1, 1);
+                sb.AppendLine();
+            }
+            return sb.ToString();
         }
 
         private void btnSetDefaultSettings_Click(object sender, EventArgs e)

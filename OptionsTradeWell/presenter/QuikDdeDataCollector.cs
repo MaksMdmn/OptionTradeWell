@@ -186,7 +186,7 @@ namespace OptionsTradeWell.presenter
                 CheckConnectionFlags();
             }
 
-            //DDE ORDER IS: futures -> options
+            //DDE ORDER IS: futures -> options -> pos
             if (topic.Equals(FUTURES_DESK))
             {
                 if (GetBasicFutures() == null)

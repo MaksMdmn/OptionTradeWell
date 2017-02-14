@@ -80,6 +80,8 @@
             this.btnHandleHedge = new System.Windows.Forms.Button();
             this.dgvActualPos = new System.Windows.Forms.DataGridView();
             this.tabVols = new System.Windows.Forms.TabPage();
+            this.txBxPathToQuik = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.txBxAccount = new System.Windows.Forms.TextBox();
             this.label24 = new System.Windows.Forms.Label();
             this.txBxPosTableName = new System.Windows.Forms.TextBox();
@@ -120,8 +122,6 @@
             this.toolStripStLbAsset = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStLbLastUpd = new System.Windows.Forms.ToolStripStatusLabel();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.txBxPathToQuik = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.tabSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPutVol)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtCallVol)).BeginInit();
@@ -710,6 +710,22 @@
             this.tabVols.Text = "Settings";
             this.tabVols.UseVisualStyleBackColor = true;
             // 
+            // txBxPathToQuik
+            // 
+            this.txBxPathToQuik.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.txBxPathToQuik.Location = new System.Drawing.Point(162, 259);
+            this.txBxPathToQuik.Name = "txBxPathToQuik";
+            this.txBxPathToQuik.Size = new System.Drawing.Size(462, 20);
+            this.txBxPathToQuik.TabIndex = 16;
+            // 
+            // label9
+            // 
+            this.label9.Location = new System.Drawing.Point(6, 259);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(150, 15);
+            this.label9.TabIndex = 43;
+            this.label9.Text = "PathToQuikFolder";
+            // 
             // txBxAccount
             // 
             this.txBxAccount.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
@@ -1030,22 +1046,6 @@
             // 
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
-            // 
-            // txBxPathToQuik
-            // 
-            this.txBxPathToQuik.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.txBxPathToQuik.Location = new System.Drawing.Point(162, 259);
-            this.txBxPathToQuik.Name = "txBxPathToQuik";
-            this.txBxPathToQuik.Size = new System.Drawing.Size(100, 20);
-            this.txBxPathToQuik.TabIndex = 16;
-            // 
-            // label9
-            // 
-            this.label9.Location = new System.Drawing.Point(6, 259);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(150, 15);
-            this.label9.TabIndex = 43;
-            this.label9.Text = "PathToQuikFolder";
             // 
             // MainForm
             // 
