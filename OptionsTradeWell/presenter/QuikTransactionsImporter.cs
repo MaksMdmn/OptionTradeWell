@@ -11,15 +11,24 @@ namespace OptionsTradeWell.presenter
     public class QuikTransactionsImporter : ITerminalTransactionsImporter
     {
         private static int transactionId = 0;
-        private string ACCOUNT = Settings.Default.Account;
-        private string TERMINAL_PATH = Settings.Default.PathToQuik;
+        private string account = Settings.Default.Account;
+        private string terminalPath = Settings.Default.PathToQuik;
 
+        #region ITerminalTransactionsImporter_Implementation
         public QuikTransactionsImporter()
         {
-            OrderMap = new Dictionary<double, QuikOrder>();
+            OrderMap = new Dictionary<double, TerminalOrder>();
         }
 
-        public Dictionary<double, QuikOrder> OrderMap { get; }
+        public QuikTransactionsImporter(string account, string path)
+        {
+            this.account = account;
+            this.terminalPath = path;
+            OrderMap = new Dictionary<double, TerminalOrder>();
+        }
+
+
+        public Dictionary<double, TerminalOrder> OrderMap { get; }
 
         public bool ConnectToTerminal()
         {
@@ -43,7 +52,7 @@ namespace OptionsTradeWell.presenter
 
             string inputParams = GetTransactionsInputParams(new string[]
             {
-                "ACCOUNT=" + ACCOUNT,
+                "ACCOUNT=" + account,
                 "TRANS_ID=" + GetNewTransactionId(),
                 "CLASSCODE=" + derivativeClass,
                 "SECCODE=" + ticker,
@@ -56,8 +65,8 @@ namespace OptionsTradeWell.presenter
 
             double result = SendSyncTransactionToQuik(inputParams);
 
-            QuikOrder tempOrder = new QuikOrder(result, ticker, QuikOrderType.LIMIT, QuikOrderOperation.BUY, price, size);
-            tempOrder.OrderStatus = QuikOrderStatus.ACTIVE;
+            TerminalOrder tempOrder = new TerminalOrder(result, ticker, TerminalOrderType.LIMIT, TerminalOrderOperation.BUY,
+                price, size, TerminalOrderStatus.ACTIVE);
             tempOrder.CreationTime = DateTime.Now;
 
             OrderMap.Add(result, tempOrder);
@@ -71,7 +80,7 @@ namespace OptionsTradeWell.presenter
 
             string inputParams = GetTransactionsInputParams(new string[]
             {
-                "ACCOUNT=" + ACCOUNT,
+                "ACCOUNT=" + account,
                 "TRANS_ID=" + GetNewTransactionId(),
                 "CLASSCODE=" + derivativeClass,
                 "SECCODE=" + ticker,
@@ -84,8 +93,8 @@ namespace OptionsTradeWell.presenter
 
             double result = SendSyncTransactionToQuik(inputParams);
 
-            QuikOrder tempOrder = new QuikOrder(result, ticker, QuikOrderType.LIMIT, QuikOrderOperation.SELL, price, size);
-            tempOrder.OrderStatus = QuikOrderStatus.ACTIVE;
+            TerminalOrder tempOrder = new TerminalOrder(result, ticker, TerminalOrderType.LIMIT, TerminalOrderOperation.SELL,
+                price, size, TerminalOrderStatus.ACTIVE);
             tempOrder.CreationTime = DateTime.Now;
 
             OrderMap.Add(result, tempOrder);
@@ -95,7 +104,7 @@ namespace OptionsTradeWell.presenter
 
         public double RollLimitOrder(double id, double price, int size)
         {
-            QuikOrder existingOrder;
+            TerminalOrder existingOrder;
             if (!OrderMap.TryGetValue(id, out existingOrder))
             {
                 throw new NotImplementedException();
@@ -118,11 +127,11 @@ namespace OptionsTradeWell.presenter
             double result = SendSyncTransactionToQuik(inputParams);
 
             existingOrder.LastTime = DateTime.Now;
-            existingOrder.OrderStatus = QuikOrderStatus.CANCELED;
+            existingOrder.OrderStatus = TerminalOrderStatus.CANCELED;
             //AND IF IT WAS EXECUTED?
 
-            QuikOrder tempOrder = new QuikOrder(result, existingOrder.Ticker, QuikOrderType.LIMIT, QuikOrderOperation.SELL, price, size);
-            tempOrder.OrderStatus = QuikOrderStatus.ACTIVE;
+            TerminalOrder tempOrder = new TerminalOrder(result, existingOrder.Ticker, TerminalOrderType.LIMIT, TerminalOrderOperation.SELL,
+                price, size, TerminalOrderStatus.ACTIVE);
             tempOrder.CreationTime = DateTime.Now;
 
             OrderMap.Add(result, tempOrder);
@@ -136,7 +145,7 @@ namespace OptionsTradeWell.presenter
 
             string inputParams = GetTransactionsInputParams(new string[]
             {
-                "ACCOUNT=" + ACCOUNT,
+                "ACCOUNT=" + account,
                 "TRANS_ID=" + GetNewTransactionId(),
                 "CLASSCODE=" + derivativeClass,
                 "SECCODE=" + ticker,
@@ -149,8 +158,8 @@ namespace OptionsTradeWell.presenter
 
             double result = SendSyncTransactionToQuik(inputParams);
 
-            QuikOrder tempOrder = new QuikOrder(result, ticker, QuikOrderType.MARKET, QuikOrderOperation.BUY, 0.0, size);
-            tempOrder.OrderStatus = QuikOrderStatus.EXECUTED;
+            TerminalOrder tempOrder = new TerminalOrder(result, ticker, TerminalOrderType.MARKET, TerminalOrderOperation.BUY,
+                0.0, size, TerminalOrderStatus.EXECUTED);
             tempOrder.CreationTime = DateTime.Now;
             tempOrder.LastTime = DateTime.Now;
 
@@ -165,7 +174,7 @@ namespace OptionsTradeWell.presenter
 
             string inputParams = GetTransactionsInputParams(new string[]
             {
-                "ACCOUNT=" + ACCOUNT,
+                "ACCOUNT=" + account,
                 "TRANS_ID=" + GetNewTransactionId(),
                 "CLASSCODE=" + derivativeClass,
                 "SECCODE=" + ticker,
@@ -178,8 +187,8 @@ namespace OptionsTradeWell.presenter
 
             double result = SendSyncTransactionToQuik(inputParams);
 
-            QuikOrder tempOrder = new QuikOrder(result, ticker, QuikOrderType.MARKET, QuikOrderOperation.SELL, 0.0, size);
-            tempOrder.OrderStatus = QuikOrderStatus.EXECUTED;
+            TerminalOrder tempOrder = new TerminalOrder(result, ticker, TerminalOrderType.MARKET, TerminalOrderOperation.SELL,
+                0.0, size, TerminalOrderStatus.EXECUTED);
             tempOrder.CreationTime = DateTime.Now;
             tempOrder.LastTime = DateTime.Now;
 
@@ -204,7 +213,7 @@ namespace OptionsTradeWell.presenter
             if (result != -1)
             {
                 OrderMap[id].LastTime = DateTime.Now;
-                OrderMap[id].OrderStatus = QuikOrderStatus.CANCELED;
+                OrderMap[id].OrderStatus = TerminalOrderStatus.CANCELED;
 
                 return true;
             }
@@ -212,7 +221,7 @@ namespace OptionsTradeWell.presenter
             return false;
         }
 
-        public bool CancelAllOrders(DerivativesClasses cls, string baseContract)
+        public bool CancelGroupOfOrders(DerivativesClasses cls, string baseContract)
         {
             string derivativeClass = cls == DerivativesClasses.FUTURES
                 ? T2QParametres.CLASS_CODE_FUT
@@ -220,7 +229,7 @@ namespace OptionsTradeWell.presenter
 
             string inputParams = GetTransactionsInputParams(new string[]
              {
-                "ACCOUNT=" + ACCOUNT,
+                "ACCOUNT=" + account,
                 "TRANS_ID=" + GetNewTransactionId(),
                 "CLASSCODE=" + derivativeClass,
                 "ACTION=" + T2QParametres.ACTION_CANCEL_ALL_ORDERS,
@@ -232,10 +241,10 @@ namespace OptionsTradeWell.presenter
 
             if (result != -1)
             {
-                foreach (QuikOrder order in OrderMap.Values)
+                foreach (TerminalOrder order in OrderMap.Values)
                 {
                     order.LastTime = DateTime.Now;
-                    order.OrderStatus = QuikOrderStatus.CANCELED;
+                    order.OrderStatus = TerminalOrderStatus.CANCELED;
                 }
 
                 return true;
@@ -244,6 +253,14 @@ namespace OptionsTradeWell.presenter
             return false;
         }
 
+        public bool CancelAllOrders()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+
+        #region TRANS2QUIK_DDL_Implementation
         private double SendSyncTransactionToQuik(string inputParams)
         {
             int errCode;
@@ -265,6 +282,17 @@ namespace OptionsTradeWell.presenter
             //}
 
 
+            Console.WriteLine();
+            Console.WriteLine("QUIK MESSAGE BEGINS");
+            Console.WriteLine("error code: " + errCode);
+            Console.WriteLine("reply code: " + replCode);
+            Console.WriteLine("trans id: " + transID);
+            Console.WriteLine("order id: " + orderNum);
+            Console.WriteLine("status message: " + statusStringBuilder);
+            Console.WriteLine("error message: " + errorMessageBuilder);
+            Console.WriteLine("QUIK MESSAGE ENDS");
+            Console.WriteLine();
+
             return orderNum;
         }
 
@@ -272,7 +300,7 @@ namespace OptionsTradeWell.presenter
         {
             int errCode;
             StringBuilder errorMessageBuilder = new StringBuilder(512);
-            return T2Q.TRANS2QUIK_CONNECT(TERMINAL_PATH, out errCode, errorMessageBuilder, 512) == 0;
+            return T2Q.TRANS2QUIK_CONNECT(terminalPath, out errCode, errorMessageBuilder, 512) == 0;
         }
 
         private bool BreakConnectionToQuik()
@@ -312,6 +340,89 @@ namespace OptionsTradeWell.presenter
         private int GetNewTransactionId()
         {
             return ++transactionId;
+        }
+
+        public double TestSubscribeOrders(string classCode, string secCode)
+        {
+            return T2Q.TRANS2QUIK_SUBSCRIBE_ORDERS(classCode, secCode);
+        }
+
+        public double TestStartGetOrders()
+        {
+            return T2Q.TRANS2QUIK_START_ORDERS(OrdersCallBack);
+        }
+
+        public double TestUnsubscribeOrders()
+        {
+            return T2Q.TRANS2QUIK_UNSUBSCRIBE_ORDERS();
+        }
+
+
+        public double TestSubscribeTrades(string classCode, string secCode)
+        {
+            return T2Q.TRANS2QUIK_SUBSCRIBE_TRADES(classCode, secCode);
+        }
+
+        public double TestStartGetTrades()
+        {
+            return T2Q.TRANS2QUIK_START_TRADES(TradesCallBack);
+        }
+
+        public double TestUnsubscribeTrades()
+        {
+            return T2Q.TRANS2QUIK_UNSUBSCRIBE_TRADES();
+        }
+
+        private void OrdersCallBack(int nmode, uint dwtransid, double dnumber, string lpstrclasscode, string lpstrseccode, 
+            double dprice, long nbalance, double dvalue, int nlssell, int nstatus)
+        {
+            Console.WriteLine("ORDERS UPDATE:");
+            Console.WriteLine("nmode: " + nmode);
+            Console.WriteLine("dwtransid: " + dwtransid);
+            Console.WriteLine("dnumber: " + dnumber);
+            Console.WriteLine("lpstrclasscode: " + lpstrclasscode);
+            Console.WriteLine("lpstrseccode: " + lpstrseccode);
+            Console.WriteLine("dprice: " + dprice);
+            Console.WriteLine("nbalance: " + nbalance);
+            Console.WriteLine("dvalue: " + dvalue);
+            Console.WriteLine("nlssell: " + nlssell);
+            Console.WriteLine("nstatus: " + nstatus);
+            Console.WriteLine("ORDERS UPDATE END");
+            Console.WriteLine();
+
+        }
+
+        private void TradesCallBack(int nmode, double dnumber, double dordernum, string lpstrclasscode, string lpstrseccode,
+            double dprice, Int64 nqty, double dvalue, int nlssell)
+        {
+            Console.WriteLine("TRADES UPDATE:");
+            Console.WriteLine("nmode: " + nmode);
+            Console.WriteLine("dnumber: " + dnumber);
+            Console.WriteLine("dordernum: " + dordernum);
+            Console.WriteLine("lpstrclasscode: " + lpstrclasscode);
+            Console.WriteLine("lpstrseccode: " + lpstrseccode);
+            Console.WriteLine("dprice: " + dprice);
+            Console.WriteLine("nqty: " + nqty);
+            Console.WriteLine("dvalue: " + dvalue);
+            Console.WriteLine("nlssell: " + nlssell);
+            Console.WriteLine("TRADES UPDATE END");
+            Console.WriteLine();
+
+        }
+
+
+        #endregion
+
+        private void UpdateOrderMap(TerminalOrder order)
+        {
+            if (OrderMap.ContainsKey(order.Id))
+            {
+                OrderMap[order.Id] = order;
+            }
+            else
+            {
+                OrderMap.Add(order.Id, order);
+            }
         }
     }
 }

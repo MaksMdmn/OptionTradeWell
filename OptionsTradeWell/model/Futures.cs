@@ -35,6 +35,11 @@ namespace OptionsTradeWell.model
 
         public string BaseContract { get; set; }
 
+        public double MinPriceLimit { get; set; }
+
+        public double MaxPriceLimit { get; set; }
+
+
         public static Futures GetFakeFutures(double enterFutPrice, int futPosition, TradeBlotter blotter, double priceStep, double priceVal)
         {
             Futures fut = new Futures("", DateTime.Now, 0.0, 0.0, priceStep, priceVal);
@@ -70,5 +75,6 @@ namespace OptionsTradeWell.model
         {
             return this.blotter;
         }
+
     }
 }

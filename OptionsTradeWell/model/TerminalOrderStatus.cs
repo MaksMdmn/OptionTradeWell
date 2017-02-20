@@ -1,6 +1,6 @@
 ﻿namespace OptionsTradeWell.model
 {
-    public enum QuikOrderStatus
+    public enum TerminalOrderStatus
     {
         ACTIVE,
         EXECUTED,

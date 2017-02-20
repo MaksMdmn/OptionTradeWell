@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using OptionsTradeWell.model;
+using OptionsTradeWell.Properties;
 
-namespace OptionsTradeWell.presenter
+namespace OptionsTradeWell.model
 {
     public class PositionManager
     {

@@ -1,6 +1,6 @@
 ﻿namespace OptionsTradeWell.model
 {
-    public enum QuikOrderOperation
+    public enum TerminalOrderOperation
     {
         BUY,
         SELL

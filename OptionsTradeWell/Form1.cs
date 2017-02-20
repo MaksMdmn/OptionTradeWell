@@ -21,8 +21,8 @@ namespace OptionsTradeWell
         public static double maxValueY = Settings.Default.ChartsMaxYValue;
         public static double stepY = Settings.Default.ChartsStepYValue;
 
-        private static int NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE = 30;
-        private static string POS_SAVE_FILE_NAME = "posData.xml";
+        private static int NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE = 30;
+        private static string SIMUL_POS_SAVE_FILE_NAME = "simulPosData.xml";
         private static string ACT_POS_SAVE_FILE_NAME = "actPosData.xml";
         private static Logger LOGGER = LogManager.GetCurrentClassLogger();
 
@@ -47,7 +47,7 @@ namespace OptionsTradeWell
         private System.Timers.Timer statusBarReducingTimer;
 
         private DataTable optionsDataTable;
-        private DataTable posDataTable;
+        private DataTable simulationPosDataTable;
         private DataTable actualPosDataTable;
 
         private string[] totalInfoNames;
@@ -85,9 +85,9 @@ namespace OptionsTradeWell
 
             LOGGER.Info("OptionsDataTable initialized");
 
-            InitializePosDataTable();
+            InitializeSimulationPosDataTable();
 
-            LOGGER.Info("PositionDataTable initialized");
+            LOGGER.Info("SimulationPositionDataTable initialized");
 
             InitializeActualPosDataTable();
 
@@ -106,7 +106,7 @@ namespace OptionsTradeWell
             toolStripPrBrConnection.Value = 100;
 
             dgvOptionDesk.DataError += DgvOptionDesk_DataError;
-            dgvPositions.DataError += DgvPositions_DataError;
+            dgvSimulPos.DataError += DgvSimulPosDataError;
             dgvTotalInfo.DataError += DgvTotalInfo_DataError;
             dgvActualPos.DataError += DgvActualPos_DataError;
 
@@ -153,9 +153,9 @@ namespace OptionsTradeWell
             }
         }
 
-        public void UpdatePositionTableData(List<string[]> tableDataList)
+        public void UpdateSimulationPositionTableData(List<string[]> tableDataList)
         {
-            FulfilDataTable(posDataTable, tableDataList);
+            FulfilDataTable(simulationPosDataTable, tableDataList);
         }
 
         public void UpdateActualPositionTableData(List<string[]> tableDataList)
@@ -498,10 +498,10 @@ namespace OptionsTradeWell
             dgvOptionDesk.ScrollBars = ScrollBars.Vertical;
         }
 
-        private void InitializePosDataTable()
+        private void InitializeSimulationPosDataTable()
         {
-            posDataTable = new DataTable();
-            posDataTable.TableName = "posDataTable";
+            simulationPosDataTable = new DataTable();
+            simulationPosDataTable.TableName = "simulationPosDataTable";
 
             List<string> columnsNames = new List<string>()
             {
@@ -521,48 +521,48 @@ namespace OptionsTradeWell
 
             for (int i = 0; i < columnsNames.Count; i++)
             {
-                posDataTable.Columns.Add(columnsNames[i]);
+                simulationPosDataTable.Columns.Add(columnsNames[i]);
             }
 
-            if (File.Exists(POS_SAVE_FILE_NAME))
+            if (File.Exists(SIMUL_POS_SAVE_FILE_NAME))
             {
-                posDataTable.ReadXml(POS_SAVE_FILE_NAME);
+                simulationPosDataTable.ReadXml(SIMUL_POS_SAVE_FILE_NAME);
             }
             else
             {
                 //hardcore 30 row
-                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE; i++)
                 {
-                    posDataTable.Rows.Add();
+                    simulationPosDataTable.Rows.Add();
                 }
             }
 
 
-            dgvPositions.DataSource = posDataTable;
+            dgvSimulPos.DataSource = simulationPosDataTable;
 
             for (int i = 0; i < columnsNames.Count; i++)
             {
-                dgvPositions.Columns[i].HeaderText = columnsNames[i];
-                dgvPositions.Columns[i].Width = 60;
-                dgvPositions.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
-                dgvPositions.Columns[i].ReadOnly = false;
-                dgvPositions.Columns[i].Resizable = DataGridViewTriState.False;
+                dgvSimulPos.Columns[i].HeaderText = columnsNames[i];
+                dgvSimulPos.Columns[i].Width = 60;
+                dgvSimulPos.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+                dgvSimulPos.Columns[i].ReadOnly = false;
+                dgvSimulPos.Columns[i].Resizable = DataGridViewTriState.False;
             }
-            dgvPositions.MultiSelect = true;
-            dgvPositions.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
-            dgvPositions.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dgvPositions.CellBorderStyle = DataGridViewCellBorderStyle.Single;
-            dgvPositions.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-            dgvPositions.RowsDefaultCellStyle.SelectionBackColor = System.Drawing.Color.Aquamarine;
-            dgvPositions.RowsDefaultCellStyle.SelectionForeColor = System.Drawing.Color.Black;
-            dgvPositions.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.BottomCenter;
-            dgvPositions.AllowUserToDeleteRows = false;
-            dgvPositions.AllowUserToAddRows = false;
+            dgvSimulPos.MultiSelect = true;
+            dgvSimulPos.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCellsExceptHeaders;
+            dgvSimulPos.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+            dgvSimulPos.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+            dgvSimulPos.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dgvSimulPos.RowsDefaultCellStyle.SelectionBackColor = System.Drawing.Color.Aquamarine;
+            dgvSimulPos.RowsDefaultCellStyle.SelectionForeColor = System.Drawing.Color.Black;
+            dgvSimulPos.RowsDefaultCellStyle.Alignment = DataGridViewContentAlignment.BottomCenter;
+            dgvSimulPos.AllowUserToDeleteRows = false;
+            dgvSimulPos.AllowUserToAddRows = false;
 
-            dgvPositions.Height = 310;
-            dgvPositions.Width = 590;
+            dgvSimulPos.Height = 310;
+            dgvSimulPos.Width = 590;
 
-            dgvPositions.ScrollBars = ScrollBars.Both;
+            dgvSimulPos.ScrollBars = ScrollBars.Both;
         }
 
         private void InitializeActualPosDataTable()
@@ -596,7 +596,7 @@ namespace OptionsTradeWell
             else
             {
                 //hardcore 30 row
-                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE; i++)
                 {
                     actualPosDataTable.Rows.Add();
                 }
@@ -661,7 +661,8 @@ namespace OptionsTradeWell
                 "delta:",
                 "gamma:",
                 "vega:",
-                "theta:"
+                "theta:",
+                "MY_GO:"
             };
 
             dgvTotalInfo[0, 0].Value = "TOTAL";
@@ -843,9 +844,8 @@ namespace OptionsTradeWell
 
                if (isPosUpdating)
                {
-                   posDataTable.WriteXml(POS_SAVE_FILE_NAME);
-                   PositionTableArgs args = new PositionTableArgs(GetPosTableArgs(posDataTable));
-                   CleanDataTable(posDataTable);
+                   PositionTableArgs args = new PositionTableArgs(GetPosTableArgs(simulationPosDataTable));
+                   CleanDataTable(simulationPosDataTable);
 
                    if (OnPosUpdateButtonClick != null)
                    {
@@ -860,7 +860,7 @@ namespace OptionsTradeWell
         {
             List<string[]> result = new List<string[]>();
 
-            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE; i++)
             {
                 string[] tempArgs = new string[4];
                 tempArgs[0] = dataTable.Rows[i]["Type"].ToString().ToUpper();
@@ -894,7 +894,7 @@ namespace OptionsTradeWell
         {
             dataTable.Rows.Clear();
             //hardcore 30 row
-            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE; i++)
             {
                 dataTable.Rows.Add();
             }
@@ -971,9 +971,9 @@ namespace OptionsTradeWell
 
         }
 
-        private void DgvPositions_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        private void DgvSimulPosDataError(object sender, DataGridViewDataErrorEventArgs e)
         {
-            DgvGeneralActionsIfDataErrorHappened(dgvPositions, e, "Positions in simulation");
+            DgvGeneralActionsIfDataErrorHappened(dgvSimulPos, e, "Positions in simulation");
 
         }
 
@@ -984,12 +984,28 @@ namespace OptionsTradeWell
             UpdateMessageWindow(e.Exception.Message);
 
             LOGGER.Error("{0}: dataGridError event was activated: {1}, \n\r" +
-                         "Could be helpful that data: \n\r rowMap: {2}" +
-                         "\n\r dgv: {3}",
+                         "Could be helpful that data: \n\r ---rowMap---\n\r{2}\n\r" +
+                         "---dgv---\n\r{3}",
                          dgvName,
                          e.Exception.ToString(),
-                         string.Join(";", rowMap),
+                         RowMapToStringRepresentation(rowMap),
                          DataGrivViewToStringRepresentation(dgv));
+        }
+
+        private string RowMapToStringRepresentation(SortedDictionary<double, OptionsTableRow> map)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (KeyValuePair<double, OptionsTableRow> pair in map)
+            {
+                sb.Append("key: ");
+                sb.Append(pair.Key);
+                sb.Append(" value: ");
+                sb.Append(pair.Value.ToString());
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
         }
 
         private string DataGrivViewToStringRepresentation(DataGridView dgv)
@@ -1052,12 +1068,24 @@ namespace OptionsTradeWell
                 btnUpdatePos.BackColor = Color.DarkSlateGray;
                 btnUpdatePos.ForeColor = Color.WhiteSmoke;
                 btnUpdatePos.Text = "updating...";
+
+                for (int i = 0; i < dgvSimulPos.Rows.Count; i++)
+                {
+                    dgvSimulPos.Rows[i].ReadOnly = true;
+                }
+
+                simulationPosDataTable.WriteXml(SIMUL_POS_SAVE_FILE_NAME);
             }
             else
             {
                 btnUpdatePos.BackColor = Color.Gainsboro;
                 btnUpdatePos.ForeColor = Color.Black;
                 btnUpdatePos.Text = "update";
+
+                for (int i = 0; i < dgvSimulPos.Rows.Count; i++)
+                {
+                    dgvSimulPos.Rows[i].ReadOnly = false;
+                }
             }
 
             btnCleanSelected.Enabled = !isPosUpdating;
@@ -1118,14 +1146,14 @@ namespace OptionsTradeWell
                 return;
             }
 
-            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE; i++)
             {
-                if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
+                if (Convert.ToString(dgvSimulPos[0, i].Value).Equals(""))
                 {
-                    dgvPositions[0, i].Value = type;
-                    dgvPositions[1, i].Value = strike;
-                    dgvPositions[2, i].Value = price;
-                    dgvPositions[3, i].Value = number;
+                    dgvSimulPos[0, i].Value = type;
+                    dgvSimulPos[1, i].Value = strike;
+                    dgvSimulPos[2, i].Value = price;
+                    dgvSimulPos[3, i].Value = number;
                     break;
                 }
             }
@@ -1135,21 +1163,21 @@ namespace OptionsTradeWell
         {
             LOGGER.Info("btnCleanSelected_Click");
 
-            CleanRowsInTable(posDataTable, dgvPositions);
+            CleanRowsInTable(simulationPosDataTable, dgvSimulPos);
         }
 
         private void btnPlusOneFut_Click(object sender, EventArgs e)
         {
             LOGGER.Info("btnPlusOneFut_Click");
 
-            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE; i++)
             {
-                if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
+                if (Convert.ToString(dgvSimulPos[0, i].Value).Equals(""))
                 {
-                    dgvPositions[0, i].Value = "F";
-                    dgvPositions[1, i].Value = "";
-                    dgvPositions[2, i].Value = lblSpotPrice.Text;
-                    dgvPositions[3, i].Value = "1";
+                    dgvSimulPos[0, i].Value = "F";
+                    dgvSimulPos[1, i].Value = "";
+                    dgvSimulPos[2, i].Value = lblSpotPrice.Text;
+                    dgvSimulPos[3, i].Value = "1";
                     break;
                 }
             }
@@ -1159,14 +1187,14 @@ namespace OptionsTradeWell
         {
             LOGGER.Info("btnMinusOneFut_Click");
 
-            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+            for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE; i++)
             {
-                if (Convert.ToString(dgvPositions[0, i].Value).Equals(""))
+                if (Convert.ToString(dgvSimulPos[0, i].Value).Equals(""))
                 {
-                    dgvPositions[0, i].Value = "F";
-                    dgvPositions[1, i].Value = "";
-                    dgvPositions[2, i].Value = lblSpotPrice.Text;
-                    dgvPositions[3, i].Value = "-1";
+                    dgvSimulPos[0, i].Value = "F";
+                    dgvSimulPos[1, i].Value = "";
+                    dgvSimulPos[2, i].Value = lblSpotPrice.Text;
+                    dgvSimulPos[3, i].Value = "-1";
                     break;
                 }
             }
@@ -1178,9 +1206,11 @@ namespace OptionsTradeWell
 
             if (OnTotalResetPositionInfoClick != null)
             {
-                CleanDataTable(posDataTable);
+                CleanDataTable(simulationPosDataTable);
                 OnTotalResetPositionInfoClick(sender, e);
             }
+
+            simulationPosDataTable.WriteXml(SIMUL_POS_SAVE_FILE_NAME);
         }
 
 
@@ -1204,12 +1234,12 @@ namespace OptionsTradeWell
 
             if (!isPosUpdating)
             {
-                CleanDataTable(posDataTable);
-                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLEs_HARDCORE; i++)
+                CleanDataTable(simulationPosDataTable);
+                for (int i = 0; i < NUMBER_OF_ROWS_IN_ALL_POS_TABLES_HARDCORE; i++)
                 {
                     for (int j = startCl; j <= endCl; j++)
                     {
-                        posDataTable.Rows[i][j] = actualPosDataTable.Rows[i][j];
+                        simulationPosDataTable.Rows[i][j] = actualPosDataTable.Rows[i][j];
                     }
                 }
             }
@@ -1230,7 +1260,6 @@ namespace OptionsTradeWell
         {
             LOGGER.Info("btnOneTimUpdActPos_Click");
 
-            actualPosDataTable.WriteXml(ACT_POS_SAVE_FILE_NAME);
             PositionTableArgs args = new PositionTableArgs(GetPosTableArgs(actualPosDataTable));
             CleanDataTable(actualPosDataTable);
 
@@ -1238,6 +1267,8 @@ namespace OptionsTradeWell
             {
                 OnActPosUpdateButtonClick(sender, args);
             }
+
+            actualPosDataTable.WriteXml(ACT_POS_SAVE_FILE_NAME);
         }
 
         private void btnLockPosTable_Click(object sender, EventArgs e)
@@ -1690,6 +1721,11 @@ namespace OptionsTradeWell
                 BuyPutVol = DataArr[buyVollPutIndex] * 100.0;
                 SellPutVol = DataArr[sellVollPutIndex] * 100.0;
                 MidPutVol = ((DataArr[buyVollPutIndex] + DataArr[sellVollPutIndex]) / 2.0) * 100.0;
+            }
+
+            public override string ToString()
+            {
+                return $"{nameof(IndexInTable)}: {IndexInTable}, {nameof(UniqueValueInDataArrIndex)}: {UniqueValueInDataArrIndex}, {nameof(DataArr)}: {String.Join(";", DataArr)}, {nameof(UniqueValue)}: {UniqueValue}, {nameof(Strike)}: {Strike}, {nameof(BuyCallVol)}: {BuyCallVol}, {nameof(SellCallVol)}: {SellCallVol}, {nameof(MidCallVol)}: {MidCallVol}, {nameof(BuyPutVol)}: {BuyPutVol}, {nameof(SellPutVol)}: {SellPutVol}, {nameof(MidPutVol)}: {MidPutVol}";
             }
         }
     }

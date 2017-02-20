@@ -13,6 +13,7 @@ namespace OptionsTradeWell.presenter.interfaces
         double SendMarketBuyOrder(string ticker, int size);
         double SendMarketSellOrder(string ticker, int size);
         bool CancelOrder(double id);
-        bool CancelAllOrders(DerivativesClasses cls, string baseContract);
+        bool CancelGroupOfOrders(DerivativesClasses cls, string baseContract);
+        bool CancelAllOrders();
     }
 }

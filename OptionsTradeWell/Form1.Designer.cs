@@ -45,7 +45,7 @@
             this.txBxMsgInfo = new System.Windows.Forms.TextBox();
             this.chrtPos = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.btnUpdatePos = new System.Windows.Forms.Button();
-            this.dgvPositions = new System.Windows.Forms.DataGridView();
+            this.dgvSimulPos = new System.Windows.Forms.DataGridView();
             this.label21 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.lblDaysToExp = new System.Windows.Forms.Label();
@@ -128,7 +128,7 @@
             this.tabOptDesk.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTotalInfo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPos)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvPositions)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvSimulPos)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOptionDesk)).BeginInit();
             this.tabs.SuspendLayout();
             this.tabActualPos.SuspendLayout();
@@ -200,7 +200,7 @@
             this.tabOptDesk.Controls.Add(this.txBxMsgInfo);
             this.tabOptDesk.Controls.Add(this.chrtPos);
             this.tabOptDesk.Controls.Add(this.btnUpdatePos);
-            this.tabOptDesk.Controls.Add(this.dgvPositions);
+            this.tabOptDesk.Controls.Add(this.dgvSimulPos);
             this.tabOptDesk.Controls.Add(this.label21);
             this.tabOptDesk.Controls.Add(this.label20);
             this.tabOptDesk.Controls.Add(this.lblDaysToExp);
@@ -308,13 +308,13 @@
             this.btnUpdatePos.UseVisualStyleBackColor = true;
             this.btnUpdatePos.Click += new System.EventHandler(this.btnUpdatePos_Click);
             // 
-            // dgvPositions
+            // dgvSimulPos
             // 
-            this.dgvPositions.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvPositions.Location = new System.Drawing.Point(34, 340);
-            this.dgvPositions.Name = "dgvPositions";
-            this.dgvPositions.Size = new System.Drawing.Size(590, 307);
-            this.dgvPositions.TabIndex = 15;
+            this.dgvSimulPos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvSimulPos.Location = new System.Drawing.Point(34, 340);
+            this.dgvSimulPos.Name = "dgvSimulPos";
+            this.dgvSimulPos.Size = new System.Drawing.Size(590, 307);
+            this.dgvSimulPos.TabIndex = 15;
             // 
             // label21
             // 
@@ -1063,7 +1063,7 @@
             this.tabOptDesk.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTotalInfo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chrtPos)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvPositions)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvSimulPos)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOptionDesk)).EndInit();
             this.tabs.ResumeLayout(false);
             this.tabActualPos.ResumeLayout(false);
@@ -1129,7 +1129,7 @@
         private System.Windows.Forms.TextBox txBxMsgInfo;
         private System.Windows.Forms.DataVisualization.Charting.Chart chrtPos;
         private System.Windows.Forms.Button btnUpdatePos;
-        private System.Windows.Forms.DataGridView dgvPositions;
+        private System.Windows.Forms.DataGridView dgvSimulPos;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.Button btnCleanSelected;
         private System.Windows.Forms.Button btnAddFromTable;

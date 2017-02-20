@@ -1,6 +1,6 @@
 ﻿namespace OptionsTradeWell.model
 {
-    public enum QuikOrderType
+    public enum TerminalOrderType
     {
         LIMIT,
         MARKET

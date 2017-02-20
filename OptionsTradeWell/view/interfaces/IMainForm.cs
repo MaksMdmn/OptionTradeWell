@@ -20,7 +20,7 @@ namespace OptionsTradeWell.view.interfaces
 
         void UpdateViewData(List<double[]> tableDataList);
         void UpdateFuturesData(string[] data);
-        void UpdatePositionTableData(List<string[]> tableDataList);
+        void UpdateSimulationPositionTableData(List<string[]> tableDataList);
         void UpdateActualPositionTableData(List<string[]> tableDataList);
         void UpdatePositionChartData(List<double[]> tableDataList);
         void UpdateTotalInfoTable(double[] dataArr);

@@ -61,7 +61,7 @@ namespace OptionsTradeWell.presenter
         private static Dictionary<string, int> CreateCustomDdeTableMap()
         {
             Dictionary<string, int> resultMap = new Dictionary<string, int>();
-            resultMap.Add(FUTURES_DESK, 11);
+            resultMap.Add(FUTURES_DESK, 13);
             resultMap.Add(OPTIONS_DESK, 14);
             resultMap.Add(POS_TABLE, 3);
 
@@ -212,6 +212,8 @@ namespace OptionsTradeWell.presenter
                         priceStepValue);
                     basicFutures.BaseContract = baseContract;
                     basicFutures.AssignTradeBlotter(futuresBlotter);
+                    basicFutures.MinPriceLimit = Convert.ToDouble(data[11]);
+                    basicFutures.MaxPriceLimit = Convert.ToDouble(data[12]);
 
                     LOGGER.Debug("Initializing completed. Futures instance: {0}", basicFutures);
                 }
@@ -224,6 +226,9 @@ namespace OptionsTradeWell.presenter
                     futuresBlotter.BidSize = Convert.ToDouble(data[7]);
                     futuresBlotter.AskPrice = Convert.ToDouble(data[8]);
                     futuresBlotter.AskSize = Convert.ToDouble(data[9]);
+
+                    basicFutures.MinPriceLimit = Convert.ToDouble(data[11]);
+                    basicFutures.MaxPriceLimit = Convert.ToDouble(data[12]);
 
                     LOGGER.Debug("Updating completed.");
                 }

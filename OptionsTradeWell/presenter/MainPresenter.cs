@@ -20,9 +20,10 @@ namespace OptionsTradeWell.presenter
         private readonly ITerminalOptionDataCollector dataCollector;
         private readonly IMainForm mainForm;
         private readonly IDerivativesDataRender dataRender;
-        private PositionManager posManager;
+        private PositionManager simulPosManager;
         private PositionManager quikPosManager;
-        private System.Timers.Timer writtingTimer = new System.Timers.Timer();
+
+        private bool startUpSuccess = false;
 
         public MainPresenter(ITerminalOptionDataCollector dataCollector, IMainForm mainForm, IDerivativesDataRender dataRender)
         {
@@ -31,12 +32,14 @@ namespace OptionsTradeWell.presenter
             this.dataCollector = dataCollector;
             this.mainForm = mainForm;
             this.dataRender = dataRender;
-            this.posManager = new PositionManager();
+            this.simulPosManager = new PositionManager();
             this.quikPosManager = new PositionManager();
+
+            simulPosManager.FixedPnL = Settings.Default.SimulFixedPnL;
 
             mainForm.OnStartUpClick += MainFormOnStartUpClick;
             mainForm.OnPosUpdateButtonClick += MainForm_OnPosUpdateButtonClick;
-            mainForm.OnTotalResetPositionInfoClick += MainFormOnTotalResetPositionInfoClick;
+            mainForm.OnTotalResetPositionInfoClick += MainFormOnTotalResetSimulPositionInfoClick;
             mainForm.OnGetPosFromQuikClick += MainForm_OnGetPosFromQuikClick;
             mainForm.OnActPosUpdateButtonClick += MainForm_OnActPosUpdateButtonClick;
 
@@ -103,15 +106,18 @@ namespace OptionsTradeWell.presenter
             }
         }
 
-        private void MainFormOnTotalResetPositionInfoClick(object sender, EventArgs e)
+        private void MainFormOnTotalResetSimulPositionInfoClick(object sender, EventArgs e)
         {
-            if (posManager != null)
+            if (simulPosManager != null)
             {
-                posManager.CleanAllPositions();
-                posManager.ResetFixedPnLValue();
-                mainForm.UpdatePositionTableData(new List<string[]>() { });
-                mainForm.UpdateTotalInfoTable(new double[] { 0, 0, 0, 0, 0, 0, 0 });
+                simulPosManager.CleanAllPositions();
+                simulPosManager.ResetFixedPnLValue();
+                mainForm.UpdateSimulationPositionTableData(new List<string[]>() { });
+                mainForm.UpdateTotalInfoTable(new double[] { 0, 0, 0, 0, 0, 0, 0, 0 });
                 mainForm.UpdatePositionChartData(new List<double[]>() { });
+
+                Settings.Default.SimulFixedPnL = simulPosManager.FixedPnL;
+                Settings.Default.Save();
             }
         }
 
@@ -122,31 +128,51 @@ namespace OptionsTradeWell.presenter
                 List<string[]> tempPosTableData = new List<string[]>();
                 List<double[]> tempPosChartData = new List<double[]>();
 
-                posManager.CleanAllPositions();
-                ParseUserArgsPositionForManager(posManager, e.userArgs);
+                simulPosManager.CleanAllPositions();
+                ParseUserArgsPositionForManager(simulPosManager, e.userArgs);
 
-                posManager.UpdateGeneralParametres();
+                simulPosManager.UpdateGeneralParametres();
 
-                if (posManager.Futures != null)
+                if (simulPosManager.Futures != null)
                 {
-                    tempPosTableData.Add(CreatePosTableDataRowFromFut(posManager.Futures));
+                    tempPosTableData.Add(CreatePosTableDataRowFromFut(simulPosManager.Futures));
                 }
 
-                foreach (Option opt in posManager.Options)
+                foreach (Option opt in simulPosManager.Options)
                 {
                     tempPosTableData.Add(CreatePosTableDataRowFromOpt(opt));
                 }
 
-                mainForm.UpdatePositionTableData(tempPosTableData);
+                mainForm.UpdateSimulationPositionTableData(tempPosTableData);
+
+
+
+
+                GO_Calculator goCalculator = new GO_Calculator(simulPosManager, 0.3, 0.2, 0.01);
+                foreach (Option option in simulPosManager.Options)
+                {
+                    option.Futures.MinPriceLimit = dataCollector.GetBasicFutures().MinPriceLimit;
+                    option.Futures.MaxPriceLimit = dataCollector.GetBasicFutures().MaxPriceLimit;
+                }
+                double tempActVol =
+                    (dataCollector.GetOption(dataCollector.CalculateActualStrike(), OptionType.Call).BuyVol +
+                    dataCollector.GetOption(dataCollector.CalculateActualStrike(), OptionType.Put).BuyVol) / 2.0;
+
+
+
+
                 mainForm.UpdateTotalInfoTable(new double[]
                 {
-                    Math.Round(posManager.CalculatePositionCurPnL(), 0),
-                    Math.Round(posManager.CalculatePositionPnL(), 2),
-                    Math.Round(posManager.FixedPnL, 2),
-                    Math.Round(posManager.TotalDelta, 4),
-                    Math.Round(posManager.TotalGamma, 4),
-                    Math.Round(posManager.TotalVega, 4),
-                    Math.Round(posManager.TotalTheta, 4)
+                    Math.Round(simulPosManager.CalculatePositionCurPnL(), 0),
+                    Math.Round(simulPosManager.CalculatePositionPnL(), 2),
+                    Math.Round(simulPosManager.FixedPnL, 2),
+                    Math.Round(simulPosManager.TotalDelta, 4),
+                    Math.Round(simulPosManager.TotalGamma, 4),
+                    Math.Round(simulPosManager.TotalVega, 4),
+                    Math.Round(simulPosManager.TotalTheta, 4),
+                    Math.Round(goCalculator.CalculateTotalPosition_GO(
+                        tempActVol, 
+                        dataCollector.GetBasicFutures().GetTradeBlotter().AskPrice),0)
                 });
 
                 double minStr = dataCollector.CalculateMinImportantStrike();
@@ -159,12 +185,15 @@ namespace OptionsTradeWell.presenter
                     tempPosChartData.Add(new double[]
                     {
                         i,
-                        posManager.CalculateCurApproxPnL(i),
-                        posManager.CalculateExpirationPnL(i)
+                        simulPosManager.CalculateCurApproxPnL(i),
+                        simulPosManager.CalculateExpirationPnL(i)
                     });
                 }
 
                 mainForm.UpdatePositionChartData(tempPosChartData);
+
+                Settings.Default.SimulFixedPnL = simulPosManager.FixedPnL;
+                Settings.Default.Save();
             }
             catch (Exception e2)
             {
@@ -193,6 +222,8 @@ namespace OptionsTradeWell.presenter
 
                 mainForm.UpdateViewData(
                     MakeDataList(minStrike, maxStrike));
+
+                startUpSuccess = true;
             }
             catch (Exception e3)
             {
@@ -203,6 +234,8 @@ namespace OptionsTradeWell.presenter
 
         private void DataCollector_OnActualPosChanged(object sender, TerminalPosEventArgs e)
         {
+            if (!startUpSuccess) return;
+
             if (e.cls == DerivativesClasses.FUTURES)
             {
                 dataCollector.GetBasicFutures().Position.Quantity = e.actualPos;
@@ -217,6 +250,8 @@ namespace OptionsTradeWell.presenter
 
         private void DataCollector_OnOptionsDeskChanged(object sender, OptionEventArgs e)
         {
+            if (!startUpSuccess) return;
+
             try
             {
                 double tempStrike = e.opt.Strike;
@@ -232,6 +267,8 @@ namespace OptionsTradeWell.presenter
 
         private void DataCollector_OnSpotPriceChanged(object sender, OptionEventArgs e)
         {
+            if (!startUpSuccess) return;
+
             try
             {
                 string[] data = new[]

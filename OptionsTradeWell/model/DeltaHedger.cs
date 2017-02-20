@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using OptionsTradeWell.model;
 using OptionsTradeWell.presenter.interfaces;
 
-namespace OptionsTradeWell.presenter
+namespace OptionsTradeWell.model
 {
     public class DeltaHedger
     {

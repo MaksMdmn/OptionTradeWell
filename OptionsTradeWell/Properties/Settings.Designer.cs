@@ -382,5 +382,17 @@ namespace OptionsTradeWell.Properties {
                 this["PathToQuik"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double SimulFixedPnL {
+            get {
+                return ((double)(this["SimulFixedPnL"]));
+            }
+            set {
+                this["SimulFixedPnL"] = value;
+            }
+        }
     }
 }
