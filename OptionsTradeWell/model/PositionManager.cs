@@ -138,6 +138,7 @@ namespace OptionsTradeWell.model
             }
 
             result += Futures == null ? 0.0 : Futures.Position.CalcCurrentPnL(futPrice);
+            result += FixedPnL;
 
             return result;
 
