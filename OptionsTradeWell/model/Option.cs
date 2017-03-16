@@ -20,7 +20,7 @@ namespace OptionsTradeWell.model
             this.ExpirationDate = expirationDate;
             this.Ticker = ticker;
             this.OptionType = optionType;
-            this.RemainingDays = remainingDays;
+            this.RemainingDays = Math.Abs(remainingDays) < 0.0001 ? 0.4 : remainingDays; // HARDCORE 0.4
             this.Strike = strike;
             this.Position = new Position();
         }
