@@ -185,8 +185,8 @@ namespace OptionsTradeWell.presenter
                     tempPosChartData.Add(new double[]
                     {
                         i,
-                        simulPosManager.CalculateCurApproxPnL(i),
-                        simulPosManager.CalculateExpirationPnL(i)
+                        Math.Round(simulPosManager.CalculateCurApproxPnL(i),0),
+                        Math.Round(simulPosManager.CalculateExpirationPnL(i),0)
                     });
                 }
 

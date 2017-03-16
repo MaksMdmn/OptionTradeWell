@@ -198,8 +198,8 @@ namespace OptionsTradeWell
                foreach (double[] dataArr in tableDataList)
                {
                    xVal = dataArr[0];
-                   curPosVal = dataArr[1];
-                   expPosVal = dataArr[2];
+                   curPosVal = Math.Round(dataArr[1],0);
+                   expPosVal = Math.Round(dataArr[2],0);
 
                    if (expPosVal > tempMaxValY)
                    {

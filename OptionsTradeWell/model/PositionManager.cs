@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OptionsTradeWell.Properties;
 
 namespace OptionsTradeWell.model
@@ -114,8 +115,20 @@ namespace OptionsTradeWell.model
         {
             double tempPnL = 0.0;
 
-            tempPnL += Futures == null ? 0.0 : Futures.Position.CalcCurrentPnLInCurrency(Futures.GetTradeBlotter(), Futures.PriceStep, Futures.PriceStepValue);
-            tempPnL += Futures == null ? 0.0 : (FixedPnL / Futures.PriceStep * Futures.PriceStepValue);
+            if (Futures == null && Options.Count == 0)
+            {
+                return tempPnL;
+            }
+
+            if (Futures == null)
+            {
+                tempPnL += (FixedPnL / Options[0].PriceStep * Options[0].PriceStepValue);
+            }
+            else
+            {
+                tempPnL += Futures.Position.CalcCurrentPnLInCurrency(Futures.GetTradeBlotter(), Futures.PriceStep, Futures.PriceStepValue);
+                tempPnL += (FixedPnL / Futures.PriceStep * Futures.PriceStepValue);
+            }
 
             foreach (Option opt in Options)
             {
