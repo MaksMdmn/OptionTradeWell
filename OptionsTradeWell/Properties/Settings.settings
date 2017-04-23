@@ -36,7 +36,7 @@
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="MaxOptionStrikeInQuikDesk" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">70000</Value>
+      <Value Profile="(Default)">67000</Value>
     </Setting>
     <Setting Name="StrikeStep" Type="System.Double" Scope="User">
       <Value Profile="(Default)">250</Value>
@@ -45,7 +45,7 @@
       <Value Profile="(Default)">POS</Value>
     </Setting>
     <Setting Name="Account" Type="System.String" Scope="User">
-      <Value Profile="(Default)">SPBFUT26WILL</Value>
+      <Value Profile="(Default)">LATER</Value>
     </Setting>
     <Setting Name="checkBoxMaxFutQ" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -90,7 +90,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="PathToQuik" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">LATER</Value>
     </Setting>
     <Setting Name="SimulFixedPnL" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>

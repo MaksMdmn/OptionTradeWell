@@ -31,7 +31,7 @@ namespace OptionsTradeWell.model
             {
                 if (tempOption.Position.Quantity == option.Position.Quantity * -1)
                 {
-                    FixedPnL += tempOption.Position.CloseExistingPosAndGetFixedPnL(tempOption.GetTradeBlotter());
+                    FixedPnL += tempOption.Position.CloseExistingPosAndGetFixedPnL(option.Position.EnterPrice);
                     Options.Remove(tempOption);
                 }
                 else
@@ -55,7 +55,7 @@ namespace OptionsTradeWell.model
             {
                 if (Futures.Position.Quantity == futures.Position.Quantity * -1)
                 {
-                    FixedPnL += Futures.Position.CloseExistingPosAndGetFixedPnL(futures.GetTradeBlotter());
+                    FixedPnL += Futures.Position.CloseExistingPosAndGetFixedPnL(futures.Position.EnterPrice);
                     Futures = null;
                 }
                 else

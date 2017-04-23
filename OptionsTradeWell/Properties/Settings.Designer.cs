@@ -157,7 +157,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("70000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("67000")]
         public double MaxOptionStrikeInQuikDesk {
             get {
                 return ((double)(this["MaxOptionStrikeInQuikDesk"]));
@@ -193,7 +193,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("SPBFUT26WILL")]
+        [global::System.Configuration.DefaultSettingValueAttribute("LATER")]
         public string Account {
             get {
                 return ((string)(this["Account"]));
@@ -373,7 +373,7 @@ namespace OptionsTradeWell.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("LATER")]
         public string PathToQuik {
             get {
                 return ((string)(this["PathToQuik"]));

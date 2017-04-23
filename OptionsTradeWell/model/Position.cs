@@ -84,6 +84,13 @@ namespace OptionsTradeWell.model
             return result;
         }
 
+        public double CloseExistingPosAndGetFixedPnL(double price)
+        {
+            double result = PosCalcsRoudning(CalcCurrentPnL(price));
+            Quantity = 0;
+            return result;
+        }
+
         public override string ToString()
         {
             return $"{nameof(Quantity)}: {Quantity}, {nameof(EnterPrice)}: {EnterPrice}";
